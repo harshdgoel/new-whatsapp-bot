@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const LoginService = require('./loginService');
-const baseURL = "http://rnamb-148-87-23-5.a.free.pinggy.link";
+const baseURL = "http://rnwij-148-87-23-5.a.free.pinggy.link";
 
 module.exports = class OBDXService {
     async invokeService(ctxPath, method, headers, queryParam, body, userId) {
