@@ -4,6 +4,9 @@ const LoginService = require('./loginService');
 class BalanceService {
     async fetchBalance(userSession) {
         console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
+        console.log("Token being sent:", LoginService.getToken());
+        console.log("Headers:", headers);
+
         // Change headers to a Map
         const headers = new Map([
             ["Authorization", `Bearer ${LoginService.getToken()}`],
