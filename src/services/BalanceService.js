@@ -4,6 +4,11 @@ const LoginService = require('./loginService');
 class BalanceService {
     async fetchBalance(userSession) {
         console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
+        console.log("get cookie method returns:", LoginService.getCookie);
+        console.log("cookie after replacing /r/n", LoginService.getCookie().replace(/[\r\n]+/g, ""));
+        console.log("token after replacing /r/n", LoginService.getToken().replace(/[\r\n]+/g, ""));
+
+        
 
         // Clean the token and cookie by removing \r\n
         const token = LoginService.getToken().replace(/[\r\n]+/g, "");
