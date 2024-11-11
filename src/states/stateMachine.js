@@ -76,4 +76,4 @@ class StateMachine {
     }
 }
 
-module.exports = StateMachine;
+module.exports = new StateMachine(); // Exporting the instance directly
