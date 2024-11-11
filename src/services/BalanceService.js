@@ -18,7 +18,9 @@ class BalanceService {
         const headers = {
             Authorization: `Bearer ${token}`,
             Cookie: cookie,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-Token-Type", "JWT",
+            "X-Target-Unit", "OBDX_BU"
         };
 
         console.log("Balance headers are:", headers);
