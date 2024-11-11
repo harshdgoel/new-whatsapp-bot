@@ -46,14 +46,16 @@ class BalanceService {
             // Log the full response to debug the structure
             console.log("balance response is:", response);
 
-            // Check if accounts array exists and has items
-            if (response.accounts && response.accounts.length > 0) {
-                const firstAccount = response.accounts[0];
-                const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
-                return `Your current balance is ${balance}`;
-            } else {
-                return "No accounts found.";
-            }
+          const firstAccount = response.data.accounts[0];
+
+        if (firstAccount) {
+            // Access the account number (displayValue), currency, and balance amount
+            const accountNumber = firstAccount.id.displayValue; // Display value of account ID
+            const currency = firstAccount.currentBalance.currency; // Currency code from current balance
+            const balanceAmount = firstAccount.currentBalance.amount; // Amount from current balance
+
+            // Return the formatted message
+            return `Your balance for account number: ${accountNumber} is ${currency} ${balanceAmount}`;
         } catch (error) {
             console.error("Error fetching balance:", error.message);
             return "An error occurred while fetching your balance. Please try again.";
