@@ -1,15 +1,12 @@
-const OBDXService = require("./OBDXService");
-const LoginService = require('./loginService');
+// In your BalanceService or wherever invokeService is being called
+const OBDXService = require('./OBDXService');
+const LoginService = require('./loginService');  // Import LoginService
 
 class BalanceService {
     async fetchBalance(userSession) {
         console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
-        console.log("get cookie method returns:", LoginService.getCookie());
-        console.log("token after replacing /r/n", LoginService.getToken().replace(/[\r\n]+/g, ""));
 
-        
-
-        // Clean the token and cookie by removing \r\n
+        // Clean token and cookie handling
         const token = LoginService.getToken().replace(/[\r\n]+/g, "");
         const cookie = LoginService.getCookie();
 
@@ -18,7 +15,6 @@ class BalanceService {
             return "Authentication failed. Please log in again.";
         }
 
-        // Initialize headers after token and cookie are cleaned
         const headers = {
             Authorization: `Bearer ${token}`,
             Cookie: cookie,
@@ -34,11 +30,15 @@ class BalanceService {
         ]);
 
         try {
+            // Pass LoginService as a parameter to invokeService
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
-                headers,
-                queryParams
+                new Map(Object.entries(headers)),  // Convert headers object to Map
+                queryParams,
+                {},
+                null,  // userId is not required
+                LoginService  // Pass LoginService instance here
             );
 
             console.log("balance response is:", response);
