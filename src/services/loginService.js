@@ -11,7 +11,7 @@ class LoginService {
 
     setAuthDetails(token, cookie) {
         this.authCache.token = token ? token.replace(/[\r\n]+/g, '') : null;
-        this.authCache.cookie = cookie ? cookie.replace(/[\r\n]+/g, '') : null;
+        this.authCache.cookie = cookie;
     }
 
     setAnonymousToken(token) {
