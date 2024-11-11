@@ -37,6 +37,7 @@ class StateMachine {
         // Check if user is logged in; if not, ask for OTP
         const isLoggedIn = await LoginService.checkLogin();
         if (!isLoggedIn) {
+            userSession.lastIntent = intent;
             userSession.state = states.OTP_VERIFICATION;
             return "Please enter the One Time Password sent to your registered number.";
         }
@@ -47,7 +48,8 @@ class StateMachine {
         return this.handleIntentAfterLogin(userSession);
     }
 
-   
+    // In your StateMachine class:
+
 async handleOTPVerification(userSession) {
     console.log("entering handleOTPVerification, OTP is:", userSession.otp); // Log the OTP entered by the user
     const otp = userSession.otp;  // Correctly use the otp from userSession
@@ -69,7 +71,9 @@ async handleOTPVerification(userSession) {
 }
 
 
+
     async handleIntentAfterLogin(userSession) {
+        console.log("handleIntentAfterLogin method and userSession:", userSession);
         switch (userSession.lastIntent) {
             case "BALANCE":
                 return await BalanceService.fetchBalance(userSession);
