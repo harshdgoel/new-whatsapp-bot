@@ -7,10 +7,14 @@ class BalanceService {
         console.log("Token being sent:", LoginService.getToken());
         console.log("Headers:", headers);
 
+
+        const token = LoginService.getToken().replace(/[\r\n]+/g, "");
+        const cookie = LoginService.getCookie().replace(/[\r\n]+/g, "");
+
         // Change headers to a Map
         const headers = new Map([
-            ["Authorization", `Bearer ${LoginService.getToken()}`],
-            ["Cookie", LoginService.getCookie()],
+            ["Authorization", `Bearer ${token}`],
+            ["Cookie", cookie],
             ["Content-Type", "application/json"]
         ]);
 
