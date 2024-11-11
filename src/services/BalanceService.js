@@ -4,19 +4,22 @@ const LoginService = require('./loginService');
 class BalanceService {
     async fetchBalance(userSession) {
         console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
-        console.log("Token being sent:", LoginService.getToken());
-        console.log("Headers:", headers);
 
-
+        // Clean the token and cookie by removing \r\n
         const token = LoginService.getToken().replace(/[\r\n]+/g, "");
         const cookie = LoginService.getCookie().replace(/[\r\n]+/g, "");
 
-        // Change headers to a Map
-        const headers = new Map([
-            ["Authorization", `Bearer ${token}`],
-            ["Cookie", cookie],
-            ["Content-Type", "application/json"]
-        ]);
+        if (!token || !cookie) {
+            console.error("Missing token or cookie.");
+            return "Authentication failed. Please log in again.";
+        }
+
+        // Initialize headers after token and cookie are cleaned
+        const headers = {
+            Authorization: `Bearer ${token}`,
+            Cookie: cookie,
+            "Content-Type": "application/json"
+        };
 
         console.log("Balance headers are:", headers);
 
@@ -27,19 +30,15 @@ class BalanceService {
         ]);
 
         try {
-            // Pass LoginService as the last parameter
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
                 headers,
-                queryParams,
-                null,  // No body needed for GET request
-                null,  // No userId needed
-                LoginService  // Pass LoginService instance
+                queryParams
             );
 
-            console.log("balance response is:", response.data); // Access `data` for response body
-            const firstAccount = response.data.accounts[0];
+            console.log("balance response is:", response);
+            const firstAccount = response.accounts[0];
             if (firstAccount) {
                 const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
                 return `Your current balance is ${balance}`;
