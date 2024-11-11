@@ -1,17 +1,16 @@
-// BalanceService.js
 const OBDXService = require("./OBDXService");
 const LoginService = require('./loginService');
 
 class BalanceService {
     async fetchBalance(userSession) {
-        console.log("Entering FETCH BALANCE METHOD, usersession:",userSession);
+        console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
         const headers = {
             Authorization: `Bearer ${LoginService.getToken()}`,
             Cookie: LoginService.getCookie(),
             "Content-Type": "application/json"
         };
 
-        console.log("Balance headers are:",headers);
+        console.log("Balance headers are:", headers);
         const queryParams = new Map([
             ["accountType", "CURRENT,SAVING"],
             ["status", "ACTIVE,DORMANT,CLOSED"],
@@ -19,15 +18,19 @@ class BalanceService {
         ]);
 
         try {
+            // Pass `LoginService` as the last parameter here
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
                 headers,
-                queryParams
+                queryParams,
+                null,  // No body needed for GET request
+                null,  // No userId needed
+                LoginService  // Pass LoginService instance
             );
 
-            console.log("balance response is:",response);
-            const firstAccount = response.accounts[0];
+            console.log("balance response is:", response);
+            const firstAccount = response.data.accounts[0];  // Access `data` for the response body
             if (firstAccount) {
                 const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
                 return `Your current balance is ${balance}`;
