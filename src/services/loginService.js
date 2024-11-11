@@ -53,7 +53,7 @@ class LoginService {
         try {
             // Step 1: Get an anonymous token
             console.log("First API call to get an anonymous token");
-            console.log("OTP is ",otp);
+            console.log("OTP is ", otp);
 
             const tokenResponse = await OBDXService.invokeService(
                 "/digx-infra/login/v1/anonymousToken",
@@ -63,10 +63,12 @@ class LoginService {
                     ["x-authentication-type", "JWT"]
                 ]),
                 new Map(),
-                {}
+                {},
+                null,  // We can pass null for userId if not required
+                this  // Pass the instance of LoginService
             );
 
-            const tokenData = JSON.parse(tokenResponse.body);
+            const tokenData = tokenResponse.data; // Access response data
             if (tokenData.status.result === "SUCCESSFUL") {
                 console.log("Anonymous token obtained successfully");
                 this.setAnonymousToken(tokenData.token);
@@ -85,10 +87,12 @@ class LoginService {
                         ["X-Target-Unit", "OBDX_BU"]
                     ]),
                     new Map(),
-                    { mobileNumber: this.mobileNumber }
+                    { mobileNumber: this.mobileNumber },
+                    null,
+                    this
                 );
 
-                const otpData = JSON.parse(otpResponse.body);
+                const otpData = otpResponse.data;
                 if (otpData.status.result === "SUCCESSFUL") {
                     console.log("OTP verification successful");
                     this.registrationId = otpData.registrationId;
@@ -108,12 +112,14 @@ class LoginService {
                         {
                             mobileNumber: this.mobileNumber,
                             registrationId: this.registrationId
-                        }
+                        },
+                        null,
+                        this
                     );
 
-                    console.log("login response body:",finalLoginResponse);
+                    console.log("login response body:", finalLoginResponse);
 
-                    const finalLoginData = JSON.parse(finalLoginResponse.body);
+                    const finalLoginData = finalLoginResponse.data;
                     const setCookie = finalLoginResponse.headers["set-cookie"];
                     if (setCookie) {
                         this.authCache.cookie = setCookie;
