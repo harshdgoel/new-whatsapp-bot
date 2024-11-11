@@ -10,7 +10,7 @@ class LoginService {
     }
 
     setAuthDetails(token, cookie) {
-        this.authCache.token = token ? token.replace(/[\r\n]+/g, '') : null;
+        this.authCache.token = token;
         this.authCache.cookie = cookie;
     }
 
