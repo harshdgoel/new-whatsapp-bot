@@ -1,7 +1,7 @@
 "use strict";
 
 const axios = require('axios');
-const baseURL = "http://rnics-148-87-23-5.a.free.pinggy.link";
+const baseURL = "http://rnamb-148-87-23-5.a.free.pinggy.link";
 
 class OBDXService {
     // Accept LoginService as a parameter
@@ -13,11 +13,12 @@ class OBDXService {
 
         const token = loginService.getToken();
         const cookie = loginService.getCookie();
-
+        if(token!=null && cookie!=null){
         headers.set("Authorization", `Bearer ${token}`);
         headers.set("Cookie", cookie);
         console.log("token:", token);
         console.log("cookie:", cookie);
+        }
 
         return this.serviceMeth(ctxPath, method, headers, queryParam, body);
     }
