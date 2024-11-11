@@ -6,6 +6,9 @@ const baseURL = "http://localhost:8000/digx/v1/";
 
 module.exports = class OBDXService {
     async invokeService(ctxPath, method, headers, queryParam, body, userId) {
+        console.log("entering invoke service");
+        console.log("userID is",userId);
+        console.log("method:",method);
         await LoginService.checkLogin(baseURL); 
 
         const token = LoginService.getToken();
@@ -40,6 +43,7 @@ module.exports = class OBDXService {
                     console.error("Service request failed:", error);
                     reject(error);
                 } else {
+                    console.log("response",response);
                     resolve(response);
                 }
             });
