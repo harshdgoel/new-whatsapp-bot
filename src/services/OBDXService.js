@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const LoginService = require('./loginService');
-const baseURL = "http://localhost:8000/digx/v1/";
+const baseURL = "http://rnamb-148-87-23-5.a.free.pinggy.link";
 
 module.exports = class OBDXService {
     async invokeService(ctxPath, method, headers, queryParam, body, userId) {
@@ -26,6 +26,7 @@ module.exports = class OBDXService {
         const url = baseURL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
         const headersObj = Object.fromEntries(hdr);
         console.log("header object",headersObj)
+        console.log("url:",url);
 
         try {
             const response = await axios({
