@@ -1,66 +1,62 @@
-const OBDXService = require('./OBDXService');
-const LoginService = require('./loginService');  // Import LoginService
+"use strict";
 
-class BalanceService {
-    async fetchBalance(userSession) {
-        console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
+const axios = require('axios');
+const baseURL = "https://rnhjq-148-87-23-5.a.free.pinggy.link"; // Make sure this is your correct base URL
 
-        // Clean token and cookie handling
-        const token = LoginService.getToken().replace(/[\r\n]+/g, "");
-        const cookie = LoginService.getCookie();
+class OBDXService {
+    // Accept LoginService as a parameter
+    async invokeService(ctxPath, method, headers, queryParam, body, userId, loginService) {
+        console.log("Entering invokeService method");
+
+        // Use loginService parameter here to check login
+        const isLoggedIn = await loginService.checkLogin(baseURL); // Check if the token is valid
+
+        if (!isLoggedIn) {
+            console.error("Login check failed. Token might be expired.");
+            return { status: "error", message: "Login expired or missing." };
+        }
+
+        // Get the latest token and cookie after login check
+        const token = loginService.getToken();
+        const cookie = loginService.getCookie();
 
         if (!token || !cookie) {
             console.error("Missing token or cookie.");
-            return "Authentication failed. Please log in again.";
+            return { status: "error", message: "Missing token or cookie." };
         }
 
-        // Wrap header property names with hyphens in quotes
-        const headers = {
-            "Authorization": `Bearer ${token}`,
-            "Cookie": cookie,
-            "Content-Type": "application/json",   // Corrected syntax for hyphenated keys
-            "X-Token-Type": "JWT",
-            "X-Target-Unit": "OBDX_BU"
-        };
+        // Add Authorization and Cookie to headers
+        headers.set("Authorization", `Bearer ${token}`);
+        headers.set("Cookie", cookie);
+        console.log("Token and Cookie set in headers");
 
-        console.log("Balance headers are:", headers);
+        // Call the service
+        return this.serviceMeth(ctxPath, method, headers, queryParam, body);
+    }
 
-        const queryParams = new Map([
-            ["accountType", "CURRENT,SAVING"],
-            ["status", "ACTIVE,DORMANT,CLOSED"],
-            ["locale", "en"]
-        ]);
+    // Helper method to make the actual API call using axios
+    async serviceMeth(ctxPath, method, hdr, queryParam, body) {
+        hdr.set("Content-Type", "application/json");
+
+        const url = baseURL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
+        const headersObj = Object.fromEntries(hdr);
+        console.log("Making request with headers:", headersObj);
+        console.log("Request URL:", url);
 
         try {
-            // Pass LoginService as a parameter to invokeService
-            const response = await OBDXService.invokeService(
-                "/digx-common/dda/v1/demandDeposit",
-                "GET",
-                new Map(Object.entries(headers)),  // Convert headers object to Map
-                queryParams,
-                {},
-                null,  // userId is not required
-                LoginService  // Pass LoginService instance here
-            );
-
-            // Log the full response to debug the structure
-            console.log("balance response is:", response);
-
-          const firstAccount = response.data.accounts[0];
-
-        if (firstAccount) {
-            // Access the account number (displayValue), currency, and balance amount
-            const accountNumber = firstAccount.id.displayValue; // Display value of account ID
-            const currency = firstAccount.currentBalance.currency; // Currency code from current balance
-            const balanceAmount = firstAccount.currentBalance.amount; // Amount from current balance
-
-            // Return the formatted message
-            return `Your balance for account number: ${accountNumber} is ${currency} ${balanceAmount}`;
+            const response = await axios({
+                url,
+                method,
+                headers: headersObj,
+                data: body
+            });
+            console.log("Response from API:", response.data);
+            return response.data; // Return the response data directly
         } catch (error) {
-            console.error("Error fetching balance:", error.message);
-            return "An error occurred while fetching your balance. Please try again.";
+            console.error("Service request failed:", error.message);
+            throw error; // Rethrow error to be handled by caller
         }
     }
-}
+};
 
-module.exports = new BalanceService();
+module.exports = new OBDXService();
