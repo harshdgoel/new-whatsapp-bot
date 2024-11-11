@@ -1,20 +1,21 @@
 "use strict";
 
-const request = require('request');
-const jwt = require('jsonwebtoken');
+const OBDXService = require("./OBDXService");
+const jwt = require("jsonwebtoken");
 
 class LoginService {
     constructor() {
-        this.authCache = {
-            token: null,
-            cookie: null
-        };
+        this.authCache = { token: null, cookie: null, anonymousToken: null };
+        this.mobileNumber = "916378582419";
     }
 
     setAuthDetails(token, cookie) {
         this.authCache.token = token;
         this.authCache.cookie = cookie;
-        global.sessionMap.set('authDetails', { token, cookie });
+    }
+
+    setAnonymousToken(token) {
+        this.authCache.anonymousToken = token;
     }
 
     getToken() {
@@ -25,48 +26,120 @@ class LoginService {
         return this.authCache.cookie;
     }
 
-    isTokenExpired() {
-        const token = this.authCache.token;
-        if (!token) return true;
+    getAnonymousToken() {
+        return this.authCache.anonymousToken;
+    }
 
+    isTokenExpired() {
+        const token = this.getToken();
+        if (!token) return true;
         try {
-            const decoded = jwt.decode(token);
-            const expiryTime = decoded.exp * 1000; // Convert to milliseconds
-            return Date.now() > expiryTime;
-        } catch (error) {
-            console.error("Failed to decode token:", error.message);
+            const { exp } = jwt.decode(token);
+            return Date.now() >= exp * 1000;
+        } catch {
             return true;
         }
     }
 
     async checkLogin(baseURL) {
         if (this.isTokenExpired()) {
-            console.log("Token expired or missing. Logging in again...");
-            return await this.login(baseURL);
+            console.log("Token expired or missing. OTP verification required.");
+            return false;  // Return false to prompt for OTP
         }
         return true;
     }
 
-    login(baseURL) {
-        const ctxPath = "session";
-        return new Promise((resolve, reject) => {
-            request({
-                url: baseURL + ctxPath,
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({})
-            }, (error, response, body) => {
-                if (error || !response) {
-                    console.error("Login failed:", error);
-                    reject(error);
+    async verifyOTP(otp, baseURL) {
+        try {
+            // Step 1: Get an anonymous token
+            console.log("First API call to get an anonymous token");
+            console.log("OTP is ",otp);
+
+            const tokenResponse = await OBDXService.invokeService(
+                "/digx-infra/login/v1/anonymousToken",
+                "POST",
+                new Map([
+                    ["Content-Type", "application/json"],
+                    ["x-authentication-type", "JWT"]
+                ]),
+                new Map(),
+                {}
+            );
+
+            const tokenData = JSON.parse(tokenResponse.body);
+            if (tokenData.status.result === "SUCCESSFUL") {
+                console.log("Anonymous token obtained successfully");
+                this.setAnonymousToken(tokenData.token);
+                this.interactionId = tokenData.interactionId;
+
+                // Step 2: Verify OTP with the anonymous token
+                const otpResponse = await OBDXService.invokeService(
+                    "/digx-infra/login/v1/login?locale=en",
+                    "POST",
+                    new Map([
+                        ["Content-Type", "application/json"],
+                        ["x-authentication-type", "CHATBOT"],
+                        ["TOKEN_ID", otp],  // Use user-provided OTP here
+                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                        ["X-Token-Type", "JWT"],
+                        ["X-Target-Unit", "OBDX_BU"]
+                    ]),
+                    new Map(),
+                    { mobileNumber: this.mobileNumber }
+                );
+
+                const otpData = JSON.parse(otpResponse.body);
+                if (otpData.status.result === "SUCCESSFUL") {
+                    console.log("OTP verification successful");
+                    this.registrationId = otpData.registrationId;
+
+                    const finalLoginResponse = await OBDXService.invokeService(
+                        "/digx-infra/login/v1/login?locale=en",
+                        "POST",
+                        new Map([
+                            ["Content-Type", "application/json"],
+                            ["x-authentication-type", "CHATBOT"],
+                            ["TOKEN_ID", otp],  // Use user-provided OTP here
+                            ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                            ["X-Token-Type", "JWT"],
+                            ["X-Target-Unit", "OBDX_BU"]
+                        ]),
+                        new Map(),
+                        {
+                            mobileNumber: this.mobileNumber,
+                            registrationId: this.registrationId
+                        }
+                    );
+
+                    console.log("login response body:",finalLoginResponse);
+
+                    const finalLoginData = JSON.parse(finalLoginResponse.body);
+                    const setCookie = finalLoginResponse.headers["set-cookie"];
+                    if (setCookie) {
+                        this.authCache.cookie = setCookie;
+                        console.log("Cookies set successfully:", setCookie);
+                    }
+
+                    if (finalLoginData.status.result === "SUCCESSFUL") {
+                        console.log("Login successful");
+                        this.setAuthDetails(finalLoginData.token, setCookie);
+                        return true;
+                    } else {
+                        console.error("Final login failed:", finalLoginData);
+                        return "Final login failed. Please try again.";
+                    }
                 } else {
-                    const cookie = response.headers['set-cookie'];
-                    const token = response.headers['jwt-token'];
-                    this.setAuthDetails(token, cookie);
-                    resolve(response);
+                    console.error("OTP verification failed:", otpData);
+                    return "OTP verification failed. Please try again.";
                 }
-            });
-        });
+            } else {
+                console.error("Failed to obtain anonymous token:", tokenData);
+                return "Failed to initiate login. Please try again.";
+            }
+        } catch (error) {
+            console.error("Error during login process:", error.message);
+            return "An error occurred during verification. Please try again.";
+        }
     }
 }
 
