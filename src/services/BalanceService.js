@@ -3,12 +3,14 @@ const OBDXService = require("./OBDXService");
 
 class BalanceService {
     async fetchBalance(userSession) {
+        console.log("Entering FETCH BALANCE METHOD, usersession:",userSession);
         const headers = {
             Authorization: `Bearer ${LoginService.getToken()}`,
             Cookie: LoginService.getCookie(),
             "Content-Type": "application/json"
         };
 
+        console.log("Balance headers are:",headers);
         const queryParams = new Map([
             ["accountType", "CURRENT,SAVING"],
             ["status", "ACTIVE,DORMANT,CLOSED"],
@@ -22,6 +24,8 @@ class BalanceService {
                 headers,
                 queryParams
             );
+
+            console.log("balance response is:",response);
             const firstAccount = response.accounts[0];
             if (firstAccount) {
                 const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
