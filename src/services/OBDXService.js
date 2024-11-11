@@ -1,21 +1,23 @@
 "use strict";
 
 const axios = require('axios');
-const LoginService = require('./loginService');
 const baseURL = "http://rnamb-148-87-23-5.a.free.pinggy.link";
 
 class OBDXService {
-    async invokeService(ctxPath, method, headers, queryParam, body, userId) {
-       console.log("entering invoke service method");
-        await LoginService.checkLogin(baseURL); 
+    // Accept LoginService as a parameter
+    async invokeService(ctxPath, method, headers, queryParam, body, userId, loginService) {
+        console.log("Entering invoke service method");
 
-        const token = LoginService.getToken();
-        const cookie = LoginService.getCookie();
+        // Use loginService parameter here to check login
+        await loginService.checkLogin(baseURL); 
+
+        const token = loginService.getToken();
+        const cookie = loginService.getCookie();
 
         headers.set("Authorization", `Bearer ${token}`);
         headers.set("Cookie", cookie);
-        console.log("token:",token);
-        console.log("cookie:",cookie);
+        console.log("token:", token);
+        console.log("cookie:", cookie);
 
         return this.serviceMeth(ctxPath, method, headers, queryParam, body);
     }
@@ -25,8 +27,8 @@ class OBDXService {
 
         const url = baseURL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
         const headersObj = Object.fromEntries(hdr);
-        console.log("header object",headersObj)
-        console.log("url:",url);
+        console.log("header object", headersObj);
+        console.log("url:", url);
 
         try {
             const response = await axios({
@@ -35,7 +37,7 @@ class OBDXService {
                 headers: headersObj,
                 data: body
             });
-            console.log("response is:",response);
+            console.log("response is:", response);
             return response;
         } catch (error) {
             console.error("Service request failed:", error);
