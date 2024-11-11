@@ -1,5 +1,6 @@
 const express = require("express");
 const { handleIncomingMessage } = require("../controllers/botController");
+const config = require("../config/config"); // Import config.js
 const router = express.Router();
 
 const intents = {
@@ -23,13 +24,14 @@ router.get("/webhook", (req, res) => {
     const challenge = req.query['hub.challenge'];
     const token = req.query['hub.verify_token'];
 
-    // Make sure the verification token matches the one you provided in Facebook Developer Console
-    const VERIFY_TOKEN = 'your-verify-token'; // Replace with your actual token
+    // Ensure that the verification token is available and correct
+    const VERIFY_TOKEN = config.verifyToken; // Use the correct key from config
 
     if (mode && token === VERIFY_TOKEN) {
-        console.log('Webhook verified');
+        console.log('Webhook verified successfully');
         res.status(200).send(challenge); // Respond with the challenge if verification is successful
     } else {
+        console.error("Invalid verify token or mode mismatch:", { mode, token });
         res.sendStatus(403); // If the token doesn't match, send Forbidden status
     }
 });
@@ -50,7 +52,7 @@ router.post("/webhook", async (req, res) => {
 
     try {
         // Call the function to handle the incoming message (e.g., check login status, etc.)
-        await handleIncomingMessage("PHONE_NUMBER_ID", from, { body: messageBody, intent });
+        await handleIncomingMessage(config.phoneNumberId, from, { body: messageBody, intent });
         return res.sendStatus(200); // Send success response to Facebook
     } catch (error) {
         console.error("Error handling incoming message:", error);
