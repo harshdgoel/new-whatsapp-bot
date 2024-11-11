@@ -1,6 +1,6 @@
 "use strict";
 
-const OBDXService = require("./OBDXService");
+const OBDXService = require('../services/OBDXService');
 const jwt = require("jsonwebtoken");
 
 class LoginService {
