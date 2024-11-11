@@ -44,7 +44,7 @@ class BalanceService {
             );
 
             console.log("balance response is:", response);
-            const firstAccount = response.accounts[0];
+            const firstAccount = response.data.accounts[0];
             if (firstAccount) {
                 const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
                 return `Your current balance is ${balance}`;
