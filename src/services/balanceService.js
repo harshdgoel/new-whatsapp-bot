@@ -11,12 +11,13 @@ class BalanceService {
 
         const queryParams = new Map([
             ["accountType", "CURRENT,SAVING"],
-            ["status", "ACTIVE,DORMANT,CLOSED"]
+            ["status", "ACTIVE,DORMANT,CLOSED"],
+            ["locale", "en"]
         ]);
 
         try {
             const response = await OBDXService.invokeService(
-                "/demandDeposit",
+                "/digx-common/dda/v1/demandDeposit",
                 "GET",
                 headers,
                 queryParams
