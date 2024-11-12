@@ -4,21 +4,21 @@ class TemplateLayer {
 
         const accounts = apiResponse || [];
         
-        if (accounts.length === 0) {
-            console.log("No accounts available. Returning empty template.");
-            return {
-                recipient_type: "individual",
-                to: "916378582419",  
-                messaging_product: "whatsapp",
-                type: "interactive",
-                interactive: {
-                    type: "list",
-                    body: {
-                        text: "No accounts available."
-                    }
-                }
-            };
-        }
+        // if (accounts.length === 0) {
+        //     console.log("No accounts available. Returning empty template.");
+        //     return {
+        //         recipient_type: "individual",
+        //         to: "916378582419",  
+        //         messaging_product: "whatsapp",
+        //         type: "interactive",
+        //         interactive: {
+        //             type: "list",
+        //             body: {
+        //                 text: "No accounts available."
+        //             }
+        //         }
+        //     };
+        // }
 
         // Create sections for the list
         const sections = [
