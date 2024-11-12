@@ -1,6 +1,6 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
-const LoginService = require('./LoginService');
+const LoginService = require('./loginService');
 
 class BalanceService {
     // Method to initiate balance inquiry
