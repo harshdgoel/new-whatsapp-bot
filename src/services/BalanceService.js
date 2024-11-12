@@ -40,7 +40,7 @@ class BalanceService {
         
         // Check if the response contains accounts
         if (response.accounts && Array.isArray(response.accounts)) {
-            const accounts = response.accounts;
+            const accounts = response.data.accounts;
             console.log("Accounts are:", accounts);
 
             // Use the TemplateLayer to generate the interactive list template
