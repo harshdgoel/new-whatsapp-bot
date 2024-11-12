@@ -30,17 +30,6 @@ class OBDXService {
 
         // Now, make the service call
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
-
-        // Check for cookies in the response headers
-        if (responseData && responseData.headers && responseData.headers['set-cookie']) {
-            const setCookie = responseData.headers['set-cookie'];
-            console.log("cookie is",setCookie);
-            if (setCookie) {
-                loginService.setCookie(setCookie);  // Join cookies if multiple
-                console.log("Cookies set in LoginService:", setCookie);
-            }
-        }
-
         return responseData;
     }
 
