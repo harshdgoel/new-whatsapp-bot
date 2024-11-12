@@ -5,7 +5,7 @@ const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
     LOGGED_OUT: "LOGGED_OUT",
-    BALANCE: "BALANCE"  // State to track balance requests
+    BALANCE: "BALANCE"
 };
 
 class StateMachine {
@@ -22,11 +22,11 @@ class StateMachine {
 
     async handleMessage(from, messageBody, intent) {
         const userSession = this.getSession(from);
-        console.log("entering handle message, userSession is:",userSession);
+        console.log("Handling message, userSession:", userSession);
 
-        // If the user is in OTP verification state, handle the OTP input
+        // Handle OTP input if user is in OTP_VERIFICATION state
         if (userSession.state === states.OTP_VERIFICATION) {
-            userSession.otp = messageBody;  // Assume the user has entered the OTP
+            userSession.otp = messageBody;
             return await this.handleOTPVerification(userSession);
         }
 
@@ -34,7 +34,6 @@ class StateMachine {
             userSession.state = states.BALANCE;
         }
 
-        // Check if user is logged in; if not, ask for OTP
         const isLoggedIn = await LoginService.checkLogin();
         if (!isLoggedIn) {
             userSession.lastIntent = intent;
@@ -42,38 +41,32 @@ class StateMachine {
             return "Please enter the One Time Password sent to your registered number.";
         }
 
-        // User is logged in; handle the intent directly
         userSession.state = states.LOGGED_IN;
         userSession.lastIntent = intent;
         return this.handleIntentAfterLogin(userSession);
     }
 
-    // In your StateMachine class:
+    async handleOTPVerification(userSession) {
+        console.log("Verifying OTP, OTP:", userSession.otp);
+        const otp = userSession.otp;
 
-async handleOTPVerification(userSession) {
-    console.log("entering handleOTPVerification, OTP is:", userSession.otp); // Log the OTP entered by the user
-    const otp = userSession.otp;  // Correctly use the otp from userSession
+        if (!otp) {
+            throw new Error("OTP is not available or initialized.");
+        }
 
-    if (!otp) {
-        throw new Error("OTP is not available or initialized.");
+        const loginResult = await LoginService.verifyOTP(otp);
+
+        if (loginResult === true) {
+            userSession.state = states.LOGGED_IN;
+            return this.handleIntentAfterLogin(userSession); 
+        } else {
+            userSession.state = states.OTP_VERIFICATION;
+            return "OTP verification failed. Please enter the OTP again.";
+        }
     }
-
-    // Attempt to verify OTP and log in
-    const loginResult = await LoginService.verifyOTP(otp);
-
-    if (loginResult === true) {
-        userSession.state = states.LOGGED_IN;
-        return this.handleIntentAfterLogin(userSession);  // Handle the previously requested intent (e.g., BALANCE)
-    } else {
-        userSession.state = states.OTP_VERIFICATION;
-        return "OTP verification failed. Please enter the OTP again.";
-    }
-}
-
-
 
     async handleIntentAfterLogin(userSession) {
-        console.log("handleIntentAfterLogin method and userSession:", userSession);
+        console.log("Handling intent after login, userSession:", userSession);
         switch (userSession.lastIntent) {
             case "BALANCE":
                 return await BalanceService.fetchBalance(userSession);
@@ -85,4 +78,4 @@ async handleOTPVerification(userSession) {
     }
 }
 
-module.exports = new StateMachine(); // Exporting the instance directly
+module.exports = new StateMachine();
