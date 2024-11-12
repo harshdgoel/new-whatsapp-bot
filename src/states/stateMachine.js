@@ -54,20 +54,21 @@ class StateMachine {
     }
 
     async handleBalanceInquiry(userSession) {
-        const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+    const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
 
-        console.log("accountsResult:",accountsResult);
+    console.log("accountsResult:", accountsResult);
 
-        if (typeof accountsResult === "string") {
-            return accountsResult; // Either OTP prompt or error message
-        } else {
+    if (typeof accountsResult === "string") {
+        return accountsResult; // Either OTP prompt or error message
+    } else {
+        // If it's an interactive template, return it directly
+        console.log("inside else condition, accountsResult:", accountsResult);
 
-            console.log("inside else condition", accountsResult.accounts);
-            //userSession.accounts = accountsResult.accounts;
-            userSession.state = states.ACCOUNT_SELECTION;
-            return accountsResult; // Return the list template for account selection
-        }
+        // If the template has an account selection message, we assume the template is ready for the user to choose an account
+        userSession.state = states.ACCOUNT_SELECTION; 
+        return accountsResult; // Return the list template for account selection
     }
+}
 
     async handleOTPVerification(userSession) {
         console.log("Verifying OTP, OTP:", userSession.otp);
