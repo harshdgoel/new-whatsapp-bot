@@ -1,5 +1,9 @@
 class TemplateLayer {
 static generateAccountListTemplate(accounts) {
+        console.log("entering generateAccountListTemplate");
+        console.log("id",account.id.value);
+        console.log("title",account.displayName);
+
         if (!accounts || accounts.length === 0) {
             return {
                 "text": "No active accounts found."
