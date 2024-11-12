@@ -1,4 +1,4 @@
-const InteractiveTemplate = require('./TemplateLayer');
+const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
 
