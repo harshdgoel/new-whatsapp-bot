@@ -122,13 +122,14 @@ class LoginService {
                     );
 
                     // Check if cookies are set in the response headers
-                    const setCookie = finalLoginResponse.headers?.["set-cookie"];
+                    const setCookie = finalLoginResponse.headers['set-cookie'];
                     if (setCookie) {
                         this.setAuthDetails(finalLoginResponse.data.token, setCookie);
                         console.log("Token and cookies set successfully.");
                         return true;
                     } else {
                         console.error("Cookie setting failed in final login.");
+                        console.log("cookie is:",finalLoginResponse.headers['set-cookie']);
                         return "Final login failed. Please try again.";
                     }
                 } else {
