@@ -1,4 +1,4 @@
-const LoginService = require("../services/LoginService");
+const LoginService = require("../services/loginService");
 const BalanceService = require("../services/BalanceService");
 const TemplateLayer = require("../services/TemplateLayer"); // Import TemplateLayer
 
