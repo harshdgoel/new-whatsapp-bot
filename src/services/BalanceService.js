@@ -1,9 +1,10 @@
-const TemplateLayer = require('./TemplateLayer'); // Import TemplateLayer
-const LoginService = require('./loginService');
+const InteractiveTemplate = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
+const LoginService = require('./loginService');
 
 class BalanceService {
-    static async fetchAccounts() {
+    // Method to initiate balance inquiry
+    static async initiateBalanceInquiry() {
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
@@ -35,9 +36,9 @@ class BalanceService {
             );
 
             const accounts = response.data.accounts;
-            console.log("accounts are:", accounts);
+            console.log("Accounts are:", accounts);
 
-            // Use the INTERACTIVE layer to generate the interactive list
+            // Use the InteractiveTemplate layer to generate the interactive list template
             return TemplateLayer.generateAccountListTemplate(accounts);
         } catch (error) {
             console.error("Error fetching accounts:", error.message);
@@ -47,4 +48,3 @@ class BalanceService {
 }
 
 module.exports = BalanceService;
-
