@@ -35,6 +35,8 @@ class BalanceService {
                 LoginService
             );
 
+
+            console.log("response is for fetch accts", response.data);
             const accounts = response.data.accounts;
             console.log("Accounts are:", accounts);
 
