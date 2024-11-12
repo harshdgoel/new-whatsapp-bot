@@ -1,47 +1,46 @@
 class TemplateLayer {
-static generateAccountListTemplate(accounts) {
-        console.log("entering generateAccountListTemplate");
-        console.log("id",account.id.value);
-        console.log("title",account.displayName);
-
+        console.log("entering the template layer");
+        console.log("accounts passed in template layer are", accounts);
+    static generateAccountListTemplate(accounts) {
+        // Check if accounts are valid
         if (!accounts || accounts.length === 0) {
-            return {
-                "text": "No active accounts found."
-            };
+            console.log("No accounts available for template generation.");
+            return "No accounts available.";
         }
 
-        let sections = accounts.map(account => {
-            return {
-                "title": account.displayName,
-                "rows": [
-                    {
-                        "id": account.id.value,  // Use account ID for row selection
-                        "title": account.displayName,
-                        "description": `${account.currencyCode} ${account.currentBalance.amount} - ${account.iban}`
-                    }
-                ]
-            };
-        });
+        // Generate sections for each account
+        const sections = accounts.map(account => ({
+            title: `Account: ${account.displayName}`,
+            rows: [
+                {
+                    id: account.id.value,  // Unique identifier for the row
+                    title: account.accountNickname || account.displayName,
+                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}`,
+                }
+            ]
+        }));
 
-        return {
-            "interactive": {
-                "type": "list",
-                "header": {
-                    "type": "text",
-                    "text": "Select an Account"
+        const interactiveTemplate = {
+            interactive: {
+                type: "list",
+                header: {
+                    type: "text",
+                    text: "Account Balance Information"
                 },
-                "body": {
-                    "text": "Please select an account to view its balance."
+                body: {
+                    text: "Please select an account to view details."
                 },
-                "footer": {
-                    "text": "Choose your account"
+                footer: {
+                    text: "Tap to select an account"
                 },
-                "action": {
-                    "button": "Select Account",
-                    "sections": sections
+                action: {
+                    button: "View Account",
+                    sections: sections
                 }
             }
         };
+
+        return interactiveTemplate;
     }
 }
 
