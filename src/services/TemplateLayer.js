@@ -5,10 +5,12 @@ class TemplateLayer {
 
         // Check if apiResponse is valid
         if (!apiResponse || !Array.isArray(apiResponse)) {
-            console.log("logging starts. APIRESPONSE IS:", apiresponse);
-            console.log("first account",apiresponse[0].id.value);
             console.error("Error: API response is null or not an array.");
-            
+            console.log("Logging API response starts. API RESPONSE IS:", apiResponse);
+            if (apiResponse && apiResponse[0]) {
+                console.log("First account ID value:", apiResponse[0].id?.value);
+            }
+
             return {
                 recipient_type: "individual",
                 to: "916378582419",
@@ -37,17 +39,47 @@ class TemplateLayer {
             };
         }
 
-        // Create sections for the list based on the available accounts
+        // Initialize rows array for storing account details
+        const rows = [];
+
+        // Iterate over each account in the API response
+        for (let i = 0; i < apiResponse.length; i++) {
+            const account = apiResponse[i];
+
+            // Log the entire account object for debugging
+            console.log(`Processing account ${i + 1}:`, account);
+
+            // Extract the account ID and log it
+            const accountId = account.id?.value;
+            if (!accountId) {
+                console.warn(`Account ${i + 1} is missing id.value`);
+                continue; // Skip this account if id is missing
+            }
+            console.log(`Account ${i + 1} id:`, accountId);
+
+            // Determine the title with fallbacks and log it
+            const accountTitle = account.accountNickname || account.displayName || "Account";
+            console.log(`Account ${i + 1} title:`, accountTitle);
+
+            // Add this account's id and title to rows array
+            rows.push({
+                id: accountId,
+                title: accountTitle
+            });
+        }
+
+        // Log the final rows array to see all added entries
+        console.log("Final rows array:", rows);
+
+        // Create sections for the list based on the populated rows
         const sections = [
             {
                 title: "Select an Account",
-                rows: apiResponse.map(account => ({
-                    id: account.id.value,  // Ensure 'id' field structure is correct
-                    title: account.accountNickname || account.displayName || "Account"  // Use appropriate title fallback
-                }))
+                rows: rows
             }
         ];
 
+        // Generate the final interactive template
         const interactiveTemplate = {
             recipient_type: "individual",
             to: "916378582419",
@@ -65,7 +97,9 @@ class TemplateLayer {
             }
         };
 
+        // Log the generated interactive template
         console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
+
         return interactiveTemplate;
     }
 }
