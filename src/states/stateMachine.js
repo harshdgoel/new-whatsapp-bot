@@ -58,26 +58,29 @@ class StateMachine {
 
     console.log("Full accountsResult:", JSON.stringify(accountsResult, null, 2));
 
-    // Check if accountsResult is a valid object and contains accounts in a different structure
+    // Check if accountsResult is a valid object and contains sections and rows
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
-    } else if (accountsResult) {
+    } else if (accountsResult && accountsResult.interactive && accountsResult.interactive.action && Array.isArray(accountsResult.interactive.action.sections)) {
         // Initialize an empty array for rows
         const rows = [];
 
-        // Iterate over each item in accountsResult
-        for (let i = 0; i < accountsResult.length; i++) {
-            const account = accountsResult[i];  // Access account directly
+        // Access the rows in the first section
+        const sections = accountsResult.interactive.action.sections;
+
+        // Iterate over the rows array in the first section
+        for (let i = 0; i < sections[0].rows.length; i++) {
+            const account = sections[0].rows[i];  // Access account directly from the rows
 
             // Log the entire account object for debugging
             console.log(`Processing account ${i + 1}:`, account);
 
             // Extract the account ID and log it
-            const accountId = account.id?.value;
+            const accountId = account.id;
 
-            // Check if the account has an id.value field, otherwise skip it
+            // Check if the account has an id field, otherwise skip it
             if (!accountId) {
-                console.warn(`Account ${i + 1} is missing id.value`);
+                console.warn(`Account ${i + 1} is missing id`);
                 continue; // Skip this account if id is missing
             }
 
@@ -90,7 +93,7 @@ class StateMachine {
 
         // If there are valid rows, set them in the sections array
         if (rows.length > 0) {
-            accountsResult.interactive.action.sections[0].rows = rows;
+            sections[0].rows = rows; // Populate the rows with valid account data
 
             console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
 
