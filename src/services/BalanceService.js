@@ -48,8 +48,9 @@ class BalanceService {
              
             const accounts = response.data.accounts;
             if (accounts && accounts.length > 0) {
-                // Formatting the body message as a string for the template
-                const buttons = accounts.map(account => account.accountDropdownDisplay); // Use string display info
+                // Using account.id.displayValue for the button text
+                const buttons = accounts.map(account => account.id.displayValue); // Correctly accessing id.displayValue
+                
                 const accountListTemplate = TemplateLayer.createListTemplate(
                     "Account Selection", 
                     "Please select an account to view its balance.", 
