@@ -1,7 +1,7 @@
 "use strict";
 
 const axios = require('axios');
-const baseURL = "https://rnqgj-148-87-23-5.a.free.pinggy.link"; // Make sure this is your correct base URL
+const baseURL = "https://rnqgj-148-87-23-5.a.free.pinggy.link"; // Ensure this is your correct base URL
 
 class OBDXService {
     // Accept LoginService as a parameter
@@ -16,22 +16,31 @@ class OBDXService {
             return { status: "error", message: "Login expired or missing." };
         }
 
-        // Get the latest token and cookie after login check
+        // Get the latest token from LoginService
         const token = loginService.getToken();
-        const cookie = loginService.getCookie();
 
-        if (!token || !cookie) {
-            console.error("Missing token or cookie.");
-            return { status: "error", message: "Missing token or cookie." };
+        if (!token) {
+            console.error("Missing token.");
+            return { status: "error", message: "Missing token." };
         }
 
-        // Add Authorization and Cookie to headers
+        // Set Authorization header
         headers.set("Authorization", `Bearer ${token}`);
-        headers.set("Cookie", cookie);
-        console.log("Token and Cookie set in headers");
+        console.log("Token set in headers");
 
-        // Call the service
-        return this.serviceMeth(ctxPath, method, headers, queryParam, body);
+        // Now, make the service call
+        const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
+
+        // Check for cookies in the response headers
+        if (responseData && responseData.headers && responseData.headers['set-cookie']) {
+            const setCookie = responseData.headers['set-cookie'];
+            if (setCookie) {
+                loginService.setCookie(setCookie);  // Join cookies if multiple
+                console.log("Cookies set in LoginService:", setCookie);
+            }
+        }
+
+        return responseData;
     }
 
     // Helper method to make the actual API call using axios
@@ -50,9 +59,9 @@ class OBDXService {
                 headers: headersObj,
                 data: body
             });
-            console.log("response checking for headers cookie", response);
+
             console.log("Response from API:", response.data);
-            return response.data; // Return the response data directly
+            return response;
         } catch (error) {
             console.error("Service request failed:", error.message);
             throw error; // Rethrow error to be handled by caller
