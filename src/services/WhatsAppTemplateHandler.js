@@ -1,37 +1,44 @@
-// src/services/WhatsAppTemplateHandler.js
 class WhatsAppTemplateHandler {
-    createListTemplate(headerText, bodyText, footerText, buttonText, accounts) {
-        const sections = [
-            {
-                title: "Available Accounts",
-                rows: accounts.map((account, index) => ({
-                    id: `${index}`,
-                    title: account.displayName,
-                    description: `IBAN: ${account.iban}`
-                }))
-            }
-        ];
+  static createAccountListTemplate(accounts) {
+    const accountOptions = accounts.map(account => ({
+      title: account.id.displayValue, // Shows the account number
+      description: `${account.displayName} | ${account.currencyCode} | Available Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}`,
+      id: account.id.value // Unique identifier for account selection
+    }));
 
-        return {
-            interactive: {
-                type: "list",
-                header: {
-                    type: "text",
-                    text: headerText
-                },
-                body: {
-                    text: bodyText
-                },
-                footer: {
-                    text: footerText
-                },
-                action: {
-                    button: buttonText,
-                    sections: sections
-                }
-            }
-        };
-    }
+    // WhatsApp list template structure
+    return {
+      type: 'list',
+      header: {
+        type: 'text',
+        text: 'Select an Account'
+      },
+      body: {
+        text: 'Choose one of your accounts to view balance details.'
+      },
+      action: {
+        button: 'View Accounts',
+        sections: [
+          {
+            title: 'Accounts',
+            rows: accountOptions.map(option => ({
+              title: option.title,
+              description: option.description,
+              rowId: option.id
+            }))
+          }
+        ]
+      }
+    };
+  }
+
+  static createBalanceDisplayTemplate(account) {
+    // Template for displaying balance after an account is selected
+    return {
+      type: 'text',
+      text: `Account Number: ${account.id.displayValue}\nAccount Name: ${account.displayName}\nCurrency: ${account.currencyCode}\nAvailable Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}\nCurrent Balance: ${account.currentBalance.amount} ${account.currentBalance.currency}`
+    };
+  }
 }
 
-module.exports = new WhatsAppTemplateHandler();
+module.exports = WhatsAppTemplateHandler;
