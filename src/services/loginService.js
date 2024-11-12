@@ -74,14 +74,16 @@ class LoginService {
 
             if (tokenResponse.status === "200") {
                 console.log("tokenResponse is:", tokenResponse);
-                console.log("Anonymous token obtained successfully.",tokenResponse.headers.authorization);
-                console.log("Cookie is:",tokenResponse.headers['set-cookie']);
+                console.log("Anonymous token obtained successfully.", tokenResponse.headers.authorization);
+                console.log("Cookie is:", tokenResponse.headers['set-cookie']);
                 this.setAnonymousToken(tokenResponse.authorization);
+
+                // Correct handling of set-cookie
                 const setCookie = tokenResponse.headers['set-cookie'];
-                    if (setCookie) {
-                        this.auth.setCookies(setCookie); // Store cookies
-                        console.log("set cookie is", this.auth.getCookies());
-                    }
+                if (setCookie) {
+                    this.authCache.cookie = setCookie.join('; '); // Ensure we store the cookie correctly
+                    console.log("Cookies successfully stored:", this.authCache.cookie);
+                }
 
                 // Second call to validate OTP
                 const otpResponse = await OBDXService.serviceMeth(
@@ -99,13 +101,11 @@ class LoginService {
                     { mobileNumber: this.mobileNumber }
                 );
 
-                // Log the full OTP response to verify its structure
                 console.log("OTP Response:", otpResponse);
 
                 if (otpResponse?.status?.result === "SUCCESSFUL") {
                     console.log("OTP verified successfully.");
 
-                    // Access registrationId directly from otpResponse.data if it exists
                     const registrationId = otpResponse?.registrationId || otpResponse.data?.registrationId;
 
                     if (!registrationId) {
@@ -130,21 +130,19 @@ class LoginService {
                         { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
                     );
 
-                    // Log the response headers to track cookie issues
                     console.log("Final Login Response:", finalLoginResponse);
 
                     // Check for cookies in the response headers set by OBDXService
-                    const setCookie = finalLoginResponse.headers['set-cookie'];
-                    if (setCookie) {
-                        console.log("Cookies found in final response:", setCookie);
-                        // Use the cookie set by OBDXService, no need to set again in LoginService
-                        this.authCache.cookie = setCookie; // Store it in authCache for future use
-                        console.log("Cookies successfully stored.",this.authCache.cookie);
+                    const setCookieFinal = finalLoginResponse.headers['set-cookie'];
+                    if (setCookieFinal) {
+                        console.log("Cookies found in final response:", setCookieFinal);
+                        this.authCache.cookie = setCookieFinal.join('; '); // Store the final cookies in authCache
+                        console.log("Final cookies successfully stored:", this.authCache.cookie);
                     } else {
                         console.error("Cookie setting failed in final login.");
-                        console.log("set-cookie header is missing or in unexpected format:", finalLoginResponse.headers);
                         return "Final login failed. Please try again.";
                     }
+
                     // Store token in authCache after successful login
                     this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
                     return true;
