@@ -50,6 +50,7 @@ class OBDXService {
                 headers: headersObj,
                 data: body
             });
+            console.log("response checking for headers cookie", response);
             console.log("Response from API:", response.data);
             return response.data; // Return the response data directly
         } catch (error) {
