@@ -70,6 +70,8 @@ class LoginService {
                 {}
             );
 
+            console.log("THE RESPONSE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse);
+
             if (tokenResponse?.status?.result === "SUCCESSFUL") {
                 console.log("tokenResponse is:", tokenResponse);
                 console.log("Anonymous token obtained successfully.",tokenResponse.token);
