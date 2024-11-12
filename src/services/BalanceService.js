@@ -35,13 +35,16 @@ class BalanceService {
                 LoginService
             );
 
+            // Check if the response contains data
+            if (response.data && Array.isArray(response.data)) {
+                const accounts = response.data;
+                console.log("Accounts are:", accounts);
 
-            console.log("response is for fetch accts", response.data);
-            const accounts = response.data.accounts;
-            console.log("Accounts are:", accounts);
-
-            // Use the InteractiveTemplate layer to generate the interactive list template
-            return TemplateLayer.generateAccountListTemplate(accounts);
+                // Use the TemplateLayer to generate the interactive list template
+                return TemplateLayer.generateAccountListTemplate(accounts);
+            } else {
+                throw new Error("No accounts found in the response.");
+            }
         } catch (error) {
             console.error("Error fetching accounts:", error.message);
             return "An error occurred while fetching your accounts. Please try again.";
