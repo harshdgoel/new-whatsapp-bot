@@ -1,27 +1,31 @@
 class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
-        // Check if accounts exist in the API response
+        // Extract accounts from the API response
         const accounts = apiResponse.accounts || [];
         
         if (accounts.length === 0) {
             console.log("No accounts available for template generation.");
-            return { text: "No accounts available." };
+            return {
+                text: "No accounts available."
+            };
         }
 
-        // Create sections for the WhatsApp list template
-        const sections = accounts.map(account => ({
-            title: `Account: ${account.displayName}`,
-            rows: [
-                {
-                    id: account.id.value, // Assuming `id` is an object and accessing `value`
+        // Construct sections for the WhatsApp list template
+        const sections = [
+            {
+                title: "Select an Account",
+                rows: accounts.map(account => ({
+                    // Adjust the following accesses to match the actual structure of `account`
+                    id: account.id?.value || account.id.displayValue, // Checks `id.value` or falls back to `id.displayValue`
                     title: account.accountNickname || account.displayName,
-                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}` // Assuming availableBalance is an object
-                }
-            ]
-        }));
+                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}` // Ensures correct access to `availableBalance`
+                }))
+            }
+        ];
 
-        // Construct the interactive WhatsApp list template
+        // Create the interactive template object
         const interactiveTemplate = {
+            type: "interactive",
             interactive: {
                 type: "list",
                 header: {
@@ -44,5 +48,3 @@ class TemplateLayer {
         return interactiveTemplate;
     }
 }
-
-module.exports = TemplateLayer;
