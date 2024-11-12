@@ -56,31 +56,51 @@ class StateMachine {
    async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
 
-    console.log("accountsResult accounts:", accountsResult.accounts);
+    console.log("Full accountsResult:", JSON.stringify(accountsResult, null, 2));
 
+    // Check if accountsResult is a valid object and contains accounts in a different structure
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
-    } else {
-        // Check if accounts are available in the response
-        if (accountsResult.accounts && accountsResult.accounts.length > 0) {
-            // Dynamically generate rows based on accounts
-            const rows = accountsResult.accounts.map(account => ({
-                id: account.id,
-                title: account.title
-            }));
+    } else if (accountsResult && Array.isArray(accountsResult)) {
+        // Initialize an empty array for rows
+        const rows = [];
 
-            // Set the rows in the sections array
+        // Iterate over each item in accountsResult
+        for (let i = 0; i < accountsResult.length; i++) {
+            const account = accountsResult[i];  // Access account directly
+
+            // Log the entire account object for debugging
+            console.log(`Processing account ${i + 1}:`, account);
+
+            // Extract the account ID and log it
+            const accountId = account.id?.value;
+
+            // Check if the account has an id.value field, otherwise skip it
+            if (!accountId) {
+                console.warn(`Account ${i + 1} is missing id.value`);
+                continue; // Skip this account if id is missing
+            }
+
+            // Push the valid account data to the rows array
+            rows.push({
+                id: accountId,
+                title: account.title
+            });
+        }
+
+        // If there are valid rows, set them in the sections array
+        if (rows.length > 0) {
             accountsResult.interactive.action.sections[0].rows = rows;
 
-            // Log the sections to ensure it's populated correctly
             console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
 
-            // Return the updated accountsResult for WhatsApp
             userSession.state = states.ACCOUNT_SELECTION;
             return accountsResult;  // This should send the populated list template to WhatsApp
         } else {
-            return "No accounts available.";
+            return "No valid accounts available.";
         }
+    } else {
+        return "No accounts available.";
     }
 }
 
