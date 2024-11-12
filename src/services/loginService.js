@@ -70,13 +70,18 @@ class LoginService {
                 {}
             );
 
-            console.log("THE RESPONSE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse);
+            console.log("THE RESPONSE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse); 
+            console.log("THE TOKEN COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse.headers.authorization);
+            console.log("THE COOKIE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse.headers['set-cookie']);
 
-            if (tokenResponse.status === "200") {
+
+
+            if (tokenResponse) {   //need to check for tokenResponse.status=="SUCCESS" here
+                
                 console.log("tokenResponse is:", tokenResponse);
                 console.log("Anonymous token obtained successfully.", tokenResponse.headers.authorization);
                 console.log("Cookie is:", tokenResponse.headers['set-cookie']);
-                this.setAnonymousToken(tokenResponse.authorization);
+                this.setAnonymousToken(tokenResponse.headers.authorization);
 
                 // Correct handling of set-cookie
                 const setCookie = tokenResponse.headers['set-cookie'];
