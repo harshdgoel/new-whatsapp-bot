@@ -5,8 +5,18 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = 
     let responseData;
 
     try {
+        // Validate critical parameters
+        if (!phoneNumberId || !to || !message) {
+            throw new Error("Missing essential parameters: phoneNumberId, to, or message.");
+        }
+
         if (message && message.type === 'interactive') {
             console.log("Detected interactive message type. Generating list template...");
+
+            // Check if apiResponse has data before generating template
+            if (!apiResponse || !Array.isArray(apiResponse) || apiResponse.length === 0) {
+                throw new Error("Invalid or empty API response for interactive template.");
+            }
 
             responseData = TemplateLayer.generateAccountListTemplate(apiResponse);
 
