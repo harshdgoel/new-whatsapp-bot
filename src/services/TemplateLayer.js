@@ -1,38 +1,27 @@
 class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
+        // Check if apiResponse is valid
+        if (!apiResponse || !Array.isArray(apiResponse)) {
+            console.error("Error: API response is null or not an array.");
+            return null;  // Return null if the response is invalid
+        }
+
         console.log("generateAccountListTemplate - Received API response:", apiResponse);
 
-        const accounts = apiResponse;
-        // if (accounts.length === 0) {
-        //     console.log("No accounts available. Returning empty template.");
-        //     return {
-        //         recipient_type: "individual",
-        //         to: "916378582419",  
-        //         messaging_product: "whatsapp",
-        //         type: "interactive",
-        //         interactive: {
-        //             type: "list",
-        //             body: {
-        //                 text: "No accounts available."
-        //             }
-        //         }
-        //     };
-        // }
-
-        // Create sections for the list
+        // Create sections for the list, mapping over each account
         const sections = [
             {
                 title: "Select an Account",
-                rows: accounts.map(account => ({
-                    id: account.id.value, 
-                    title: account.id.displayName
+                rows: apiResponse.map(account => ({
+                    id: account.id?.value || account.id?.displayValue, 
+                    title: account.accountNickname || account.displayName,
                 }))
             }
         ];
 
         const interactiveTemplate = {
             recipient_type: "individual",
-            to: "916378582419",
+            to: "916378582419",  // Replace with the actual recipient's number
             messaging_product: "whatsapp",
             type: "interactive",
             interactive: {
