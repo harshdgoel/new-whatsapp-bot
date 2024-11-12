@@ -35,6 +35,9 @@ class BalanceService {
             LoginService
         );
 
+        
+        console.log("response after FETCHACCOUNT API CALL IS", response);
+        
         // Check if the response contains accounts
         if (response.accounts && Array.isArray(response.accounts)) {
             const accounts = response.accounts;
