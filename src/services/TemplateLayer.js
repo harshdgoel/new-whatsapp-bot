@@ -1,23 +1,26 @@
 class TemplateLayer {
-    static generateAccountListTemplate(accounts) {
-        // Check if accounts are valid
-        if (!accounts || accounts.length === 0) {
+    static generateAccountListTemplate(apiResponse) {
+        // Check if accounts exist in the API response
+        const accounts = apiResponse.accounts || [];
+        
+        if (accounts.length === 0) {
             console.log("No accounts available for template generation.");
-            return "No accounts available.";
+            return { text: "No accounts available." };
         }
 
-        // Generate sections for each account
+        // Create sections for the WhatsApp list template
         const sections = accounts.map(account => ({
             title: `Account: ${account.displayName}`,
             rows: [
                 {
-                    id: account.id.value,  // Unique identifier for the row
+                    id: account.id.value, // Assuming `id` is an object and accessing `value`
                     title: account.accountNickname || account.displayName,
-                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}`,
+                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}` // Assuming availableBalance is an object
                 }
             ]
         }));
 
+        // Construct the interactive WhatsApp list template
         const interactiveTemplate = {
             interactive: {
                 type: "list",
