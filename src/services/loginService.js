@@ -71,6 +71,7 @@ class LoginService {
             );
 
             if (tokenResponse?.status?.result === "SUCCESSFUL") {
+                console.log("tokenResponse is:", tokenResponse);
                 console.log("Anonymous token obtained successfully.");
                 this.setAnonymousToken(tokenResponse.token);
 
