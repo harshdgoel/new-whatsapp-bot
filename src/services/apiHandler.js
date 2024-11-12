@@ -41,7 +41,7 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = 
 // Placeholder for sending message to WhatsApp API (Assuming you're using an HTTP request like axios)
 const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
     try {
-        console.log("sendToWhatsAppAPI - Sending data:", JSON.stringify(messageData, null, 2));
+        console.log("sendToWhatsAppAPI - Sending data:", JSON.stringify(messageData));
 
         // Example of sending a message using axios
         const response = await axios.post(
