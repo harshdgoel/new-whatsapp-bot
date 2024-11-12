@@ -39,7 +39,7 @@ class BalanceService {
         console.log("response after FETCHACCOUNT API CALL IS", response);
         
         // Check if the response contains accounts
-        if (response.accounts && Array.isArray(response.accounts)) {
+        if (response.data.accounts) {
             const accounts = response.data.accounts;
             console.log("Accounts are:", accounts);
 
