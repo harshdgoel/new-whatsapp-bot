@@ -11,7 +11,7 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = 
         }
 
         if (message && message.type === 'interactive') {
-            console.log("Detected interactive message type. Generating list template...",apiresponse);
+            console.log("Detected interactive message type. Generating list template...", apiResponse);
 
             // Check if apiResponse has data before generating template
             if (!apiResponse) {
