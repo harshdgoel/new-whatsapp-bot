@@ -84,7 +84,7 @@ class LoginService {
                     this.authCache.cookie = setCookie.join('; '); // Ensure we store the cookie correctly
                     console.log("Cookies successfully stored:", this.authCache.cookie);
                 }
-                 console.log("second call anonymoustoken is",${this.getAnonymousToken()} )
+                 console.log("second call anonymoustoken is",this.getAnonymousToken() )
                 // Second call to validate OTP
                 const otpResponse = await OBDXService.serviceMeth(
                     "/digx-infra/login/v1/login?locale=en",
