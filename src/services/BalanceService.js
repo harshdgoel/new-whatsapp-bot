@@ -1,10 +1,11 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
+const { sendResponseToWhatsApp } = require('./apiHandler');
 
 class BalanceService {
-    // Method to initiate balance inquiry
-    static async initiateBalanceInquiry() {
+    // Initiates the balance inquiry by fetching the accounts
+    static async initiateBalanceInquiry(userSession) {
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
@@ -24,7 +25,6 @@ class BalanceService {
         const queryParams = new Map([["accountType", "CURRENT,SAVING"], ["status", "ACTIVE"], ["locale", "en"]]);
 
         try {
-            // Fetch the list of accounts
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
@@ -37,12 +37,9 @@ class BalanceService {
 
             console.log("Response after FETCHACCOUNT API CALL IS", response);
 
-            // Check if the response contains accounts
             if (response.data && response.data.accounts) {
                 const accounts = response.data.accounts;
-                console.log("Accounts are:", accounts);
-
-                // Use the TemplateLayer to generate the interactive list template
+                userSession.accounts = accounts; // Store accounts in user session
                 return TemplateLayer.generateAccountListTemplate(accounts);
             } else {
                 throw new Error("No accounts found in the response.");
@@ -51,6 +48,23 @@ class BalanceService {
             console.error("Error fetching accounts:", error.message);
             return "An error occurred while fetching your accounts. Please try again.";
         }
+    }
+
+    // Fetches balance for the selected account
+    static async fetchBalanceForSelectedAccount(selectedAccount) {
+        try {
+            const balanceMessage = `Balance for ${selectedAccount.accountNickname || selectedAccount.displayName}: ${selectedAccount.availableBalance.amount} ${selectedAccount.availableBalance.currency}`;
+            console.log("Fetched balance for selected account:", selectedAccount.accountNickname);
+            return balanceMessage;
+        } catch (error) {
+            console.error("Error fetching balance:", error.message);
+            return "Unable to fetch balance at this time. Please try again later.";
+        }
+    }
+
+    // Parse the selected account and return the account object
+    static parseAccountSelection(accountId, accounts) {
+        return accounts.find(account => account.id === accountId);
     }
 }
 
