@@ -1,6 +1,6 @@
 const LoginService = require("../services/loginService");
 const BalanceService = require("../services/BalanceService");
-const TemplateLayer = require("../services/TemplateLayer"); // Import TemplateLayer
+const TemplateLayer = require("../services/TemplateLayer");
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
@@ -89,8 +89,6 @@ class StateMachine {
         switch (userSession.lastIntent) {
             case "BALANCE":
                 return await this.handleBalanceInquiry(userSession);
-            case "TRANSACTIONS":
-                return "Transaction history will be displayed here.";
             default:
                 return "You're logged in! How may I assist you?";
         }
