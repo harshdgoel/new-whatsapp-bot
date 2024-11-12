@@ -1,11 +1,21 @@
 class TemplateLayer {
-    static generateAccountListTemplate(apiResponse) {
+    static generateAccountListTemplate(apiResponse, recipientPhoneNumber) {
+        console.log("generateAccountListTemplate apiResponse", apiResponse);
         const accounts = apiResponse || [];
         
         if (accounts.length === 0) {
             console.log("No accounts available for template generation.");
             return {
-                text: "No accounts available."
+                recipient_type: "individual",
+                to: recipientPhoneNumber,  // Use dynamic phone number here
+                messaging_product: "whatsapp",
+                type: "interactive",
+                interactive: {
+                    type: "list",
+                    body: {
+                        text: "No accounts available."
+                    }
+                }
             };
         }
 
@@ -14,28 +24,23 @@ class TemplateLayer {
                 title: "Select an Account",
                 rows: accounts.map(account => ({
                     id: account.id?.value || account.id.displayValue, 
-                    title: account.accountNickname || account.displayName,
-                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}`
+                    title: account.accountNickname || account.displayName
                 }))
             }
         ];
 
         const interactiveTemplate = {
+            recipient_type: "individual",
+            to: "916378582419",  // Use dynamic phone number here
+            messaging_product: "whatsapp",
             type: "interactive",
             interactive: {
                 type: "list",
-                header: {
-                    type: "text",
-                    text: "Account Balance Information"
-                },
                 body: {
-                    text: "Please select an account to view details."
-                },
-                footer: {
-                    text: "Tap to select an account"
+                    text: "Please select from the following account to view details."
                 },
                 action: {
-                    button: "View Account",
+                    button: "View Accounts",
                     sections: sections
                 }
             }
