@@ -2,8 +2,7 @@ class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
         console.log("generateAccountListTemplate - Received API response:", apiResponse);
 
-        const accounts = apiResponse || [];
-        
+        const accounts = apiResponse;
         // if (accounts.length === 0) {
         //     console.log("No accounts available. Returning empty template.");
         //     return {
@@ -25,9 +24,8 @@ class TemplateLayer {
             {
                 title: "Select an Account",
                 rows: accounts.map(account => ({
-                    id: account.id?.value || account.id.displayValue, 
-                    title: account.accountNickname || account.displayName,
-                    description: account.balance ? `Balance: ${account.balance}` : "No balance info"
+                    id: account.id.value, 
+                    title: account.id.displayName
                 }))
             }
         ];
