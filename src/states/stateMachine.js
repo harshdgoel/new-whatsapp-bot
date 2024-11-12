@@ -18,7 +18,7 @@ class StateMachine {
 
     getSession(userId) {
         if (!this.sessionCache.has(userId)) {
-            this.sessionCache.set(userId, { state: states.OTP_VERIFICATION, lastIntent: null, otp: null, accounts: null, selectedAccount: null });
+            this.sessionCache.set(userId, { state: states.LOGGED_OUT, lastIntent: null, otp: null, accounts: null, selectedAccount: null });
         }
         return this.sessionCache.get(userId);
     }
