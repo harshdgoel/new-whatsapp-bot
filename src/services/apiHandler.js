@@ -11,10 +11,10 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = 
         }
 
         if (message && message.type === 'interactive') {
-            console.log("Detected interactive message type. Generating list template...");
+            console.log("Detected interactive message type. Generating list template...",apiresponse);
 
             // Check if apiResponse has data before generating template
-            if (!apiResponse || !Array.isArray(apiResponse) || apiResponse.length === 0) {
+            if (!apiResponse) {
                 throw new Error("Invalid or empty API response for interactive template.");
             }
 
