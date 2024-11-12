@@ -1,7 +1,7 @@
 class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
         // Extract accounts from the API response
-        const accounts = apiResponse.accounts || [];
+        const accounts = apiResponse || [];
         
         if (accounts.length === 0) {
             console.log("No accounts available for template generation.");
@@ -48,3 +48,5 @@ class TemplateLayer {
         return interactiveTemplate;
     }
 }
+
+module.exports = TemplateLayer;
