@@ -1,5 +1,5 @@
 class TemplateLayer {
-    static generateAccountListTemplate(apiResponse, recipientPhoneNumber) {
+    static generateAccountListTemplate(apiResponse) {
         console.log("generateAccountListTemplate apiResponse", apiResponse);
         const accounts = apiResponse || [];
         
@@ -7,7 +7,7 @@ class TemplateLayer {
             console.log("No accounts available for template generation.");
             return {
                 recipient_type: "individual",
-                to: recipientPhoneNumber,  // Use dynamic phone number here
+                to: "916378582419",  // Use dynamic phone number here
                 messaging_product: "whatsapp",
                 type: "interactive",
                 interactive: {
