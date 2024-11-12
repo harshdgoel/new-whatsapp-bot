@@ -1,13 +1,14 @@
-const LoginService = require("../services/loginService");
+const LoginService = require("../services/LoginService");
 const BalanceService = require("../services/BalanceService");
+const TemplateLayer = require("../services/TemplateLayer"); // Import TemplateLayer
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
     LOGGED_OUT: "LOGGED_OUT",
     BALANCE: "BALANCE",
-    ACCOUNT_SELECTION: "ACCOUNT_SELECTION",  // New state for account selection
-    FETCHING_BALANCE: "FETCHING_BALANCE"     // New state for fetching selected account balance
+    ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
+    FETCHING_BALANCE: "FETCHING_BALANCE"
 };
 
 class StateMachine {
@@ -17,7 +18,7 @@ class StateMachine {
 
     getSession(userId) {
         if (!this.sessionCache.has(userId)) {
-            this.sessionCache.set(userId, { state: states.LOGGED_OUT, lastIntent: null, otp: null, selectedAccount: null });
+            this.sessionCache.set(userId, { state: states.LOGGED_OUT, lastIntent: null, otp: null, accounts: null, selectedAccount: null });
         }
         return this.sessionCache.get(userId);
     }
@@ -26,19 +27,18 @@ class StateMachine {
         const userSession = this.getSession(from);
         console.log("Handling message, userSession:", userSession);
 
-        // Handle OTP input if user is in OTP_VERIFICATION state
         if (userSession.state === states.OTP_VERIFICATION) {
             userSession.otp = messageBody;
             return await this.handleOTPVerification(userSession);
         }
 
-        // If user is selecting an account in ACCOUNT_SELECTION state
         if (userSession.state === states.ACCOUNT_SELECTION) {
             return await this.handleAccountSelection(userSession, messageBody);
         }
 
         if (intent === "BALANCE") {
             userSession.state = states.BALANCE;
+            return await this.handleBalanceInquiry(userSession);
         }
 
         const isLoggedIn = await LoginService.checkLogin();
@@ -51,6 +51,18 @@ class StateMachine {
         userSession.state = states.LOGGED_IN;
         userSession.lastIntent = intent;
         return this.handleIntentAfterLogin(userSession);
+    }
+
+    async handleBalanceInquiry(userSession) {
+        const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+
+        if (typeof accountsResult === "string") {
+            return accountsResult; // Either OTP prompt or error message
+        } else {
+            userSession.accounts = accountsResult.accounts;
+            userSession.state = states.ACCOUNT_SELECTION;
+            return accountsResult; // Return the list template for account selection
+        }
     }
 
     async handleOTPVerification(userSession) {
@@ -76,10 +88,7 @@ class StateMachine {
         console.log("Handling intent after login, userSession:", userSession);
         switch (userSession.lastIntent) {
             case "BALANCE":
-                // Fetch accounts list instead of balance
-                const accountsMessage = await BalanceService.fetchAccounts(userSession);
-                userSession.state = states.ACCOUNT_SELECTION;
-                return `Please select an account:\n${accountsMessage}`; // Display list of accounts to user
+                return await this.handleBalanceInquiry(userSession);
             case "TRANSACTIONS":
                 return "Transaction history will be displayed here.";
             default:
@@ -88,19 +97,15 @@ class StateMachine {
     }
 
     async handleAccountSelection(userSession, messageBody) {
-        console.log("Handling account selection, user response:", messageBody);
-        
-        // Assuming messageBody contains an identifier for the selected account
-        const selectedAccount = BalanceService.parseAccountSelection(messageBody);  // Implement parsing in BalanceService
+        const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
 
         if (selectedAccount) {
             userSession.selectedAccount = selectedAccount;
             userSession.state = states.FETCHING_BALANCE;
 
-            // Fetch balance for the selected account
-            const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount);
-            userSession.state = states.LOGGED_IN;  // Reset to LOGGED_IN after fetching balance
-            return balanceMessage;
+            const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
+            userSession.state = states.LOGGED_IN;
+            return balanceMessage;  // Return balance message
         } else {
             return "Please enter a valid account selection from the list.";
         }
