@@ -1,12 +1,21 @@
 const OBDXService = require('./OBDXService');
-const LoginService = require('./loginService');  // Import LoginService
+const LoginService = require('./LoginService');  // Import LoginService
 
 class BalanceService {
-    async fetchBalance(userSession) {
-        console.log("Entering FETCH BALANCE METHOD, usersession:", userSession);
+    async initiateBalanceInquiry(userSession) {
+        // Step 1: Check login state by verifying the token and cookie
+        const isLoggedIn = await LoginService.checkLogin();
+        if (!isLoggedIn) {
+            // If not logged in, prompt for OTP
+            return "Authentication required. Please enter your OTP.";
+        }
 
-        // Clean token and cookie handling
-        const token = LoginService.getToken().replace(/[\r\n]+/g, "");
+        // Step 2: If logged in, proceed to fetch account details
+        return await this.fetchAccounts();
+    }
+
+    async fetchAccounts() {
+        const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
         if (!token || !cookie) {
@@ -14,47 +23,58 @@ class BalanceService {
             return "Authentication failed. Please log in again.";
         }
 
-        // Wrap header property names with hyphens in quotes
         const headers = {
             "Authorization": `Bearer ${token}`,
             "Cookie": cookie,
-            "Content-Type": "application/json",   // Corrected syntax for hyphenated keys
+            "Content-Type": "application/json",
             "X-Token-Type": "JWT",
             "X-Target-Unit": "OBDX_BU"
         };
 
-        console.log("Balance headers are:", headers);
-
         const queryParams = new Map([
             ["accountType", "CURRENT,SAVING"],
-            ["status", "ACTIVE,DORMANT,CLOSED"],
+            ["status", "ACTIVE"],
             ["locale", "en"]
         ]);
 
         try {
-            // Pass LoginService as a parameter to invokeService
+            // Fetch the list of accounts
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
-                new Map(Object.entries(headers)),  // Convert headers object to Map
+                new Map(Object.entries(headers)),
                 queryParams,
                 {},
-                null,  // userId is not required
-                LoginService  // Pass LoginService instance here
+                null,
+                LoginService
             );
-
-            console.log("balance response is:", response);
-            const firstAccount = response.data.accounts[0];
-            if (firstAccount) {
-                const balance = `${firstAccount.currentBalance.currency} ${firstAccount.currentBalance.amount}`;
-                return `Your current balance is ${balance}`;
+             
+            const accounts = response.data.accounts;
+            console.log("accounts are:", accounts);
+            if (accounts && accounts.length > 0) {
+                // Display the list of accounts for user to choose
+                let accountList = "Please select an account to view its balance:\n";
+                accounts.forEach((account, index) => {
+                    accountList += `${index + 1}. ${account.displayName} - ${account.iban}\n`;
+                });
+                return { message: accountList, accounts: accounts }; // Returning accounts for further use
             } else {
-                return "No accounts found.";
+                return "No active accounts found.";
             }
         } catch (error) {
-            console.error("Error fetching balance:", error.message);
-            return "An error occurred while fetching your balance. Please try again.";
+            console.error("Error fetching accounts:", error.message);
+            return "An error occurred while fetching your accounts. Please try again.";
         }
+    }
+
+    async fetchBalanceForSelectedAccount(selectedIndex, accounts) {
+        const account = accounts[selectedIndex];
+        if (!account) {
+            return "Invalid account selection.";
+        }
+        
+        const balance = `${account.currentBalance.currency} ${account.currentBalance.amount}`;
+        return `The balance for account ${account.displayName} is ${balance}.`;
     }
 }
 
