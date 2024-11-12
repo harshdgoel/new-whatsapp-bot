@@ -45,7 +45,7 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
 
         // Example of sending a message using axios
         const response = await axios.post(
-            `https://graph.facebook.com/v14.0/${phoneNumberId}/messages`,
+            `https://graph.facebook.com/v20.0/${phoneNumberId}/messages`,
             messageData,
             {
                 headers: { 'Authorization': `Bearer ${process.env.MYTOKEN}` }
