@@ -1,7 +1,7 @@
 "use strict";
 
 const axios = require('axios');
-const baseURL = "https://rnqgj-148-87-23-5.a.free.pinggy.link"; // Ensure this is your correct base URL
+const baseURL = "https://rnagq-148-87-23-5.a.free.pinggy.link"; // Ensure this is your correct base URL
 
 class OBDXService {
     // Accept LoginService as a parameter
