@@ -61,7 +61,7 @@ class StateMachine {
     // Check if accountsResult is a valid object and contains accounts in a different structure
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
-    } else if (accountsResult && Array.isArray(accountsResult)) {
+    } else if (accountsResult) {
         // Initialize an empty array for rows
         const rows = [];
 
