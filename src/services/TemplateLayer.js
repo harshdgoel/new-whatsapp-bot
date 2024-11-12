@@ -1,6 +1,4 @@
 class TemplateLayer {
-        console.log("entering the template layer");
-        console.log("accounts passed in template layer are", accounts);
     static generateAccountListTemplate(accounts) {
         // Check if accounts are valid
         if (!accounts || accounts.length === 0) {
