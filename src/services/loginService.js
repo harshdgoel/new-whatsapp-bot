@@ -30,13 +30,23 @@ class LoginService {
         return this.authCache.anonymousToken;
     }
 
+    clearAuthCache() {
+        this.authCache = { token: null, cookie: null, anonymousToken: null };
+        console.log("Auth cache cleared due to expired token.");
+    }
+
     isTokenExpired() {
         const token = this.getToken();
         if (!token) return true;
         try {
             const { exp } = jwt.decode(token);
-            return Date.now() >= exp * 1000;
+            const isExpired = Date.now() >= exp * 1000;
+            if (isExpired) {
+                this.clearAuthCache();  // Clear token and cookie if expired
+            }
+            return isExpired;
         } catch {
+            this.clearAuthCache();  // Clear if decoding fails
             return true;
         }
     }
@@ -44,7 +54,7 @@ class LoginService {
     async checkLogin(baseURL) {
         if (this.isTokenExpired()) {
             console.log("Token expired or missing. OTP verification required.");
-            return false;  // Return false to prompt for OTP
+            return false;
         }
         return true;
     }
@@ -64,12 +74,12 @@ class LoginService {
                 ]),
                 new Map(),
                 {},
-                null,  // We can pass null for userId if not required
-                this  // Pass the instance of LoginService
+                null,
+                this
             );
 
-            const tokenData = tokenResponse.data; // Access response data
-            if (tokenData.status.result === "SUCCESSFUL") {
+            const tokenData = tokenResponse.data || {};
+            if (tokenData.status && tokenData.status.result === "SUCCESSFUL") {
                 console.log("Anonymous token obtained successfully");
                 this.setAnonymousToken(tokenData.token);
                 this.interactionId = tokenData.interactionId;
@@ -81,7 +91,7 @@ class LoginService {
                     new Map([
                         ["Content-Type", "application/json"],
                         ["x-authentication-type", "CHATBOT"],
-                        ["TOKEN_ID", otp],  // Use user-provided OTP here
+                        ["TOKEN_ID", otp],
                         ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                         ["X-Token-Type", "JWT"],
                         ["X-Target-Unit", "OBDX_BU"]
@@ -92,8 +102,8 @@ class LoginService {
                     this
                 );
 
-                const otpData = otpResponse.data;
-                if (otpData.status.result === "SUCCESSFUL") {
+                const otpData = otpResponse.data || {};
+                if (otpData.status && otpData.status.result === "SUCCESSFUL") {
                     console.log("OTP verification successful");
                     this.registrationId = otpData.registrationId;
 
@@ -103,7 +113,7 @@ class LoginService {
                         new Map([
                             ["Content-Type", "application/json"],
                             ["x-authentication-type", "CHATBOT"],
-                            ["TOKEN_ID", otp],  // Use user-provided OTP here
+                            ["TOKEN_ID", otp],
                             ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                             ["X-Token-Type", "JWT"],
                             ["X-Target-Unit", "OBDX_BU"]
@@ -119,14 +129,14 @@ class LoginService {
 
                     console.log("login response body:", finalLoginResponse);
 
-                    const finalLoginData = finalLoginResponse.data;
-                    const setCookie = finalLoginResponse.headers["set-cookie"];
+                    const finalLoginData = finalLoginResponse.data || {};
+                    const setCookie = finalLoginResponse.headers?.["set-cookie"];
                     if (setCookie) {
                         this.authCache.cookie = setCookie;
                         console.log("Cookies set successfully:", setCookie);
                     }
 
-                    if (finalLoginData.status.result === "SUCCESSFUL") {
+                    if (finalLoginData.status && finalLoginData.status.result === "SUCCESSFUL") {
                         console.log("Login successful");
                         this.setAuthDetails(finalLoginData.token, setCookie);
                         return true;
