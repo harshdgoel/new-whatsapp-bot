@@ -86,7 +86,7 @@ class LoginService {
                 // Correct handling of set-cookie
                 const setCookie = tokenResponse.headers['set-cookie'];
                 if (setCookie) {
-                    this.authCache.cookie = setCookie.join('; '); // Ensure we store the cookie correctly
+                    this.authCache.cookie = setCookie;
                     console.log("Cookies successfully stored:", this.authCache.cookie);
                 }
                  console.log("second call anonymoustoken is",this.getAnonymousToken() )
@@ -105,13 +105,13 @@ class LoginService {
                     new Map(),
                     { mobileNumber: this.mobileNumber }
                 );
+                
+                console.log("OTP Response for second call:", otpResponse);
 
-                console.log("OTP Response:", otpResponse);
+                if (otpResponse.data.status.result === "SUCCESSFUL") {  //otpResponse?.status?.result === "SUCCESSFUL" add this check
+                    console.log("OTP verified successfully.", otpResponse.data);
 
-                if (otpResponse?.status?.result === "SUCCESSFUL") {
-                    console.log("OTP verified successfully.");
-
-                    const registrationId = otpResponse?.registrationId || otpResponse.data?.registrationId;
+                    const registrationId = otpResponse.data.registrationId;
 
                     if (!registrationId) {
                         console.error("Registration ID missing in OTP response:", otpResponse);
