@@ -92,7 +92,13 @@ class LoginService {
 
                 if (otpResponse?.status?.result === "SUCCESSFUL") {
                     console.log("OTP verified successfully.");
-                    this.registrationId = otpResponse.data.registrationId;
+                    const registrationId = otpResponse.data?.registrationId;
+
+                    if (!registrationId) {
+                        console.error("Registration ID missing in OTP response.");
+                        return "Final login failed due to missing registration ID. Please try again.";
+                    }
+                    this.registrationId = registrationId;
 
                     // Third and final call to get session token and cookie
                     const finalLoginResponse = await OBDXService.serviceMeth(
