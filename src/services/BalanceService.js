@@ -1,5 +1,5 @@
 const TemplateLayer = require('./TemplateLayer'); // Import TemplateLayer
-const LoginService = require('./LoginService');
+const LoginService = require('./loginService');
 const OBDXService = require('./OBDXService');
 
 class BalanceService {
