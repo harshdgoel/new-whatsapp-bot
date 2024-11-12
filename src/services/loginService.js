@@ -42,36 +42,34 @@ class LoginService {
             const { exp } = jwt.decode(token);
             const isExpired = Date.now() >= exp * 1000;
             if (isExpired) {
-                this.clearAuthCache();  // Clear token and cookie if expired
+                this.clearAuthCache();
             }
             return isExpired;
         } catch {
-            this.clearAuthCache();  // Clear if decoding fails
+            this.clearAuthCache();
             return true;
         }
     }
 
-    async checkLogin(baseURL) {
+    async checkLogin(baseURL, otp = null) {
         if (this.isTokenExpired()) {
             console.log("Token expired or missing. OTP verification required.");
-            return false;
+            if (otp) {
+                // OTP verification flow if OTP is provided
+                return await this.verifyOTP(otp, baseURL);
+            }
+            return false;  // Return false if no OTP is provided
         }
         return true;
     }
 
     async verifyOTP(otp, baseURL) {
         try {
-            // Step 1: Get an anonymous token
-            console.log("First API call to get an anonymous token");
-            console.log("OTP is ", otp);
-
+            console.log("Obtaining anonymous token...");
             const tokenResponse = await OBDXService.invokeService(
                 "/digx-infra/login/v1/anonymousToken",
                 "POST",
-                new Map([
-                    ["Content-Type", "application/json"],
-                    ["x-authentication-type", "JWT"]
-                ]),
+                new Map([["Content-Type", "application/json"], ["x-authentication-type", "JWT"]]),
                 new Map(),
                 {},
                 null,
@@ -79,12 +77,11 @@ class LoginService {
             );
 
             const tokenData = tokenResponse.data || {};
-            if (tokenData.status && tokenData.status.result === "SUCCESSFUL") {
+            if (tokenData.status?.result === "SUCCESSFUL") {
                 console.log("Anonymous token obtained successfully");
                 this.setAnonymousToken(tokenData.token);
                 this.interactionId = tokenData.interactionId;
 
-                // Step 2: Verify OTP with the anonymous token
                 const otpResponse = await OBDXService.invokeService(
                     "/digx-infra/login/v1/login?locale=en",
                     "POST",
@@ -103,7 +100,7 @@ class LoginService {
                 );
 
                 const otpData = otpResponse.data || {};
-                if (otpData.status && otpData.status.result === "SUCCESSFUL") {
+                if (otpData.status?.result === "SUCCESSFUL") {
                     console.log("OTP verification successful");
                     this.registrationId = otpData.registrationId;
 
@@ -119,15 +116,10 @@ class LoginService {
                             ["X-Target-Unit", "OBDX_BU"]
                         ]),
                         new Map(),
-                        {
-                            mobileNumber: this.mobileNumber,
-                            registrationId: this.registrationId
-                        },
+                        { mobileNumber: this.mobileNumber, registrationId: this.registrationId },
                         null,
                         this
                     );
-
-                    console.log("login response body:", finalLoginResponse);
 
                     const finalLoginData = finalLoginResponse.data || {};
                     const setCookie = finalLoginResponse.headers?.["set-cookie"];
@@ -136,7 +128,7 @@ class LoginService {
                         console.log("Cookies set successfully:", setCookie);
                     }
 
-                    if (finalLoginData.status && finalLoginData.status.result === "SUCCESSFUL") {
+                    if (finalLoginData.status?.result === "SUCCESSFUL") {
                         console.log("Login successful");
                         this.setAuthDetails(finalLoginData.token, setCookie);
                         return true;
