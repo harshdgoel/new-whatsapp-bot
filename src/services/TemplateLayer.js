@@ -1,50 +1,40 @@
 class TemplateLayer {
-    // Method to create a list template
-    static createListTemplate(header, body, footer, buttons) {
-        return {
-            type: "interactive",
-            interactive: {
-                type: "list",
-                header: {
-                    type: "text",
-                    text: header
-                },
-                body: {
-                    text: body
-                },
-                footer: {
-                    text: footer
-                },
-                action: {
-                    buttons: buttons.map((buttonText, index) => ({
-                        type: "reply",
-                        reply: {
-                            id: `${index + 1}`,
-                            title: buttonText
-                        }
-                    }))
-                }
-            }
-        };
-    }
+static generateAccountListTemplate(accounts) {
+        if (!accounts || accounts.length === 0) {
+            return {
+                "text": "No active accounts found."
+            };
+        }
 
-    // Method to create a button template
-    static createButtonTemplate(body, buttons) {
+        let sections = accounts.map(account => {
+            return {
+                "title": account.displayName,
+                "rows": [
+                    {
+                        "id": account.id.value,  // Use account ID for row selection
+                        "title": account.displayName,
+                        "description": `${account.currencyCode} ${account.currentBalance.amount} - ${account.iban}`
+                    }
+                ]
+            };
+        });
+
         return {
-            type: "interactive",
-            interactive: {
-                type: "button",
-                body: {
-                    text: body
+            "interactive": {
+                "type": "list",
+                "header": {
+                    "type": "text",
+                    "text": "Select an Account"
                 },
-                action: {
-                    buttons: buttons.map((buttonText, index) => ({
-                        type: "reply",
-                        reply: {
-                            id: `${index + 1}`,
-                            title: buttonText
-                        }
-                    }))
+                "body": {
+                    "text": "Please select an account to view its balance."
+                },
+                "footer": {
+                    "text": "Choose your account"
+                },
+                "action": {
+                    "button": "Select Account",
+                    "sections": sections
                 }
             }
         };
