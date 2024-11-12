@@ -72,10 +72,16 @@ class LoginService {
 
             console.log("THE RESPONSE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse);
 
-            if (tokenResponse?.status?.result === "SUCCESSFUL") {
+            if (tokenResponse.status === "200") {
                 console.log("tokenResponse is:", tokenResponse);
-                console.log("Anonymous token obtained successfully.",tokenResponse.token);
-                this.setAnonymousToken(tokenResponse.token);
+                console.log("Anonymous token obtained successfully.",tokenResponse.headers.authorization);
+                console.log("Cookie is:",tokenResponse.headers['set-cookie']);
+                this.setAnonymousToken(tokenResponse.authorization);
+                const setCookie = tokenResponse.headers['set-cookie'];
+                    if (setCookie) {
+                        this.auth.setCookies(setCookie); // Store cookies
+                        console.log("set cookie is", this.auth.getCookies());
+                    }
 
                 // Second call to validate OTP
                 const otpResponse = await OBDXService.serviceMeth(
@@ -132,8 +138,8 @@ class LoginService {
                     if (setCookie) {
                         console.log("Cookies found in final response:", setCookie);
                         // Use the cookie set by OBDXService, no need to set again in LoginService
-                        this.authCache.cookie = setCookie.join('; '); // Store it in authCache for future use
-                        console.log("Cookies successfully stored.");
+                        this.authCache.cookie = setCookie; // Store it in authCache for future use
+                        console.log("Cookies successfully stored.",this.authCache.cookie);
                     } else {
                         console.error("Cookie setting failed in final login.");
                         console.log("set-cookie header is missing or in unexpected format:", finalLoginResponse.headers);
