@@ -5,7 +5,10 @@ class TemplateLayer {
 
         // Check if apiResponse is valid
         if (!apiResponse || !Array.isArray(apiResponse)) {
+            console.log("logging starts. APIRESPONSE IS:", apiresponse);
+            console.log("first account",apiresponse[0].id.value);
             console.error("Error: API response is null or not an array.");
+            
             return {
                 recipient_type: "individual",
                 to: "916378582419",
