@@ -46,7 +46,9 @@ class TemplateLayer {
             }
         };
 
-        return interactiveTemplate;
+        
+       console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
+       return interactiveTemplate;
     }
 }
 
