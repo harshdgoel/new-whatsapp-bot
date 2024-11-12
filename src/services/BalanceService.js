@@ -1,20 +1,18 @@
 const OBDXService = require('./OBDXService');
-const LoginService = require('./loginService');  // Import LoginService
+const LoginService = require('./LoginService');
+const TemplateLayer = require('./TemplateLayer'); // Import TemplateLayer
 
 class BalanceService {
     async initiateBalanceInquiry(userSession) {
-        // Step 1: Check login state by verifying the token and cookie
         const isLoggedIn = await LoginService.checkLogin();
         if (!isLoggedIn) {
-            // If not logged in, prompt for OTP
             return "Authentication required. Please enter your OTP.";
         }
 
-        // Step 2: If logged in, proceed to fetch account details
-        return await this.fetchAccounts();
+        return await this.fetchAccounts(userSession);
     }
 
-    async fetchAccounts() {
+    async fetchAccounts(userSession) {
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
@@ -38,7 +36,6 @@ class BalanceService {
         ]);
 
         try {
-            // Fetch the list of accounts
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit",
                 "GET",
@@ -50,14 +47,17 @@ class BalanceService {
             );
              
             const accounts = response.data.accounts;
-            console.log("accounts are:", accounts);
             if (accounts && accounts.length > 0) {
-                // Display the list of accounts for user to choose
-                let accountList = "Please select an account to view its balance:\n";
-                accounts.forEach((account, index) => {
-                    accountList += `${index + 1}. ${account.displayName} - ${account.iban}\n`;
-                });
-                return { message: accountList, accounts: accounts }; // Returning accounts for further use
+                // Using TemplateLayer to create the list template for accounts
+                const buttons = accounts.map(account => `${account.displayName} - ${account.iban}`);
+                const accountListTemplate = TemplateLayer.createListTemplate(
+                    "Account Selection", 
+                    "Please select an account to view its balance.", 
+                    "Choose an account", 
+                    buttons
+                );
+                userSession.accounts = accounts;
+                return accountListTemplate;  // Returning the template for selection
             } else {
                 return "No active accounts found.";
             }
@@ -67,14 +67,18 @@ class BalanceService {
         }
     }
 
-    async fetchBalanceForSelectedAccount(selectedIndex, accounts) {
-        const account = accounts[selectedIndex];
-        if (!account) {
+    async fetchBalanceForSelectedAccount(selectedAccount) {
+        if (!selectedAccount) {
             return "Invalid account selection.";
         }
-        
-        const balance = `${account.currentBalance.currency} ${account.currentBalance.amount}`;
-        return `The balance for account ${account.displayName} is ${balance}.`;
+
+        const balance = `${selectedAccount.currentBalance.currency} ${selectedAccount.currentBalance.amount}`;
+        return `The balance for account ${selectedAccount.displayName} is ${balance}.`;
+    }
+
+    parseAccountSelection(selection, accounts) {
+        const index = parseInt(selection) - 1;
+        return accounts && accounts[index] ? accounts[index] : null;
     }
 }
 
