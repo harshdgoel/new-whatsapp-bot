@@ -1,6 +1,5 @@
 class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
-        // Extract accounts from the API response
         const accounts = apiResponse || [];
         
         if (accounts.length === 0) {
@@ -10,20 +9,17 @@ class TemplateLayer {
             };
         }
 
-        // Construct sections for the WhatsApp list template
         const sections = [
             {
                 title: "Select an Account",
                 rows: accounts.map(account => ({
-                    // Adjust the following accesses to match the actual structure of `account`
-                    id: account.id?.value || account.id.displayValue, // Checks `id.value` or falls back to `id.displayValue`
+                    id: account.id?.value || account.id.displayValue, 
                     title: account.accountNickname || account.displayName,
-                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}` // Ensures correct access to `availableBalance`
+                    description: `Balance: ${account.availableBalance.amount} ${account.availableBalance.currency}`
                 }))
             }
         ];
 
-        // Create the interactive template object
         const interactiveTemplate = {
             type: "interactive",
             interactive: {
