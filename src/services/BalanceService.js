@@ -1,5 +1,5 @@
 const OBDXService = require('./OBDXService');
-const LoginService = require('./loginService');
+const LoginService = require('./LoginService');
 const TemplateLayer = require('./TemplateLayer'); // Import TemplateLayer
 
 class BalanceService {
@@ -48,8 +48,8 @@ class BalanceService {
              
             const accounts = response.data.accounts;
             if (accounts && accounts.length > 0) {
-                // Using TemplateLayer to create the list template for accounts
-                const buttons = accounts.map(account => `${account.displayName} - ${account.iban}`);
+                // Formatting the body message as a string for the template
+                const buttons = accounts.map(account => account.accountDropdownDisplay); // Use string display info
                 const accountListTemplate = TemplateLayer.createListTemplate(
                     "Account Selection", 
                     "Please select an account to view its balance.", 
