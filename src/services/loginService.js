@@ -121,15 +121,19 @@ class LoginService {
                         { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
                     );
 
+                    // Log the response headers to track cookie issues
+                    console.log("Final Login Response Headers:", finalLoginResponse.headers);
+
                     // Check if cookies are set in the response headers
                     const setCookie = finalLoginResponse.headers['set-cookie'];
                     if (setCookie) {
+                        console.log("Cookies found in final response:", setCookie);
                         this.setAuthDetails(finalLoginResponse.data.token, setCookie);
                         console.log("Token and cookies set successfully.");
                         return true;
                     } else {
                         console.error("Cookie setting failed in final login.");
-                        console.log("cookie is:",finalLoginResponse.headers['set-cookie']);
+                        console.log("set-cookie header is missing or in unexpected format:", finalLoginResponse.headers);
                         return "Final login failed. Please try again.";
                     }
                 } else {
