@@ -61,6 +61,8 @@ class StateMachine {
         if (typeof accountsResult === "string") {
             return accountsResult; // Either OTP prompt or error message
         } else {
+
+            console.log("inside else condition", accountsResult.accounts);
             //userSession.accounts = accountsResult.accounts;
             userSession.state = states.ACCOUNT_SELECTION;
             return accountsResult; // Return the list template for account selection
