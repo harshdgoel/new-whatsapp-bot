@@ -61,14 +61,29 @@ class StateMachine {
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
     } else {
-        // If it's an interactive template, return it directly
+        // Log the accountsResult details for debugging
         console.log("inside else condition, accountsResult:", accountsResult);
 
-        // If the template has an account selection message, we assume the template is ready for the user to choose an account
-        userSession.state = states.ACCOUNT_SELECTION; 
-        return accountsResult; // Return the list template for account selection
+        // Check if sections and rows are populated correctly
+        if (accountsResult?.interactive?.action?.sections?.length > 0) {
+            // Validate that sections and rows exist and are not empty
+            accountsResult.interactive.action.sections.forEach((section, index) => {
+                if (section.rows?.length === 0) {
+                    console.error(`Section ${index} has no rows, skipping it.`);
+                }
+            });
+
+            // If valid, return the interactive template
+            userSession.state = states.ACCOUNT_SELECTION;
+            return accountsResult; // Return the list template for account selection
+        } else {
+            // If sections or rows are missing or empty
+            console.error("No sections or rows found in the interactive message.");
+            return "There was an issue generating the account selection list.";
+        }
     }
 }
+
 
     async handleOTPVerification(userSession) {
         console.log("Verifying OTP, OTP:", userSession.otp);
