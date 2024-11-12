@@ -4,13 +4,8 @@ class TemplateLayer {
         console.log("generateAccountListTemplate - Received API response:", apiResponse);
 
         // Check if apiResponse is valid
-        if (!apiResponse || !Array.isArray(apiResponse)) {
-            console.error("Error: API response is null or not an array.");
-            console.log("Logging API response starts. API RESPONSE IS:", apiResponse);
-            if (apiResponse && apiResponse[0]) {
-                console.log("First account ID value:", apiResponse[0].id?.value);
-            }
-
+        if (!apiResponse || !Array.isArray(apiResponse) || apiResponse.length === 0) {
+            console.error("Error: API response is null, not an array, or empty.");
             return {
                 recipient_type: "individual",
                 to: "916378582419",
@@ -100,7 +95,7 @@ class TemplateLayer {
         // Log the generated interactive template
         console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
 
-        return interactiveTemplate; // Return without stringifying
+        return JSON.stringify(interactiveTemplate, null, 2);
     }
 }
 
