@@ -1,5 +1,5 @@
 const OBDXService = require('./OBDXService');
-const LoginService = require('./LoginService');  // Import LoginService
+const LoginService = require('./loginService');  // Import LoginService
 
 class BalanceService {
     async initiateBalanceInquiry(userSession) {
