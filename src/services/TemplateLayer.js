@@ -7,7 +7,7 @@ class TemplateLayer {
             console.log("No accounts available for template generation.");
             return {
                 recipient_type: "individual",
-                to: "916378582419",
+                to: "916378582419",  
                 messaging_product: "whatsapp",
                 type: "interactive",
                 interactive: {
@@ -31,13 +31,13 @@ class TemplateLayer {
 
         const interactiveTemplate = {
             recipient_type: "individual",
-            to: "916378582419", 
+            to: "916378582419",
             messaging_product: "whatsapp",
             type: "interactive",
             interactive: {
                 type: "list",
                 body: {
-                    text: "Please select from the following account to view details." 
+                    text: "Please select from the following account to view details."
                 },
                 action: {
                     button: "View Accounts",
