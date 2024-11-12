@@ -1,5 +1,5 @@
 class TemplateLayer {
-    static generateAccountListTemplate(apiResponse, recipientPhoneNumber) {
+    static generateAccountListTemplate(apiResponse) {
         console.log("generateAccountListTemplate apiResponse", apiResponse);
         const accounts = apiResponse || [];
         
@@ -7,13 +7,13 @@ class TemplateLayer {
             console.log("No accounts available for template generation.");
             return {
                 recipient_type: "individual",
-                to: recipientPhoneNumber,  // Use dynamic phone number here
+                to: "916378582419",
                 messaging_product: "whatsapp",
                 type: "interactive",
                 interactive: {
                     type: "list",
                     body: {
-                        text: "No accounts available."  // Ensure this is a valid string
+                        text: "No accounts available."
                     }
                 }
             };
@@ -30,14 +30,16 @@ class TemplateLayer {
         ];
 
         const interactiveTemplate = {
+            console.log("sections set successfully");
+            console.log("entering interactiveTemplate", sections);
             recipient_type: "individual",
-            to: recipientPhoneNumber,  // Use dynamic phone number here
+            to: "916378582419", 
             messaging_product: "whatsapp",
             type: "interactive",
             interactive: {
                 type: "list",
                 body: {
-                    text: "Please select from the following account to view details."  // Ensure this is a valid string
+                    text: "Please select from the following account to view details." 
                 },
                 action: {
                     button: "View Accounts",
