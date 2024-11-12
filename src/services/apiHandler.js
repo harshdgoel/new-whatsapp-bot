@@ -1,47 +1,62 @@
-const axios = require('axios');
-require('dotenv').config(); // Ensure environment variables are loaded
+const axios = require('axios');  // Assuming axios is used for API calls
+const TemplateLayer = require('./TemplateLayer');  // Import TemplateLayer class
 
-// Function to send a response message to WhatsApp
-const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
+// The function to send response to WhatsApp
+const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = null) => {
+    let responseData;
+
     try {
-        // Ensure the message is a string
-        const messageData = {
-            messaging_product: "whatsapp",
-            to: to,
-            text: { body: String(message) }
-        };
+        // Check if the message type is 'interactive' (list template)
+        if (message && message.type === 'interactive') {
+            console.log("Detected interactive message type. Generating list template...");
 
-        // Get the WhatsApp API token from the environment variables
-        const token = process.env.MYTOKEN;
+            // Use TemplateLayer to generate the interactive list template
+            responseData = TemplateLayer.generateAccountListTemplate(apiResponse);
+            console.log("Generated interactive template:", JSON.stringify(responseData, null, 2));
+        } else {
+            // Default message handling (text message)
+            console.log("Sending a text message...");
 
-        if (!token) {
-            console.error("Error: Missing WhatsApp API token.");
-            throw new Error("WhatsApp API token is not defined.");
+            responseData = {
+                messaging_product: "whatsapp",
+                to: to,
+                text: { body: String(message) }  // Ensure message is a string
+            };
+
+            console.log("Text message response data:", JSON.stringify(responseData, null, 2));
         }
 
-        // Log the message that will be sent
-        console.log("Sending message to WhatsApp:", JSON.stringify(messageData, null, 2));
+        // Log the request payload before sending it to WhatsApp
+        console.log("Sending response to WhatsApp...");
+        
+        const response = await sendToWhatsAppAPI(phoneNumberId, responseData);  // Send to WhatsApp API
+        
+        console.log("WhatsApp response sent successfully:", response);
 
-        // Send the message via the WhatsApp API
+    } catch (error) {
+        console.error("Error sending WhatsApp message:", error);
+    }
+};
+
+// Placeholder for sending message to WhatsApp API (Assuming you're using an HTTP request like axios)
+const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
+    try {
+        console.log("sendToWhatsAppAPI - Sending data:", JSON.stringify(messageData, null, 2));
+
+        // Example of sending a message using axios
         const response = await axios.post(
             `https://graph.facebook.com/v14.0/${phoneNumberId}/messages`,
             messageData,
             {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${process.env.MYTOKEN}` }
             }
         );
 
-        // Log the response from the API
-        console.log("Response from WhatsApp API:", response.data);
-
+        return response.data;  // Return the response from WhatsApp API
     } catch (error) {
-        console.error("Error in sendResponseToWhatsApp:", error);
-        if (error.response) {
-            // Log the response error details
-            console.error("API Response Error:", error.response.data);
-        }
-        throw error;  // Rethrow error after logging
+        console.error("Error in sendToWhatsAppAPI:", error);
+        throw error;  // Re-throw to be handled by the caller
     }
 };
 
-module.exports = { sendResponseToWhatsApp };
+module.exports = { sendResponseToWhatsApp };  // Export the function
