@@ -72,7 +72,7 @@ class LoginService {
 
             if (tokenResponse?.status?.result === "SUCCESSFUL") {
                 console.log("tokenResponse is:", tokenResponse);
-                console.log("Anonymous token obtained successfully.");
+                console.log("Anonymous token obtained successfully.",tokenResponse.token);
                 this.setAnonymousToken(tokenResponse.token);
 
                 // Second call to validate OTP
