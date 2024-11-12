@@ -99,8 +99,8 @@ class TemplateLayer {
 
         // Log the generated interactive template
         console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
-        const finalinteractiveTemplate = JSON.stringify(interactiveTemplate, null, 2);
-        return finalinteractiveTemplate;
+
+        return interactiveTemplate; // Return without stringifying
     }
 }
 
