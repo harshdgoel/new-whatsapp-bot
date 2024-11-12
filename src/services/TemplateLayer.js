@@ -30,8 +30,6 @@ class TemplateLayer {
         ];
 
         const interactiveTemplate = {
-            console.log("sections set successfully");
-            console.log("entering interactiveTemplate", sections);
             recipient_type: "individual",
             to: "916378582419", 
             messaging_product: "whatsapp",
