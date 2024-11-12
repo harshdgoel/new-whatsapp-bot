@@ -1,10 +1,11 @@
 class TemplateLayer {
     static generateAccountListTemplate(apiResponse) {
-        console.log("generateAccountListTemplate apiResponse", apiResponse);
+        console.log("generateAccountListTemplate - Received API response:", apiResponse);
+
         const accounts = apiResponse || [];
         
         if (accounts.length === 0) {
-            console.log("No accounts available for template generation.");
+            console.log("No accounts available. Returning empty template.");
             return {
                 recipient_type: "individual",
                 to: "916378582419",  
@@ -19,12 +20,14 @@ class TemplateLayer {
             };
         }
 
+        // Create sections for the list
         const sections = [
             {
                 title: "Select an Account",
                 rows: accounts.map(account => ({
                     id: account.id?.value || account.id.displayValue, 
-                    title: account.accountNickname || account.displayName
+                    title: account.accountNickname || account.displayName,
+                    description: account.balance ? `Balance: ${account.balance}` : "No balance info"
                 }))
             }
         ];
@@ -46,9 +49,8 @@ class TemplateLayer {
             }
         };
 
-        
-       console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
-       return interactiveTemplate;
+        console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
+        return interactiveTemplate;
     }
 }
 
