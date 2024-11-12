@@ -1,5 +1,6 @@
 const axios = require('axios');  // Assuming axios is used for API calls
 const TemplateLayer = require('./TemplateLayer');  // Import TemplateLayer class
+require('dotenv').config(); // Ensure environment variables are loaded
 
 // The function to send response to WhatsApp
 const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = null) => {
