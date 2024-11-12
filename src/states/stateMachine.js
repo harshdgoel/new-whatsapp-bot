@@ -56,6 +56,8 @@ class StateMachine {
     async handleBalanceInquiry(userSession) {
         const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
 
+        console.log("accountsResult:",accountsResult);
+
         if (typeof accountsResult === "string") {
             return accountsResult; // Either OTP prompt or error message
         } else {
