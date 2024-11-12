@@ -124,18 +124,21 @@ class LoginService {
                     // Log the response headers to track cookie issues
                     console.log("Final Login Response:", finalLoginResponse);
 
-                    // Check if cookies are set in the response headers
+                    // Check for cookies in the response headers set by OBDXService
                     const setCookie = finalLoginResponse.headers['set-cookie'];
                     if (setCookie) {
                         console.log("Cookies found in final response:", setCookie);
-                        this.setAuthDetails(finalLoginResponse.data.token, setCookie);
-                        console.log("Token and cookies set successfully.");
-                        return true;
+                        // Use the cookie set by OBDXService, no need to set again in LoginService
+                        this.authCache.cookie = setCookie.join('; '); // Store it in authCache for future use
+                        console.log("Cookies successfully stored.");
                     } else {
                         console.error("Cookie setting failed in final login.");
                         console.log("set-cookie header is missing or in unexpected format:", finalLoginResponse.headers);
                         return "Final login failed. Please try again.";
                     }
+                    // Store token in authCache after successful login
+                    this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
+                    return true;
                 } else {
                     console.error("OTP verification failed:", otpResponse);
                     return "OTP verification failed. Please try again.";
