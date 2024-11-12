@@ -53,33 +53,33 @@ class StateMachine {
         return this.handleIntentAfterLogin(userSession);
     }
 
-    async handleBalanceInquiry(userSession) {
+   async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
 
-    console.log("accountsResult:", accountsResult);
+    console.log("accountsResult accounts:", accountsResult.accounts);
 
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
     } else {
-        // Log the accountsResult details for debugging
-        console.log("inside else condition, accountsResult:", accountsResult);
+        // Check if accounts are available in the response
+        if (accountsResult.accounts && accountsResult.accounts.length > 0) {
+            // Dynamically generate rows based on accounts
+            const rows = accountsResult.accounts.map(account => ({
+                id: account.id,
+                title: account.title
+            }));
 
-        // Check if sections and rows are populated correctly
-        if (accountsResult?.interactive?.action?.sections?.length > 0) {
-            // Validate that sections and rows exist and are not empty
-            accountsResult.interactive.action.sections.forEach((section, index) => {
-                if (section.rows?.length === 0) {
-                    console.error(`Section ${index} has no rows, skipping it.`);
-                }
-            });
+            // Set the rows in the sections array
+            accountsResult.interactive.action.sections[0].rows = rows;
 
-            // If valid, return the interactive template
+            // Log the sections to ensure it's populated correctly
+            console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
+
+            // Return the updated accountsResult for WhatsApp
             userSession.state = states.ACCOUNT_SELECTION;
-            return accountsResult; // Return the list template for account selection
+            return accountsResult;  // This should send the populated list template to WhatsApp
         } else {
-            // If sections or rows are missing or empty
-            console.error("No sections or rows found in the interactive message.");
-            return "There was an issue generating the account selection list.";
+            return "No accounts available.";
         }
     }
 }
