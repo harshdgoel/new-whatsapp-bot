@@ -122,7 +122,7 @@ class LoginService {
                     );
 
                     // Log the response headers to track cookie issues
-                    console.log("Final Login Response Headers:", finalLoginResponse.headers);
+                    console.log("Final Login Response:", finalLoginResponse);
 
                     // Check if cookies are set in the response headers
                     const setCookie = finalLoginResponse.headers['set-cookie'];
