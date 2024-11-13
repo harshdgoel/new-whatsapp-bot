@@ -63,8 +63,7 @@ class BalanceService {
     // Fetches balance for the selected account
     static async fetchBalanceForSelectedAccount(selectedAccount) {
         try {
-            const balanceMessage = `Balance for ${selectedAccount.accountNickname || selectedAccount.displayName}: ${selectedAccount.availableBalance.amount} ${selectedAccount.availableBalance.currency}`;
-            console.log("Fetched balance for selected account:", selectedAccount.accountNickname);
+            const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}`;
             return balanceMessage;
         } catch (error) {
             console.error("Error fetching balance:", error.message);
