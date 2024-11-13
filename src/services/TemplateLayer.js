@@ -56,7 +56,7 @@ class TemplateLayer {
             messaging_product: "whatsapp",
             type: "interactive",
             interactive: {
-                type: "list",
+                type: "list_reply",
                 body: {
                     text: "Please select from the following account to view details."
                 },
