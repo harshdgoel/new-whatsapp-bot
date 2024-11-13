@@ -154,4 +154,3 @@ class StateMachine {
     }
 }
 module.exports = new StateMachine();
-module.exports.states = states;
