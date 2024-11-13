@@ -46,14 +46,20 @@ router.post("/webhook", async (req, res) => {
         return res.status(400).send("No messaging event received.");
     }
 
-    const { from, text } = messagingEvent;
-    const messageBody = text?.body || "";
+    const { from, text, interactive } = messagingEvent;
+
+    let messageBody = text?.body || ""; // Default to the text message body
+    if (interactive) {
+        // If it's an interactive message (e.g., list selection), get the selected ID
+        messageBody = interactive.list_reply?.id || ""; // The ID of the selected list option
+    }
+
     const intent = identifyIntent(messageBody);
 
     try {
         // Call the function to handle the incoming message (e.g., check login status, etc.)
         await handleIncomingMessage(config.phoneNumberId, from, { body: messageBody, intent });
-        return res.sendStatus(200); // Send success response to Facebook
+        return res.sendStatus(200); // Send success response to WhatsApp
     } catch (error) {
         console.error("Error handling incoming message:", error);
         return res.status(500).send("Internal server error.");
