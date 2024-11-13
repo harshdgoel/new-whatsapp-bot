@@ -36,6 +36,9 @@ class BalanceService {
             );
 
             console.log("Response after FETCHACCOUNT API CALL IS", response);
+            console.log("Response.data:", response.data);
+            console.log("Response.data.accounte:", response.data.accounts);
+
 
             if (response.data && response.data.accounts) {
                 const accounts = response.data.accounts;
