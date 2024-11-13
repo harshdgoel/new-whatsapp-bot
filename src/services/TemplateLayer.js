@@ -53,7 +53,7 @@ class TemplateLayer {
             console.log(`Account ${i + 1} id:`, accountId);
 
             // Determine the title with fallbacks and log it
-            const accountTitle = account.accountNickname || account.displayName || "Account";
+            const accountTitle = account.id?.displayValue;
             console.log(`Account ${i + 1} title:`, accountTitle);
 
             // Add this account's id and title to rows array
