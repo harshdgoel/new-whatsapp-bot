@@ -1,13 +1,18 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
-const states = require('../states/stateMachine').states;
 const LoginService = require('./loginService');
 const { sendResponseToWhatsApp } = require('./apiHandler');
+
+const states = {
+    OTP_VERIFICATION: "OTP_VERIFICATION",
+    LOGGED_IN: "LOGGED_IN",
+    LOGGED_OUT: "LOGGED_OUT"
+};
+
 
 class BalanceService {
     // Initiates the balance inquiry by fetching the accounts
     static async initiateBalanceInquiry(userSession) {
-                console.log("Imported states:", states); // Log the imported states
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
