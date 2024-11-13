@@ -7,6 +7,7 @@ const { sendResponseToWhatsApp } = require('./apiHandler');
 class BalanceService {
     // Initiates the balance inquiry by fetching the accounts
     static async initiateBalanceInquiry(userSession) {
+                console.log("Imported states:", states); // Log the imported states
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
