@@ -134,7 +134,8 @@ class StateMachine {
             case "BALANCE":
                 return await this.handleBalanceInquiry(userSession);
             default:
-                return "You're logged in! How may I assist you?";
+                return await this.handleBalanceInquiry(userSession); // THIS NEEDED TO BE CHANGED it goes in default case as 1234 is not recoginezes as intent and intent set to null... add condition if intent null then set intent to the start intent of flow
+
         }
     }
 
