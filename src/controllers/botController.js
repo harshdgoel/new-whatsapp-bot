@@ -14,7 +14,10 @@ const handleIncomingMessage = async (phoneNumberId, from, message) => {
     // Call handleMessage
     const responseMessage = await stateMachine.handleMessage(from, body, intent);
     console.log("the response message in botController which is sent to apiHandler is:", responseMessage);
-    console.log("sections:",responseMessage.interactive.action.sections);
+   
+    if(responseMessage.interactive.action.sections){
+        console.log("sections:",responseMessage.interactive.action.sections);
+    }
     await sendResponseToWhatsApp(phoneNumberId, from, responseMessage);
 };
 
