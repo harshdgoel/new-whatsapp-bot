@@ -6,32 +6,7 @@ class TemplateLayer {
         // Check if apiResponse is valid
         if (!apiResponse || !Array.isArray(apiResponse) || apiResponse.length === 0) {
             console.error("Error: API response is null, not an array, or empty.");
-            return {
-                recipient_type: "individual",
-                to: "916378582419",
-                messaging_product: "whatsapp",
-                type: "interactive",
-                interactive: {
-                    type: "list",
-                    body: {
-                        text: "No accounts available to display."
-                    },
-                    action: {
-                        button: "View Accounts",
-                        sections: [
-                            {
-                                title: "No Accounts",
-                                rows: [
-                                    {
-                                        id: "no_accounts",
-                                        title: "No accounts found"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            };
+            return "No accounts found";
         }
 
         // Initialize rows array for storing account details
