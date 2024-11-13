@@ -1,6 +1,7 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
+const states = require('../states/stateMachine').states;
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
 class BalanceService {
