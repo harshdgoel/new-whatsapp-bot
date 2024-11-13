@@ -10,8 +10,8 @@ class BalanceService {
         const cookie = LoginService.getCookie();
 
         if (!token || !cookie) {
-            console.error("Missing token or cookie.");
-            return "Authentication failed. Please log in again.";
+           userSession.state = states.OTP_VERIFICATION;
+            return "Please enter the One Time Password sent to your registered number.";
         }
 
         const headers = {
