@@ -143,6 +143,7 @@ class StateMachine {
         console.log("entering handleAccountSelection and accounts are:",userSession.accounts);
         console.log("entering handleAccountSelection and messageBody is:", messageBody)
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+        console.log("selected account is:", selectedAccount);
 
         if (selectedAccount) {
             userSession.selectedAccount = selectedAccount;
