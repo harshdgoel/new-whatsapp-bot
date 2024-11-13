@@ -1,6 +1,6 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
-const { states } = require('../states/stateMachine');
+const states = require('../states/stateMachine').states;
 const LoginService = require('./loginService');
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
