@@ -153,8 +153,5 @@ class StateMachine {
         }
     }
 }
-
-module.exports = {
-    states,
-    StateMachine: new StateMachine() // Export the StateMachine instance as well
-};
+module.exports = new StateMachine();
+module.exports.states = states;
