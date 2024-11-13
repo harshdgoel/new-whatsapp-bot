@@ -59,52 +59,55 @@ class StateMachine {
     console.log("Full accountsResult:", JSON.stringify(accountsResult, null, 2));
 
     // Check if accountsResult is a valid object and contains sections and rows
-    if (typeof accountsResult === "string") {
-        return accountsResult; // Either OTP prompt or error message
-    } else if (accountsResult && accountsResult.interactive && accountsResult.interactive.action && Array.isArray(accountsResult.interactive.action.sections)) {
-        // Initialize an empty array for rows
-        const rows = [];
+    // if (typeof accountsResult === "string") {
+    //     return accountsResult; // Either OTP prompt or error message
+    // } else if (accountsResult) {
+    //     // Initialize an empty array for rows
+    //     const rows = [];
 
-        // Access the rows in the first section
-        const sections = accountsResult.interactive.action.sections;
+    //     // Access the rows in the first section
+    //     const sections = accountsResult.interactive.action.sections;
 
-        // Iterate over the rows array in the first section
-        for (let i = 0; i < sections[0].rows.length; i++) {
-            const account = sections[0].rows[i];  // Access account directly from the rows
+    //     // Iterate over the rows array in the first section
+    //     for (let i = 0; i < sections[0].rows.length; i++) {
+    //         const account = sections[0].rows[i];  // Access account directly from the rows
 
-            // Log the entire account object for debugging
-            console.log(`Processing account ${i + 1}:`, account);
+    //         // Log the entire account object for debugging
+    //         console.log(`Processing account ${i + 1}:`, account);
 
-            // Extract the account ID and log it
-            const accountId = account.id;
+    //         // Extract the account ID and log it
+    //         const accountId = account.id;
 
-            // Check if the account has an id field, otherwise skip it
-            if (!accountId) {
-                console.warn(`Account ${i + 1} is missing id`);
-                continue; // Skip this account if id is missing
-            }
+    //         // Check if the account has an id field, otherwise skip it
+    //         if (!accountId) {
+    //             console.warn(`Account ${i + 1} is missing id`);
+    //             continue; // Skip this account if id is missing
+    //         }
 
-            // Push the valid account data to the rows array
-            rows.push({
-                id: accountId,
-                title: account.title
-            });
-        }
+    //         // Push the valid account data to the rows array
+    //         rows.push({
+    //             id: accountId,
+    //             title: account.title
+    //         });
+    //     }
 
-        // If there are valid rows, set them in the sections array
-        if (rows.length > 0) {
-            sections[0].rows = rows; // Populate the rows with valid account data
+    //     // If there are valid rows, set them in the sections array
+    //     if (rows.length > 0) {
+    //         sections[0].rows = rows; // Populate the rows with valid account data
 
-            console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
+    //         console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
 
-            userSession.state = states.ACCOUNT_SELECTION;
-            return accountsResult;  // This should send the populated list template to WhatsApp
-        } else {
-            return "No valid accounts available.";
-        }
-    } else {
-        return "No accounts available.";
-    }
+    //         userSession.state = states.ACCOUNT_SELECTION;
+    //         return accountsResult;  // This should send the populated list template to WhatsApp
+    //     } else {
+    //         return "No valid accounts available.";
+    //     }
+    // } else {
+    //     return "No accounts available.";
+    // }
+
+       const mock_account = accountsResult;
+       return mock_account;
 }
 
 
