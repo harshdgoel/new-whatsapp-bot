@@ -74,7 +74,7 @@ class BalanceService {
 
     // Parse the selected account and return the account object
     static parseAccountSelection(accountId, accounts) {
-        return accounts.find(account => account.id === accountId);
+        return accounts.find(account => account.title === accountId);
     }
 }
 
