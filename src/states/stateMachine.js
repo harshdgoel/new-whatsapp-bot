@@ -47,7 +47,7 @@ class StateMachine {
             userSession.state = states.OTP_VERIFICATION;
             return "Please enter the One Time Password sent to your registered number.";
         }
-
+        console.log("the last intent is:",userSession.lastIntent);
         userSession.state = states.LOGGED_IN;
         userSession.lastIntent = intent;
         return this.handleIntentAfterLogin(userSession);
