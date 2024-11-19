@@ -11,7 +11,7 @@ const states = {
 
 
 class RecentTransactionService {
-    static async fetchTransactionsForSelectedAccount(selectedAccount) {
+    static async fetchTransactionsForSelectedAccount(selectedAccount, messageBody) {
         console.log("entering fetchTransactionsForSelectedAccount");
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
@@ -29,7 +29,7 @@ class RecentTransactionService {
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
         try {
             const response = await OBDXService.invokeService(
-                "/digx-common/dda/v1/demandDeposit" + "AT3%40~AT30018200020" + "/transactions",
+                "/digx-common/dda/v1/demandDeposit/"+messageBody+ "/transactions",
                 "GET",
                 new Map(Object.entries(headers)),
                 queryParams,
