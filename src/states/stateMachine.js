@@ -128,10 +128,10 @@ class StateMachine {
 
     async handleAccountSelection(userSession, messageBody) {
         console.log("UserSession in handleAccountSelection is: ", userSession)
-        console.log("entering handleAccountSelection and accounts are:",userSession.accounts);
         console.log("entering handleAccountSelection and messageBody is:", messageBody) //messageBody is the selected account actual value
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
         if (selectedAccount) {
+            console.log("the selected account is:", selectedAccount);
             userSession.selectedAccount = selectedAccount;
             if(userSession.lastIntent == "BALANCE"){
             userSession.state = states.FETCHING_BALANCE;
@@ -140,6 +140,7 @@ class StateMachine {
             return balanceMessage;  // Return balance message
             }
            else if(userSession.lastIntent == "TRANSACTIONS"){
+               console.log("entering transactions service");
                 userSession.state = states.FETCHING_TRANSACTION;
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount);
                 userSession.state = states.LOGGED_IN;
