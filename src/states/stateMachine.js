@@ -124,6 +124,7 @@ class StateMachine {
     }
 
     async handleAccountSelection(userSession, messageBody) {
+        console.log("UserSession in handleAccountSelection is: ", userSession)
         console.log("entering handleAccountSelection and accounts are:",userSession.accounts);
         console.log("entering handleAccountSelection and messageBody is:", messageBody)
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
