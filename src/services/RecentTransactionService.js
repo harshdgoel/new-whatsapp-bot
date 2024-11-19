@@ -12,6 +12,7 @@ const states = {
 
 class RecentTransactionService {
     static async fetchTransactionsForSelectedAccount(selectedAccount) {
+        console.log("entering fetchTransactionsForSelectedAccount");
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
         if (!token || !cookie) {
