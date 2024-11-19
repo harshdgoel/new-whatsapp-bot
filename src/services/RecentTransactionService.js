@@ -11,16 +11,13 @@ const states = {
 
 
 class RecentTransactionService {
-    // Fetches balance for the selected account
     static async fetchTransactionsForSelectedAccount(selectedAccount) {
-    const token = LoginService.getToken();
+        const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
-
         if (!token || !cookie) {
            userSession.state = states.OTP_VERIFICATION;
             return "Please enter the One Time Password sent to your registered number.";
         }
-
         const headers = {
             "Authorization": `Bearer ${token}`,
             "Cookie": cookie,
@@ -28,9 +25,7 @@ class RecentTransactionService {
             "X-Token-Type": "JWT",
             "X-Target-Unit": "OBDX_BU"
         };
-
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
-
         try {
             const response = await OBDXService.invokeService(
                 "/digx-common/dda/v1/demandDeposit" + "AT3%40~AT30018200020" + "/transactions",
@@ -41,12 +36,7 @@ class RecentTransactionService {
                 null,
                 LoginService
             );
-
-            console.log("Response after FETCHACCOUNT API CALL IS", response);
-            console.log("Response.data:", response.data);
-            console.log("Response.data.accounte:", response.data.accounts);
-
-
+            console.log("Response after FETCHACCOUNTACTIVITY API CALL IS", response);
             // if (response.data && response.data.accounts) {
             //     const accounts = response.data.accounts;
             //     userSession.accounts = accounts; // Store accounts in user session
