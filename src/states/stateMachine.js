@@ -56,8 +56,14 @@ class StateMachine {
    async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
 
+    if(accountsResult){
     console.log("Full accountsResult:", JSON.stringify(accountsResult, null, 2));
+    userSession.state = states.ACCOUNT_SELECTION;
     return accountsResult;
+    }
+       else{
+           return "No accounts found";
+       }
 }
 
 
