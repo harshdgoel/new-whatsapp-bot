@@ -51,13 +51,23 @@ class LoginService {
         }
     }
 
-    async checkLogin() {
-        if (this.isTokenExpired()) {
-            console.log("Token expired or missing. OTP verification required.");
-            return false; // Return false if token is missing or expired
-        }
-        return true; // Return true if token is still valid
+async checkLogin() {
+    const token = this.getToken();
+    const cookie = this.getCookie();
+
+    if (!token || !cookie) {
+        console.log("Token or cookie is missing. Prompting for OTP.");
+        return false;
     }
+
+    if (this.isTokenExpired()) {
+        console.log("Token is expired. Prompting for OTP.");
+        return false;
+    }
+
+    console.log("Token and cookie are valid.");
+    return true;
+}
 
     async verifyOTP(otp) {
         try {
