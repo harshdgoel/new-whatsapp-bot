@@ -148,6 +148,10 @@ class LoginService {
                         return "Final login failed. Please try again.";
                     }
 
+
+                    console.log("Final token set:", finalLoginResponse.data.token);
+                    console.log("Final cookie set:", this.getCookie());
+
                     // Store token in authCache after successful login
                     this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
                     return true;
