@@ -143,7 +143,7 @@ class StateMachine {
            else if(userSession.lastIntent == "TRANSACTIONS"){
                console.log("entering transactions service");
                 userSession.state = states.FETCHING_TRANSACTION;
-                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount);
+                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
                 userSession.state = states.LOGGED_IN;
                console.log("transactions are:", transactionMessage);
                 return transactionMessage;
