@@ -6,6 +6,7 @@ const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
     LOGGED_OUT: "LOGGED_OUT",
+    TRANSACTIONS: "TRANSACTIONS",
     BALANCE: "BALANCE",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
     FETCHING_BALANCE: "FETCHING_BALANCE"
@@ -40,6 +41,11 @@ class StateMachine {
             userSession.state = states.BALANCE;
             userSession.lastIntent = intent;
             return await this.handleBalanceInquiry(userSession);
+        }
+         if (intent === "TRANSACTIONS") {
+            userSession.state = states.TRANSACTIONS;
+            userSession.lastIntent = intent;
+            return await this.handleTransactionInquiry(userSession);
         }
 
         const isLoggedIn = await LoginService.checkLogin();
