@@ -49,6 +49,7 @@ class StateMachine {
         }
         console.log("the last intent is:",userSession.lastIntent);
         userSession.state = states.LOGGED_IN;
+        console.log("INTENT TO SET IN LASTINTENT IS:", intent);
         userSession.lastIntent = intent;
         return this.handleIntentAfterLogin(userSession);
     }
