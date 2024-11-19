@@ -9,7 +9,8 @@ const states = {
     TRANSACTIONS: "TRANSACTIONS",
     BALANCE: "BALANCE",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
-    FETCHING_BALANCE: "FETCHING_BALANCE"
+    FETCHING_BALANCE: "FETCHING_BALANCE",
+    FETCHING_TRANSACTION: "FETCHING_TRANSACTION"
 };
 
 class StateMachine {
@@ -139,6 +140,7 @@ class StateMachine {
             return balanceMessage;  // Return balance message
             }
            else if(userSession.lastIntent == "TRANSACTIONS"){
+                userSession.state = states.FETCHING_TRANSACTION;
                return "Now fetching transactions";
            }
         } else {
