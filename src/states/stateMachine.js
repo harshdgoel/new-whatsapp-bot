@@ -45,7 +45,7 @@ class StateMachine {
          if (intent === "TRANSACTIONS") {
             userSession.state = states.TRANSACTIONS;
             userSession.lastIntent = intent;
-            return await this.handleTransactionInquiry(userSession);
+            return await this.handleBalanceInquiry(userSession);
         }
 
         const isLoggedIn = await LoginService.checkLogin();
@@ -117,6 +117,8 @@ class StateMachine {
         switch (userSession.lastIntent) {
             case "BALANCE":
                 return await this.handleBalanceInquiry(userSession);
+            case "TRANSACTIONS":
+                return await this.handleBalanceInquiry(userSession);
             default:
                 return "Oops! I'm encountering a trouble understanding you. Please try again later"; // THIS NEEDED TO BE CHANGED it goes in default case as 1234 is not recoginezes as intent and intent set to null... add condition if intent null then set intent to the start intent of flow
 
@@ -128,15 +130,17 @@ class StateMachine {
         console.log("entering handleAccountSelection and accounts are:",userSession.accounts);
         console.log("entering handleAccountSelection and messageBody is:", messageBody)
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
-        console.log("selected account is:", selectedAccount);
-
         if (selectedAccount) {
             userSession.selectedAccount = selectedAccount;
+            if(userSession.lastIntent == "BALANCE"){
             userSession.state = states.FETCHING_BALANCE;
-
             const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
             userSession.state = states.LOGGED_IN;
             return balanceMessage;  // Return balance message
+            }
+           else if(userSession.lastIntent == "TRANSACTIONS"){
+               return "Now fetching transactions";
+           }
         } else {
             return "Please enter a valid account selection from the list.";
         }
