@@ -1,5 +1,6 @@
 const LoginService = require("../services/loginService");
 const BalanceService = require("../services/BalanceService");
+const RecentTransactionService = require("../services/RecentTransactionService");
 const TemplateLayer = require("../services/TemplateLayer");
 
 const states = {
