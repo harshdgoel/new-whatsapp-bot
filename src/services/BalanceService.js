@@ -1,7 +1,8 @@
-const TemplateLayer = require('./TemplateLayer');
-const OBDXService = require('./OBDXService');
-const LoginService = require('./loginService');
-const { sendResponseToWhatsApp } = require('./apiHandler');
+const TemplateLayer = require("./TemplateLayer");
+const OBDXService = require("./OBDXService");
+const LoginService = require("./loginService");
+const endpoints = require("../config/endpoints");
+
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
@@ -9,43 +10,26 @@ const states = {
     LOGGED_OUT: "LOGGED_OUT"
 };
 
-
 class BalanceService {
     // Initiates the balance inquiry by fetching the accounts
     static async initiateBalanceInquiry(userSession) {
-        const token = LoginService.getToken();
-        const cookie = LoginService.getCookie();
-
-        if (!token || !cookie) {
-           userSession.state = states.OTP_VERIFICATION;
-            return "Please enter the One Time Password sent to your registered number.";
-        }
-
-        const headers = {
-            "Authorization": `Bearer ${token}`,
-            "Cookie": cookie,
-            "Content-Type": "application/json",
-            "X-Token-Type": "JWT",
-            "X-Target-Unit": "OBDX_BU"
-        };
-
-        const queryParams = new Map([["accountType", "CURRENT,SAVING"], ["status", "ACTIVE"], ["locale", "en"]]);
-
         try {
+            const queryParams = new Map([
+                ["accountType", "CURRENT,SAVING"],
+                ["status", "ACTIVE"],
+                ["locale", "en"]
+            ]);
+
             const response = await OBDXService.invokeService(
-                "/digx-common/dda/v1/demandDeposit",
+                endpoints.accounts,
                 "GET",
-                new Map(Object.entries(headers)),
                 queryParams,
-                {},
-                null,
+                {}, // No body needed for GET request
                 LoginService
             );
 
             console.log("Response after FETCHACCOUNT API CALL IS", response);
             console.log("Response.data:", response.data);
-            console.log("Response.data.accounte:", response.data.accounts);
-
 
             if (response.data && response.data.accounts) {
                 const accounts = response.data.accounts;
@@ -56,6 +40,10 @@ class BalanceService {
             }
         } catch (error) {
             console.error("Error fetching accounts:", error.message);
+            if (error.message.includes("Missing token or cookie")) {
+                userSession.state = states.OTP_VERIFICATION;
+                return "Please enter the One Time Password sent to your registered number.";
+            }
             return "An error occurred while fetching your accounts. Please try again.";
         }
     }

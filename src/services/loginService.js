@@ -2,6 +2,9 @@
 
 const OBDXService = require('../services/OBDXService');
 const jwt = require("jsonwebtoken");
+const endpoints = require("../config/endpoints");
+const defaultHomeEntity = config.defaultHomeEntity;
+
 
 class LoginService {
     constructor() {
@@ -73,27 +76,15 @@ async checkLogin() {
         try {
             console.log("First API call to obtain anonymous token.");
             const tokenResponse = await OBDXService.serviceMeth(
-                "/digx-infra/login/v1/anonymousToken",
+                endpoints.anonymousToken,
                 "POST",
                 new Map([["Content-Type", "application/json"], ["x-authentication-type", "JWT"]]),
                 new Map(),
                 {}
             );
 
-            console.log("THE RESPONSE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse); 
-            console.log("THE TOKEN COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse.headers.authorization);
-            console.log("THE COOKIE COMING FROM OBDX SERVICE FOR FIRST LOGIN", tokenResponse.headers['set-cookie']);
-
-
-
-            if (tokenResponse) {   //need to check for tokenResponse.status=="SUCCESS" here
-                
-                console.log("tokenResponse is:", tokenResponse);
-                console.log("Anonymous token obtained successfully.", tokenResponse.headers.authorization);
-                console.log("Cookie is:", tokenResponse.headers['set-cookie']);
+             if (tokenResponse) {   //need to check for tokenResponse.status=="SUCCESS" here
                 this.setAnonymousToken(tokenResponse.headers.authorization);
-
-                // Correct handling of set-cookie
                 const setCookie = tokenResponse.headers['set-cookie'];
                 if (setCookie) {
                     this.authCache.cookie = setCookie;
@@ -102,7 +93,7 @@ async checkLogin() {
                  console.log("second call anonymoustoken is",this.getAnonymousToken() )
                 // Second call to validate OTP
                 const otpResponse = await OBDXService.serviceMeth(
-                    "/digx-infra/login/v1/login?locale=en",
+                    endpoints.login,
                     "POST",
                     new Map([
                         ["Content-Type", "application/json"],
@@ -110,7 +101,7 @@ async checkLogin() {
                         ["TOKEN_ID", otp],
                         ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                         ["X-Token-Type", "JWT"],
-                        ["X-Target-Unit", "OBDX_BU"]
+                        ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
                     { mobileNumber: this.mobileNumber }
@@ -129,9 +120,11 @@ async checkLogin() {
                     }
                     this.registrationId = registrationId;
 
+                    const queryParams = new Map(["locale", "en"]);
+
                     // Third and final call to get session token and cookie
                     const finalLoginResponse = await OBDXService.serviceMeth(
-                        "/digx-infra/login/v1/login?locale=en",
+                        endpoints.login,
                         "POST",
                         new Map([
                             ["Content-Type", "application/json"],
@@ -139,9 +132,9 @@ async checkLogin() {
                             ["TOKEN_ID", otp],
                             ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                             ["X-Token-Type", "JWT"],
-                            ["X-Target-Unit", "OBDX_BU"]
+                            ["X-Target-Unit", defaultHomeEntity]
                         ]),
-                        new Map(),
+                        queryParams,
                         { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
                     );
 

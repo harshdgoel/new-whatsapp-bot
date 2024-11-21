@@ -1,44 +1,54 @@
 "use strict";
-
-const axios = require('axios');
-const baseURL = "https://rngnh-148-87-23-8.a.free.pinggy.link"; // Ensure this is your correct base URL
+const config = require("../config/config"); // Import config.js
+const axios = require("axios");
+const URL = config.baseURL; // Use the correct key from config
+const defaultHomeEntity = config.defaultHomeEntity;
 
 class OBDXService {
-    // Accept LoginService as a parameter
-    async invokeService(ctxPath, method, headers, queryParam, body, userId, loginService) {
+    // Constructs and returns headers for API calls
+    populateHeaders(loginService) {
+        const token = loginService.getToken();
+        const cookie = loginService.getCookie();
+
+        if (!token || !cookie) {
+            throw new Error("Missing token or cookie for API call.");
+        }
+
+        return new Map([
+            ["Authorization", `Bearer ${token}`],
+            ["Cookie", cookie],
+            ["Content-Type", "application/json"],
+            ["X-Token-Type", "JWT"],
+            ["X-Target-Unit", defaultHomeEntity]
+        ]);
+    }
+
+    // Main method to invoke services
+    async invokeService(ctxPath, method, queryParam, body, loginService) {
         console.log("Entering invokeService method");
 
-        // Use loginService parameter here to check login
-        const isLoggedIn = await loginService.checkLogin(baseURL); // Check if the token is valid
+        // Check if the user is logged in
+        const isLoggedIn = await loginService.checkLogin(baseURL);
 
         if (!isLoggedIn) {
             console.error("Login check failed. Token might be expired.");
             return { status: "error", message: "Login expired or missing." };
         }
 
-        // Get the latest token from LoginService
-        const token = loginService.getToken();
+        // Construct headers
+        const headers = this.populateHeaders(loginService);
+        console.log("Headers constructed successfully.");
 
-        if (!token) {
-            console.error("Missing token.");
-            return { status: "error", message: "Missing token." };
-        }
-
-        // Set Authorization header
-        headers.set("Authorization", `Bearer ${token}`);
-        console.log("Token set in headers");
-
-        // Now, make the service call
+        // Make the actual API call
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
         return responseData;
     }
 
-    // Helper method to make the actual API call using axios
-    async serviceMeth(ctxPath, method, hdr, queryParam, body) {
-        hdr.set("Content-Type", "application/json");
+    // Helper method to make the API call
+    async serviceMeth(ctxPath, method, headers, queryParam, body) {
+        const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
+        const headersObj = Object.fromEntries(headers);
 
-        const url = baseURL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
-        const headersObj = Object.fromEntries(hdr);
         console.log("Making request with headers:", headersObj);
         console.log("Request URL:", url);
 
@@ -57,6 +67,6 @@ class OBDXService {
             throw error; // Rethrow error to be handled by caller
         }
     }
-};
+}
 
 module.exports = new OBDXService();

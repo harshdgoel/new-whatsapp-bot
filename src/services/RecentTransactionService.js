@@ -19,22 +19,13 @@ class RecentTransactionService {
            userSession.state = states.OTP_VERIFICATION;
             return "Please enter the One Time Password sent to your registered number.";
         }
-        const headers = {
-            "Authorization": `Bearer ${token}`,
-            "Cookie": cookie,
-            "Content-Type": "application/json",
-            "X-Token-Type": "JWT",
-            "X-Target-Unit": "OBDX_BU"
-        };
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
         try {
             const response = await OBDXService.invokeService(
-                "/digx-common/dda/v1/demandDeposit/"+messageBody+ "/transactions",
+                endpoints.accounts + "/" + messageBody+ "/transactions",
                 "GET",
-                new Map(Object.entries(headers)),
                 queryParams,
                 {},
-                null,
                 LoginService
             );
             console.log("Response after FETCHACCOUNTACTIVITY API CALL IS", response);
