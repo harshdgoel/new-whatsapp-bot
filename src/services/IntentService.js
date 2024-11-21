@@ -6,7 +6,8 @@ class IntentService {
             INITIAL: ["start", "begin", "hello", "hi", "greetings"],
             HELP: ["help", "assist", "support", "what can you do"],
             BALANCE: ["balance", "check balance", "my balance", "account balance"],
-            TRANSACTIONS: ["Transactions", "Recent Transactions"]       
+            TRANSACTIONS: ["Transactions", "Recent Transactions"] ,
+            UPCOMINGPAYMENTS: ["Upcoming Payments"]
         };
     }
 
