@@ -1,41 +1,84 @@
 class TemplateLayer {
-    static generateAccountListTemplate(sections) {
-        // Log the received sections
-        console.log("sections in generateAccountListTemplate is: ", sections);
+    static generateTemplate({ type, sections, bodyText, buttonText, channel, to }) {
+        console.log("Generating template for channel:", channel, "and type:", type);
 
-        // Validate the sections parameter
-        if (!sections || !Array.isArray(sections) || sections.length === 0) {
-            console.error("Error: Sections is null, not an array, or empty.");
-            return {
-                messaging_product: "whatsapp",
-                to: "916378582419",
-                text: {
-                    body: "No accounts found. Please try again later."
-                }
-            };
+        if (!type || !channel || !to) {
+            throw new Error("Missing essential parameters: type, channel, or recipient.");
         }
 
-        const interactiveTemplate = {
+        // Validate channel type
+        if (!['whatsapp', 'facebook'].includes(channel.toLowerCase())) {
+            throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
+        }
+
+        const template = {
             recipient_type: "individual",
-            to: "916378582419",
-            messaging_product: "whatsapp",
-            type: "interactive",
-            interactive: {
-                type: "list",
-                body: {
-                    text: "Please select an account to view details."
-                },
-                action: {
-                    button: "View Accounts",
-                    sections: sections
-                }
-            }
+            to: to,
+            messaging_product: channel === "whatsapp" ? "whatsapp" : "messenger",
         };
 
-        // Log the generated interactive template
-        console.log("Generated interactive template:", JSON.stringify(interactiveTemplate, null, 2));
+        if (channel === "whatsapp") {
+            switch (type) {
+                case "list":
+                    if (!sections || !Array.isArray(sections) || sections.length === 0) {
+                        throw new Error("Missing or invalid sections for list template.");
+                    }
+                    template.type = "interactive";
+                    template.interactive = {
+                        type: "list",
+                        body: { text: bodyText || "Please make a selection." },
+                        action: {
+                            button: buttonText || "Select",
+                            sections: sections,
+                        },
+                    };
+                    break;
 
-        return interactiveTemplate;
+                case "button":
+                    if (!sections || !Array.isArray(sections) || sections.length === 0) {
+                        throw new Error("Missing or invalid sections for button template.");
+                    }
+                    template.type = "interactive";
+                    template.interactive = {
+                        type: "button",
+                        body: { text: bodyText || "Please choose an option." },
+                        action: { buttons: sections },
+                    };
+                    break;
+
+                case "text":
+                    template.type = "text";
+                    template.text = { body: bodyText || "Hello!" };
+                    break;
+
+                default:
+                    throw new Error(`Unsupported template type for WhatsApp: ${type}`);
+            }
+        } else if (channel === "facebook") {
+            switch (type) {
+                case "list":
+                case "button":
+                    template.message = {
+                        text: bodyText || "Please make a selection.",
+                        quick_replies: sections.map(section => ({
+                            content_type: "text",
+                            title: section.title,
+                            payload: section.id,
+                        })),
+                    };
+                    break;
+
+                case "text":
+                    template.message = { text: bodyText || "Hello!" };
+                    break;
+
+                default:
+                    throw new Error(`Unsupported template type for Facebook: ${type}`);
+            }
+        }
+
+        console.log("Generated template:", JSON.stringify(template, null, 2));
+        return template;
     }
 }
 
