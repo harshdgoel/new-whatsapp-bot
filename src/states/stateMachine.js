@@ -62,33 +62,14 @@ class StateMachine {
         return this.handleIntentAfterLogin(userSession);
     }
 
-   async handleBalanceInquiry(userSession) {
+async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
     if (typeof accountsResult === "string") {
         return accountsResult; // Either OTP prompt or error message
-    } else if (accountsResult) {
-        const rows = [];
-        const sections = accountsResult.interactive.action.sections;
-        for (let i = 0; i < sections[0].rows.length; i++) {
-            const account = sections[0].rows[i];  // Access account directly from the rows
-            const accountId = account.id;
-            if (!accountId) {
-                console.warn(`Account ${i + 1} is missing id`);
-                continue; 
-            }
-            rows.push({
-                id: accountId,
-                title: account.title
-            });
-        }
-        if (rows.length > 0) {
-            sections[0].rows = rows; 
-            console.log("Final accountsResult with populated sections:", JSON.stringify(accountsResult, null, 2));
-            userSession.state = states.ACCOUNT_SELECTION;
-            return accountsResult;  // This should send the populated list template to WhatsApp
-        } else {
-            return "No valid accounts available.";
-        }
+    } else if (accountsResult && accountsResult.type === "interactive") {
+        console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
+        userSession.state = states.ACCOUNT_SELECTION;
+        return accountsResult; // Return the interactive template directly
     } else {
         return "No accounts available.";
     }
