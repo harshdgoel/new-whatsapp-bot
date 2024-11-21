@@ -67,7 +67,7 @@ const templateData = {
     bodyText: "Please select an account to view details.",
     buttonText: "View Accounts",
     channel: "whatsapp",
-    to: userSession.contactNumber || "916378582419", // Replace with actual recipient number
+    to: "916378582419", // Replace with actual recipient number
 };
 
 return TemplateLayer.generateTemplate(templateData);
