@@ -20,7 +20,8 @@ class RecentTransactionService {
             return "Please enter the One Time Password sent to your registered number.";
         }
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
-        console.log("selected acount actual value in transactions",  selectedAccount.id.value)
+        console.log("selected acount actual value in transactions",  selectedAccount.id.value);
+        console.log("url is:",endpoints.accounts + "/" + selectedAccount.id.value + "/transactions");
         try {
             const response = await OBDXService.invokeService(
                 endpoints.accounts + "/" + selectedAccount.id.value + "/transactions",
