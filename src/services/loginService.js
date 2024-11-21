@@ -3,6 +3,7 @@
 const OBDXService = require('../services/OBDXService');
 const jwt = require("jsonwebtoken");
 const endpoints = require("../config/endpoints");
+const config = require("../config/config");
 const defaultHomeEntity = config.defaultHomeEntity;
 
 
