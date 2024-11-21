@@ -1,46 +1,35 @@
 const axios = require('axios');
 const TemplateLayer = require('./TemplateLayer');
 
-const sendResponseToWhatsApp = async (phoneNumberId, to, message, apiResponse = null) => {
+const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
     let responseData;
 
     try {
-        // Validate critical parameters
         if (!phoneNumberId || !to || !message) {
             throw new Error("Missing essential parameters: phoneNumberId, to, or message.");
         }
 
-        if (message && message.type === 'interactive') {
-            console.log("Detected interactive message type. Generating list template...", message);
+        if (message.type === 'interactive') {
+            // If the message is an interactive template, send it as is
             responseData = message;
-
-            if (!responseData) {
-                throw new Error("Failed to generate interactive template due to invalid API response.");
-            }
-
-            console.log("Generated interactive template:", JSON.stringify(responseData, null, 2));
         } else {
-            console.log("Sending a text message...");
-
+            // Otherwise, send a text message
             responseData = {
                 messaging_product: "whatsapp",
                 to: to,
                 text: { body: String(message) }
             };
-
-            console.log("Text message response data:", JSON.stringify(responseData, null, 2));
         }
 
-        console.log("Sending response to WhatsApp...");
+        console.log("Sending response to WhatsApp...", JSON.stringify(responseData, null, 2));
 
         const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
-
         console.log("WhatsApp response sent successfully:", response);
-
     } catch (error) {
         console.error("Error sending WhatsApp message:", error.message || error);
     }
 };
+
 
 const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
     try {
