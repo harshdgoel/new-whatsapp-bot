@@ -6,13 +6,9 @@ const handleIncomingMessage = async (phoneNumberId, from, message) => {
     const { body, intent } = message;
     console.log("Received message:", message);
 
-    // Ensure handleMessage exists
-    if (typeof stateMachine.handleMessage !== 'function') {
-        throw new Error("handleMessage is not a function on stateMachine");
-    }
-
-    // Call handleMessage
     const responseMessage = await stateMachine.handleMessage(from, body, intent);
+
+    // Pass the generated template or message directly to the API handler
     await sendResponseToWhatsApp(phoneNumberId, from, responseMessage);
 };
 
