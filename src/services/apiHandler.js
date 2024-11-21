@@ -1,5 +1,4 @@
 const axios = require('axios');
-const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
     let responseData;
@@ -12,13 +11,16 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
         if (message.type === 'interactive') {
             // If the message is an interactive template, send it as is
             responseData = message;
-        } else {
-            // Otherwise, send a text message
+        } else if (message.type === 'text' && message.text && message.text.body) {
+            // For text messages, extract the text body
             responseData = {
                 messaging_product: "whatsapp",
                 to: to,
-                text: { body: String(message) }
+                type: "text",
+                text: { body: message.text.body }
             };
+        } else {
+            throw new Error("Invalid message format or unsupported type.");
         }
 
         console.log("Sending response to WhatsApp...", JSON.stringify(responseData, null, 2));
@@ -26,20 +28,19 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
         const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
         console.log("WhatsApp response sent successfully:", response);
     } catch (error) {
-        console.error("Error sending WhatsApp message:", error.message || error);
+        console.error("Error sending WhatsApp message:", error.response ? error.response.data : error.message);
     }
 };
 
-
 const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
     try {
-        console.log("sendToWhatsAppAPI - Sending data:", JSON.stringify(messageData));
+        console.log("sendToWhatsAppAPI - Sending data:", JSON.stringify(messageData, null, 2));
 
         const response = await axios.post(
             `https://graph.facebook.com/v20.0/${phoneNumberId}/messages`,
             messageData,
             {
-                headers: { 'Authorization': `Bearer ${process.env.MYTOKEN}` }
+                headers: { Authorization: `Bearer ${process.env.MYTOKEN}` }
             }
         );
 
