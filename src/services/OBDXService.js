@@ -26,20 +26,8 @@ class OBDXService {
     // Main method to invoke services
     async invokeService(ctxPath, method, queryParam, body, loginService) {
         console.log("Entering invokeService method");
-
-        // Check if the user is logged in
-        const isLoggedIn = await loginService.checkLogin(URL);
-
-        if (!isLoggedIn) {
-            console.error("Login check failed. Token might be expired.");
-            return { status: "error", message: "Login expired or missing." };
-        }
-
-        // Construct headers
         const headers = this.populateHeaders(loginService);
         console.log("Headers constructed successfully.");
-
-        // Make the actual API call
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
         return responseData;
     }
