@@ -28,7 +28,7 @@ class OBDXService {
         console.log("Entering invokeService method");
 
         // Check if the user is logged in
-        const isLoggedIn = await loginService.checkLogin(baseURL);
+        const isLoggedIn = await loginService.checkLogin(URL);
 
         if (!isLoggedIn) {
             console.error("Login check failed. Token might be expired.");
