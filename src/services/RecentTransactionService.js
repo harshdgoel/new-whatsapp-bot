@@ -48,7 +48,7 @@ class RecentTransactionService {
                 const transactions = response.data.items;
 
                 // Prepare text for WhatsApp
-                let bodyText = "*Recent Transactions:*\n\n";
+                let bodyText = "*Here are your Recent Transactions:*\n";
                 transactions.forEach((transaction, index) => {
                     const accountDisplayValue = transaction.accountId?.displayValue || "N/A";
                     const currency = transaction.amountInAccountCurrency?.currency || "N/A";
