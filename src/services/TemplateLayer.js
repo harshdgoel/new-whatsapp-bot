@@ -1,12 +1,20 @@
 class TemplateLayer {
     static generateAccountListTemplate(sections) {
-
-
+        // Log the received sections
         console.log("sections in generateAccountListTemplate is: ", sections);
-        if (!apiResponse || !Array.isArray(apiResponse) || apiResponse.length === 0) {
-            console.error("Error: API response is null, not an array, or empty.");
-            return "No accounts found";
+
+        // Validate the sections parameter
+        if (!sections || !Array.isArray(sections) || sections.length === 0) {
+            console.error("Error: Sections is null, not an array, or empty.");
+            return {
+                messaging_product: "whatsapp",
+                to: "916378582419",
+                text: {
+                    body: "No accounts found. Please try again later."
+                }
+            };
         }
+
         const interactiveTemplate = {
             recipient_type: "individual",
             to: "916378582419",
@@ -15,7 +23,7 @@ class TemplateLayer {
             interactive: {
                 type: "list",
                 body: {
-                    text: "Please select from the following account to view details."
+                    text: "Please select an account to view details."
                 },
                 action: {
                     button: "View Accounts",
