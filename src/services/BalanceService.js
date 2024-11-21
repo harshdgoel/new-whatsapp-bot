@@ -36,8 +36,7 @@ class BalanceService {
                 userSession.accounts = accounts; // Store accounts in user session
                  // Initialize rows array for storing account details
         const rows = [];
-
-        // Iterate over each account in the API response
+        // Iterate over each account in the API respons
         for (let i = 0; i < accounts.length; i++) {
             const account = accounts[i];
             const accountId = account.id?.value;
@@ -60,7 +59,19 @@ class BalanceService {
             }
         ];
                 console.log("Sections generated in Balance is:", sections);
-                return TemplateLayer.generateAccountListTemplate(sections);
+
+            
+const templateData = {
+    type: "list",
+    sections:sections,
+    bodyText: "Please select an account to view details.",
+    buttonText: "View Accounts",
+    channel: "whatsapp",
+    to: userSession.contactNumber || "916378582419", // Replace with actual recipient number
+};
+
+return TemplateLayer.generateTemplate(templateData);
+
             } else {
                 throw new Error("No accounts found in the response.");
             }
