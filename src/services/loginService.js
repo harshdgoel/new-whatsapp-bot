@@ -120,8 +120,7 @@ async checkLogin() {
                         return "Final login failed due to missing registration ID. Please try again.";
                     }
                     this.registrationId = registrationId;
-
-                    const queryParams = new Map(["locale", "en"]);
+                    const queryParams = new Map([["locale", "en"]]);
 
                     // Third and final call to get session token and cookie
                     const finalLoginResponse = await OBDXService.serviceMeth(
