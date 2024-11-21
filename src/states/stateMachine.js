@@ -60,13 +60,13 @@ class StateMachine {
     if (intent === "TRANSACTIONS") {
         userSession.state = states.TRANSACTIONS;
         userSession.lastIntent = intent;
-        return await this.handleTransactionsInquiry(userSession); // Update for TRANSACTIONS
+        return await this.handleBalanceInquiry(userSession); // Update for TRANSACTIONS
     }
 
      if (intent === "UPCOMINGPAYMENTS") {
         userSession.state = states.UPCOMINGPAYMENTS;
         userSession.lastIntent = intent;
-        return await this.handlePaymentsInquiry(userSession); // Update for Payments
+        return await this.handleBalanceInquiry(userSession); // Update for Payments
       }
 
     // If logged in but intent is null or not recognized
