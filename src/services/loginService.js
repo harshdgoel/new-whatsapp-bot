@@ -39,17 +39,29 @@ class LoginService {
         console.log("Auth cache cleared due to expired token.");
     }
 
-    isTokenExpired() {
+ isTokenExpired() {
         const token = this.getToken();
         if (!token) return true;
+
         try {
-            const { exp } = jwt.decode(token);
+            // Decode the token to extract the payload
+            const payloadBase64 = token.split('.')[1]; // JWT is in the format "header.payload.signature"
+            const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+
+            const exp = decodedPayload.exp;
+            if (!exp) {
+                this.clearAuthCache();
+                return true;
+            }
+
             const isExpired = Date.now() >= exp * 1000;
             if (isExpired) {
                 this.clearAuthCache();
             }
+
             return isExpired;
-        } catch {
+        } catch (error) {
+            console.error("Error decoding token:", error.message);
             this.clearAuthCache();
             return true;
         }
