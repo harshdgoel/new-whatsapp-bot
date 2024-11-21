@@ -1,6 +1,7 @@
 const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
+const endpoints = require("../config/endpoints");
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
 const states = {
