@@ -34,7 +34,33 @@ class BalanceService {
             if (response.data && response.data.accounts) {
                 const accounts = response.data.accounts;
                 userSession.accounts = accounts; // Store accounts in user session
-                return TemplateLayer.generateAccountListTemplate(accounts);
+                 // Initialize rows array for storing account details
+        const rows = [];
+
+        // Iterate over each account in the API response
+        for (let i = 0; i < accounts.length; i++) {
+            const account = accounts[i];
+            const accountId = account.id?.value;
+            if (!accountId) {
+                console.warn(`Account ${i + 1} is missing id.value`);
+                continue; // Skip this account if id is missing
+            }
+            const accountTitle = account.id?.displayValue;
+            console.log(`Account ${i + 1} title:`, accountTitle);
+            rows.push({
+                id: accountId,
+                title: accountTitle
+            });
+        }
+
+        const sections = [
+            {
+                title: "Select an Account",
+                rows: rows
+            }
+        ];
+                console.log("Sections generated in Balance is:", sections);
+                return TemplateLayer.generateAccountListTemplate(sections);
             } else {
                 throw new Error("No accounts found in the response.");
             }
