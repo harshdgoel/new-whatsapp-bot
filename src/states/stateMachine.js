@@ -26,41 +26,54 @@ class StateMachine {
         return this.sessionCache.get(userId);
     }
 
-    async handleMessage(from, messageBody, intent) {
-        const userSession = this.getSession(from);
-        console.log("Handling message, userSession:", userSession);
+   async handleMessage(from, messageBody, intent) {
+    const userSession = this.getSession(from);
+    console.log("Handling message, userSession:", userSession);
 
-        if (userSession.state === states.OTP_VERIFICATION) {
-            userSession.otp = messageBody;
-            return await this.handleOTPVerification(userSession);
-        }
-
-        if (userSession.state === states.ACCOUNT_SELECTION) {
-            return await this.handleAccountSelection(userSession, messageBody);
-        }
-
-        if (intent === "BALANCE") {
-            userSession.state = states.BALANCE;
-            userSession.lastIntent = intent;
-            return await this.handleBalanceInquiry(userSession);
-        }
-         if (intent === "TRANSACTIONS") {
-            userSession.state = states.TRANSACTIONS;
-            userSession.lastIntent = intent;
-            return await this.handleBalanceInquiry(userSession);
-        }
-
-        const isLoggedIn = await LoginService.checkLogin();
-        if (!isLoggedIn) {
-            userSession.lastIntent = intent;
-            userSession.state = states.OTP_VERIFICATION;
-            return "Please enter the One Time Password sent to your registered number.";
-        }
-        console.log("the last intent is:",userSession.lastIntent);
-        userSession.state = states.LOGGED_IN;
-        userSession.lastIntent = intent;
-        return this.handleIntentAfterLogin(userSession);
+    // Check if user is in OTP verification state
+    if (userSession.state === states.OTP_VERIFICATION) {
+        userSession.otp = messageBody;
+        return await this.handleOTPVerification(userSession);
     }
+
+    // Check if user is in account selection state
+    if (userSession.state === states.ACCOUNT_SELECTION) {
+        return await this.handleAccountSelection(userSession, messageBody);
+    }
+
+    // Early login check
+    const isLoggedIn = await LoginService.checkLogin();
+    if (!isLoggedIn) {
+        userSession.lastIntent = intent; // Save intent for post-login processing
+        userSession.state = states.OTP_VERIFICATION;
+        return "Please enter the One Time Password sent to your registered number.";
+    }
+
+    // Handle recognized intents
+    if (intent === "BALANCE") {
+        userSession.state = states.BALANCE;
+        userSession.lastIntent = intent;
+        return await this.handleBalanceInquiry(userSession);
+    }
+
+    if (intent === "TRANSACTIONS") {
+        userSession.state = states.TRANSACTIONS;
+        userSession.lastIntent = intent;
+        return await this.handleTransactionsInquiry(userSession); // Update for TRANSACTIONS
+    }
+
+    // If logged in but intent is null or not recognized
+    if (!intent) {
+	console.log("userSession.lastIntent: ", userSession.lastIntent);
+        if (userSession.lastIntent) {
+            return this.handleIntentAfterLogin(userSession); // Continue previous intent
+        }
+        return "I'm sorry, I didn't understand that. Could you please rephrase?";
+    }
+
+    // Default fallback
+    return "I'm sorry, I couldn't process your request. Please try again.";
+}
 
 async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
