@@ -64,9 +64,7 @@ class StateMachine {
 
 async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
-    if (typeof accountsResult === "string") {
-        return accountsResult; // Either OTP prompt or error message
-    } else if (accountsResult && accountsResult.type === "interactive") {
+    if (accountsResult && accountsResult.type === "interactive") {
         console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
         userSession.state = states.ACCOUNT_SELECTION;
         return accountsResult; // Return the interactive template directly
@@ -126,7 +124,7 @@ async handleBalanceInquiry(userSession) {
                 userSession.state = states.FETCHING_TRANSACTION;
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
                 userSession.state = states.LOGGED_IN;
-               console.log("transactions are:", transactionMessage);
+                console.log("transactions are:", transactionMessage);
                 return transactionMessage;
            }
         } else {
