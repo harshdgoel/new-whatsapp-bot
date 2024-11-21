@@ -2,6 +2,8 @@ const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
 const endpoints = require("../config/endpoints");
+const config = require("../config/config"); // Import config.js
+const channel = config.channel;
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
 const states = {
@@ -70,7 +72,7 @@ class RecentTransactionService {
                 const templateData ={
                     type: "text",
                     bodyText: bodyText,
-                    channel: "whatsapp",
+                    channel: channel,
                     to: "916378582419"
                 };
               return TemplateLayer.generateTemplate(templateData);
