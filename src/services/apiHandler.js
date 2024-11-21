@@ -21,6 +21,7 @@ const sendResponseToWhatsApp = async (phoneNumberId, to, message) => {
                 type: "text",
                 text: { body: message.text.body }
             };
+        }
         else {
             // Otherwise, send a text message
             responseData = {
@@ -59,4 +60,4 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
     }
 };
 
-module.exports = { sendResponseToWhatsApp };
+module.exports = { sendResponseToWhatsApp }
