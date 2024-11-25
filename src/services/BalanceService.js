@@ -1,3 +1,14 @@
+const TemplateLayer = require("./TemplateLayer");
+const OBDXService = require("./OBDXService");
+const LoginService = require("./loginService");
+const endpoints = require("../config/endpoints");
+const config = require("../config/config"); // Import config.js
+const channel = config.channel;
+const states = {
+    OTP_VERIFICATION: "OTP_VERIFICATION",
+    LOGGED_IN: "LOGGED_IN",
+    LOGGED_OUT: "LOGGED_OUT"
+};
 class BalanceService {
     static async initiateBalanceInquiry(userSession) {
         try {
