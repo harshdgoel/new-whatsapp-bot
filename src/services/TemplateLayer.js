@@ -56,15 +56,23 @@ class TemplateLayer {
             }
         } else if (channel === "facebook") {
             switch (type) {
-                case "list":
-                case "button":
+                case "button": // Use postback buttons for Facebook
+                    if (!sections || !Array.isArray(sections) || sections.length === 0) {
+                        throw new Error("Missing or invalid sections for button template.");
+                    }
                     template.message = {
-                        text: bodyText || "Please make a selection.",
-                        quick_replies: sections.map(section => ({
-                            content_type: "text",
-                            title: section.title,
-                            payload: section.id,
-                        })),
+                        attachment: {
+                            type: "template",
+                            payload: {
+                                template_type: "button",
+                                text: bodyText || "Please make a selection.",
+                                buttons: sections.map(section => ({
+                                    type: "postback",
+                                    title: section.title,
+                                    payload: section.id, // Use the account ID as payload
+                                })),
+                            },
+                        },
                     };
                     break;
 
