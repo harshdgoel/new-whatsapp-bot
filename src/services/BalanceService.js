@@ -34,24 +34,49 @@ class BalanceService {
 
                 // Generate rows for accounts
                 const rows = accounts.map((account, index) => ({
-                    id: account.id?.value || `account_${index}`,
-                    title: account.id?.displayValue || `Account ${index + 1}`,
+                    id: account.id?.value || `account_${index}`, // Unique account ID
+                    title: account.id?.displayValue || `Account ${index + 1}`, // Display name
+                    payload: account.id?.displayValue || `Account ${index + 1}`, // Payload for Messenger
                 }));
 
-                // Set the template type based on the channel
-                const templateType = config.channel.toLowerCase() === "facebook" ? "quick_replies" : "list";
+                const channel = config.channel.toLowerCase();
+                let templateData;
 
-                // Construct the template data
-                const templateData = {
-                    type: templateType,
-                    sections: rows, // Use rows directly for both list and button templates
-                    bodyText: "Please select an account to view details.",
-                    buttonText: "View Accounts",
-                    channel: config.channel, // Dynamically use the channel from config
-                    to: "916378582419", // Replace with actual recipient number
-                };
+                // Generate the appropriate template structure based on the channel
+                switch (channel) {
+                    case "whatsapp":
+                        templateData = {
+                            type: "list",
+                            sections: rows.map(row => ({
+                                id: row.id,
+                                title: row.title,
+                            })), // Include only id and title for WhatsApp
+                            bodyText: "Please select an account to view details.",
+                            buttonText: "View Accounts",
+                            channel,
+                            to: "916378582419", // Replace with actual recipient number
+                        };
+                        break;
 
-                // Generate and return the appropriate template
+                    case "facebook":
+                        templateData = {
+                            type: "quick_replies",
+                            sections: rows.map(row => ({
+                                content_type: "text",
+                                title: row.title,
+                                payload: row.payload, // Payload for Facebook
+                            })), // Include title and payload for Messenger
+                            bodyText: "Please select an account to view details.",
+                            channel,
+                            to: "1306151306130839", // Replace with actual recipient ID
+                        };
+                        break;
+
+                    default:
+                        throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
+                }
+
+                // Pass the constructed template data to the TemplateLayer
                 return TemplateLayer.generateTemplate(templateData);
             } else {
                 throw new Error("No accounts found in the response.");
