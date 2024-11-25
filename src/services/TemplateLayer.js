@@ -11,10 +11,9 @@ class TemplateLayer {
             throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
         }
 
+        // Template for WhatsApp
         const template = {
-            recipient_type: "individual",
             to: to,
-            messaging_product: channel === "whatsapp" ? "whatsapp" : "messenger",
         };
 
         if (channel === "whatsapp") {
@@ -23,6 +22,7 @@ class TemplateLayer {
                     if (!sections || !Array.isArray(sections) || sections.length === 0) {
                         throw new Error("Missing or invalid sections for list template.");
                     }
+                    template.messaging_product = "whatsapp";
                     template.type = "interactive";
                     template.interactive = {
                         type: "list",
@@ -38,6 +38,7 @@ class TemplateLayer {
                     if (!sections || !Array.isArray(sections) || sections.length === 0) {
                         throw new Error("Missing or invalid sections for button template.");
                     }
+                    template.messaging_product = "whatsapp";
                     template.type = "interactive";
                     template.interactive = {
                         type: "button",
@@ -47,6 +48,7 @@ class TemplateLayer {
                     break;
 
                 case "text":
+                    template.messaging_product = "whatsapp";
                     template.type = "text";
                     template.text = { body: bodyText || "Hello!" };
                     break;
@@ -54,26 +56,30 @@ class TemplateLayer {
                 default:
                     throw new Error(`Unsupported template type for WhatsApp: ${type}`);
             }
-        } else if (channel === "facebook") {
+        }
+
+        // Template for Facebook Messenger
+        else if (channel === "facebook") {
             switch (type) {
-                case "persistent_menu":
+                case "quick_replies":
                     if (!sections || !Array.isArray(sections) || sections.length === 0) {
-                        throw new Error("Missing or invalid sections for persistent menu.");
+                        throw new Error("Missing or invalid sections for quick reply template.");
                     }
-                    template.persistent_menu = [
-                        {
-                            locale: "default",
-                            composer_input_disabled: false,
-                            call_to_actions: sections.map(section => ({
-                                type: "postback",
-                                title: section.title,
-                                payload: section.id,
-                            })),
-                        },
-                    ];
+                    template.recipient = {
+                        id: to,
+                    };
+                    template.message = {
+                        text: bodyText || "Please select an account:",
+                        quick_replies: sections.map(section => ({
+                            content_type: "text",
+                            title: section.title,
+                            payload: section.payload,
+                        })),
+                    };
                     break;
 
                 case "text":
+                    template.recipient = { id: to };
                     template.message = { text: bodyText || "Hello!" };
                     break;
 
