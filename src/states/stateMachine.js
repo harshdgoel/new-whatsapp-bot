@@ -84,6 +84,7 @@ class StateMachine {
 
 async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+    console.log("accountsResult is: ",accountsResult);
     if (accountsResult && accountsResult.type === "interactive") {
         console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
         userSession.state = states.ACCOUNT_SELECTION;
