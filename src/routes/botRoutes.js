@@ -38,57 +38,76 @@ router.get("/webhook", (req, res) => {
 
 // This route handles both messages and statuses
 router.post("/webhook", async (req, res) => {
+    const channel = process.env.CHANNEL; // Get the channel from the environment file
     const { entry } = req.body;
 
     // Validate the structure of the webhook
-    if (!entry || !entry[0]?.changes?.[0]?.value) {
+    if (!entry || !Array.isArray(entry)) {
         console.error("Invalid webhook structure received:", JSON.stringify(entry, null, 2));
         return res.status(400).send("Invalid webhook payload.");
     }
 
-    const changes = entry[0].changes || [];
-
     try {
-        for (const change of changes) {
-            const value = change.value;
+        // Loop through the entries
+        for (const event of entry) {
+            if (channel === "whatsapp") {
+                // WhatsApp-specific webhook processing
+                const changes = event.changes || [];
 
-            // Handle incoming messages
-            if (value.messages) {
-                const messagingEvent = value.messages[0];
-                const { from, text, interactive } = messagingEvent;
+                for (const change of changes) {
+                    const value = change.value;
 
-                let messageBody = text?.body || ""; // Default to the text message body
-                if (interactive) {
-                    // If it's an interactive message (e.g., list selection), get the selected ID
-                    messageBody = interactive.list_reply?.id || ""; // The ID of the selected list option
+                    // Handle incoming WhatsApp messages
+                    if (value.messages) {
+                        const messagingEvent = value.messages[0];
+                        const { from, text, interactive } = messagingEvent;
+
+                        let messageBody = text?.body || ""; // Default to the text message body
+                        if (interactive) {
+                            // If it's an interactive message (e.g., list selection), get the selected ID
+                            messageBody = interactive.list_reply?.id || ""; // The ID of the selected list option
+                        }
+
+                        // Identify intent from the message body
+                        const intent = identifyIntent(messageBody);
+
+                        // Handle the message with the intent and from user
+                        await handleIncomingMessage(config.phoneNumberId, from, { body: messageBody, intent });
+                    } else {
+                        console.log("Unhandled change for WhatsApp:", JSON.stringify(change, null, 2));
+                    }
                 }
+            } else if (channel === "facebook") {
+                // Facebook Messenger-specific webhook processing
+                const messagingEvents = event.messaging || []; // For Facebook Messenger
 
-                const intent = identifyIntent(messageBody);
+                for (const messagingEvent of messagingEvents) {
+                    const senderId = messagingEvent.sender.id;
+                    const recipientId = messagingEvent.recipient.id;
 
-                // Call the function to handle the incoming message
-                await handleIncomingMessage(config.phoneNumberId, from, { body: messageBody, intent });
+                    if (messagingEvent.message && messagingEvent.message.text) {
+                        // Extract the message text
+                        const messageBody = messagingEvent.message.text;
 
-            } else if (value.statuses) {
-                // Handle message statuses
-                const statusEvent = value.statuses[0];
-                const { id, status, recipient_id, timestamp, conversation } = statusEvent;
+                        // Identify intent from the message
+                        const intent = identifyIntent(messageBody);
 
-                console.log("Status Update Received:", {
-                    messageId: id,
-                    recipientId: recipient_id,
-                    status,
-                    timestamp,
-                    conversationId: conversation?.id
-                });
-
-                // You can add specific logic here to handle statuses if needed
-                // For example, tracking delivery statuses or receipts
+                        // Call the function to handle the incoming message
+                        await handleIncomingMessage(recipientId, senderId, {
+                            body: messageBody,
+                            intent,
+                        });
+                    } else {
+                        console.log("Unhandled messaging event for Facebook:", JSON.stringify(messagingEvent, null, 2));
+                    }
+                }
             } else {
-                console.log("Unhandled change:", JSON.stringify(change, null, 2));
+                console.error("Unsupported channel specified:", channel);
+                return res.status(400).send("Unsupported channel specified.");
             }
         }
 
-        res.sendStatus(200); // Respond with success to WhatsApp
+        res.sendStatus(200); // Respond with success to the platform (WhatsApp/Facebook)
     } catch (error) {
         console.error("Error processing webhook:", error);
         res.status(500).send("Internal server error.");
