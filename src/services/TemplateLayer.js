@@ -56,24 +56,21 @@ class TemplateLayer {
             }
         } else if (channel === "facebook") {
             switch (type) {
-                case "button": // Use postback buttons for Facebook
+                case "persistent_menu":
                     if (!sections || !Array.isArray(sections) || sections.length === 0) {
-                        throw new Error("Missing or invalid sections for button template.");
+                        throw new Error("Missing or invalid sections for persistent menu.");
                     }
-                    template.message = {
-                        attachment: {
-                            type: "template",
-                            payload: {
-                                template_type: "button",
-                                text: bodyText || "Please make a selection.",
-                                buttons: sections.map(section => ({
-                                    type: "postback",
-                                    title: section.title,
-                                    payload: section.id, // Use the account ID as payload
-                                })),
-                            },
+                    template.persistent_menu = [
+                        {
+                            locale: "default",
+                            composer_input_disabled: false,
+                            call_to_actions: sections.map(section => ({
+                                type: "postback",
+                                title: section.title,
+                                payload: section.id,
+                            })),
                         },
-                    };
+                    ];
                     break;
 
                 case "text":
