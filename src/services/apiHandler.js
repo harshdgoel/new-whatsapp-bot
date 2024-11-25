@@ -11,9 +11,9 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
 
         if (channel === "whatsapp") {
             // WhatsApp-specific message formatting
-            if (message.type === 'interactive') {
+            if (message.type === "interactive") {
                 responseData = message;
-            } else if (message.type === 'text' && message.text?.body) {
+            } else if (message.type === "text" && message.text?.body) {
                 responseData = {
                     messaging_product: "whatsapp",
                     to: to,
@@ -29,32 +29,32 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             }
 
             console.log("Sending response to WhatsApp...", JSON.stringify(responseData, null, 2));
-
             const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
             console.log("WhatsApp response sent successfully:", response);
 
         } else if (channel === "facebook") {
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
-                // If message is a plain string, treat it as text
+                // Plain text message
                 responseData = {
-                    messaging_type: "RESPONSE",
+                    messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
                     message: { text: message },
+                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
-                // For text messages with the text body
+                // Text with the text body
                 responseData = {
-                    messaging_type: "RESPONSE",
+                    messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
                     message: { text: message.text.body },
+                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else {
                 throw new Error("Unsupported Facebook message format.");
             }
 
             console.log("Sending response to Facebook Messenger...", JSON.stringify(responseData, null, 2));
-
             const response = await sendToFacebookAPI(responseData);
             console.log("Facebook response sent successfully:", response);
         } else {
@@ -85,8 +85,14 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
 const sendToFacebookAPI = async (messageData) => {
     try {
         const response = await axios.post(
-            `https://graph.facebook.com/v20.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-            messageData
+            `https://graph.facebook.com/v20.0/me/messages`, // Correct endpoint
+            messageData,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${process.env.PAGE_ACCESS_TOKEN}`,
+                },
+            }
         );
         return response.data;
     } catch (error) {
