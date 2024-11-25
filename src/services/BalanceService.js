@@ -39,7 +39,7 @@ class BalanceService {
                 }));
 
                 // Set the template type based on the channel
-                const templateType = config.channel.toLowerCase() === "facebook" ? "persistent_menu" : "list";
+                const templateType = config.channel.toLowerCase() === "facebook" ? "quick_replies" : "list";
 
                 // Construct the template data
                 const templateData = {
