@@ -2,6 +2,7 @@ const axios = require('axios');
 const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
+    console.log("entering sendResponseToChannel and message is: ",message);
     let responseData;
 
     try {
@@ -83,6 +84,7 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
 };
 
 const sendToFacebookAPI = async (messageData) => {
+    console.log("entering sendToFacebookAPI and messageData is: ",messageData);
     try {
         const response = await axios.post(
             `https://graph.facebook.com/v20.0/me/messages`, // Correct endpoint
@@ -94,6 +96,7 @@ const sendToFacebookAPI = async (messageData) => {
                 },
             }
         );
+        console.log("sendToFacebookAPI response is: ",response);
         return response.data;
     } catch (error) {
         console.error("Error in sendToFacebookAPI:", error.response?.data || error.message);
