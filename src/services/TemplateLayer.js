@@ -1,4 +1,17 @@
 class TemplateLayer {
+    static generateTemplate(templateData) {
+        const { channel, ...rest } = templateData;
+
+        switch (channel.toLowerCase()) {
+            case "whatsapp":
+                return this.generateTemplateForWhatsApp(rest);
+            case "facebook":
+                return this.generateTemplateForFacebook(rest);
+            default:
+                throw new Error(`Unsupported channel type: ${channel}`);
+        }
+    }
+
     static generateTemplateForWhatsApp({ sections, bodyText, buttonText, to }) {
         console.log("Generating WhatsApp list template for:", to);
 
