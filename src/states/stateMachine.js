@@ -84,7 +84,7 @@ class StateMachine {
 
 async handleBalanceInquiry(userSession) {
     const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
-    console.log("accountsResult is: ",accountsResult);
+    console.log("accountsResult in handle balance inquiry is: ", accountsResult);
     //if (accountsResult && accountsResult.type === "interactive") 
     if (accountsResult) 
     {
