@@ -163,7 +163,7 @@ class LoginService {
 
                     // Make the additional API call to fetch user details
                     const userDetails = await this.fetchUserDetails();
-                    console.log("User details retrieved successfully:", userDetails);
+                    console.log(" Me call made succesfully and the User details retrieved successfully:", userDetails);
                     return true;
                 } else {
                     console.error("OTP verification failed:", otpResponse);
