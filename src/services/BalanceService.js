@@ -10,18 +10,6 @@ const states = {
     LOGGED_OUT: "LOGGED_OUT"
 };
 class BalanceService {
-const TemplateLayer = require("./TemplateLayer");
-const OBDXService = require("./OBDXService");
-const LoginService = require("./loginService");
-const endpoints = require("../config/endpoints");
-const config = require("../config/config"); // Import config.js
-const channel = config.channel;
-const states = {
-    OTP_VERIFICATION: "OTP_VERIFICATION",
-    LOGGED_IN: "LOGGED_IN",
-    LOGGED_OUT: "LOGGED_OUT"
-};
-class BalanceService {
   static async initiateBalanceInquiry(userSession) {
         try {
             const queryParams = new Map([
@@ -94,22 +82,6 @@ class BalanceService {
             return "An error occurred while fetching your accounts. Please try again.";
         }
     }
-    static async fetchBalanceForSelectedAccount(selectedAccount) {
-        try {
-            const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}`;
-            return balanceMessage;
-        } catch (error) {
-            console.error("Error fetching balance:", error.message);
-            return "Unable to fetch balance at this time. Please try again later.";
-        }
-    }
-    static parseAccountSelection(accountId, accounts) {
-        return accounts.find(account => account.id.value === accountId);
-    }
-}
-module.exports = BalanceService;
-    
-    
     static async fetchBalanceForSelectedAccount(selectedAccount) {
         try {
             const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}`;
