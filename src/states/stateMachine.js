@@ -39,12 +39,14 @@ class StateMachine {
 
     // Check if user is in account selection state
     if (userSession.state === states.ACCOUNT_SELECTION) {
+        console.log("entering account selection state, user session is:", userSession);
         return await this.handleAccountSelection(userSession, messageBody);
     }
 
     // Early login check
     const isLoggedIn = await LoginService.checkLogin();
     if (!isLoggedIn) {
+	console.log("user not logged in");
         userSession.lastIntent = intent; // Save intent for post-login processing
         userSession.state = states.OTP_VERIFICATION;
         return "Please enter the One Time Password sent to your registered number.";
@@ -52,6 +54,7 @@ class StateMachine {
 
     // Handle recognized intents
     if (intent === "BALANCE") {
+		console.log("entering BALANCE intent");
         userSession.state = states.BALANCE;
         userSession.lastIntent = intent;
         return await this.handleBalanceInquiry(userSession);
@@ -71,7 +74,8 @@ class StateMachine {
 
     // If logged in but intent is null or not recognized
     if (!intent) {
-	console.log("userSession.lastIntent: ", userSession.lastIntent);
+	    	console.log("entering !intent or unkninw intent");
+	console.log("userSession.lastIntent here is: ", userSession.lastIntent);
         if (userSession.lastIntent) {
             return this.handleIntentAfterLogin(userSession); // Continue previous intent
         }
