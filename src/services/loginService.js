@@ -189,7 +189,7 @@ class LoginService {
         ]);
 
         const response = await OBDXService.serviceMeth(
-            "/digx-common/user/v1/me",
+            endpoints.me,
             "GET",
             headers,
             new Map([["locale", "en"]]),
