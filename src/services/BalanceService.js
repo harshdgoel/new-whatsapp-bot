@@ -76,6 +76,8 @@ class BalanceService {
                         throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
                 }
 
+                console.log("template data is:", templateData);
+
                 // Pass the constructed template data to the TemplateLayer
                 return TemplateLayer.generateTemplate(templateData);
             } else {
