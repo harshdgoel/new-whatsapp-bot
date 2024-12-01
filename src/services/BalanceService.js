@@ -55,11 +55,14 @@ class BalanceService {
                     case "facebook":
                     templateData = { 
         type: "quick_replies",
-        sections: rows.slice(0, 10).map(row => ({ // Limit to top 10 entries
-            content_type: "text",
-            title: row.title,
-            payload: row.payload, // Payload for Facebook
-        })),
+       sections: rows
+    .slice(0, 10) // Limit to top 10 entries
+    .filter(row => row.content_type && row.title && row.payload) // Filter out invalid entries
+    .map(row => ({
+        content_type: "text",
+        title: row.title,
+        payload: row.payload, // Payload for Facebook
+    })),
         bodyText: "Please select an account to view details.",
         channel,
         to: "1306151306130839", // Replace with actual recipient ID
