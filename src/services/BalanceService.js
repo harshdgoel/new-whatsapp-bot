@@ -119,6 +119,7 @@ class BalanceService {
   }
 
   static parseAccountSelection(accountId, accounts) {
+      console.log("entering parseAccountSelection");
     return accounts.find(account => account.id.value === accountId);
   }
 }
