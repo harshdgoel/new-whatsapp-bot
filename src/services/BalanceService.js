@@ -48,7 +48,6 @@ class BalanceService {
           title: account.id?.displayValue || `Account ${index + 1}`, // Display name
           payload: account.id?.displayValue || `Account ${index + 1}`, // Payload for Messenger
         }));
-
         const channel = config.channel.toLowerCase();
         let templateData;
 
@@ -70,12 +69,8 @@ class BalanceService {
 
           case "facebook":
            templateData = {
-  recipient: {
-    id: "1306151306130839", // Replace with dynamic recipient ID
-  },
-  message: {
-    text: "Please select an account to view details.",
-    quick_replies: rows
+        bodyText: "Please select an account to view details.",
+    sections: rows
       .slice(0, 10) // Limit to top 10 entries
       .filter(row => row.title && row.payload) // Filter out invalid rows
       .map(row => ({
@@ -83,7 +78,7 @@ class BalanceService {
         title: row.title,
         payload: row.payload, // Payload for Facebook
       })),
-  },
+
 };
     break;
 
