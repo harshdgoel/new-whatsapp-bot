@@ -1,10 +1,12 @@
+const config = require("../config/config"); // Import config.js
+
 class TemplateLayer {
     static generateTemplate(templateData) {
         const { channel, ...rest } = templateData;
-        console.log("channel is:",channel);
+        console.log("channel is:", channel);
         console.log("rest is: ", rest);
 
-        switch (channel.toLowerCase()) {
+        switch (config.channel.toLowerCase()) {
             case "whatsapp":
                 return this.generateTemplateForWhatsApp(rest);
             case "facebook":
@@ -49,13 +51,19 @@ class TemplateLayer {
             throw new Error("Missing or invalid sections for quick reply template.");
         }
 
+        const quickReplies = sections.map(section => ({
+            content_type: section.content_type || "text",
+            title: section.title,
+            payload: section.payload,
+        }));
+
         const template = {
             recipient: {
                 id: to,
             },
             message: {
                 text: bodyText || "Please select an account:",
-                quick_replies: sections,
+                quick_replies: quickReplies,
             },
         };
 
