@@ -69,21 +69,23 @@ class BalanceService {
             break;
 
           case "facebook":
-            templateData = {
-              type: "quick_replies",
-              sections: rows
-                .slice(0, 10) // Limit to top 10 entries
-                .filter(row => row.title && row.payload) // Filter out invalid rows
-                .map(row => ({
-                  content_type: "text",
-                  title: row.title,
-                  payload: row.payload, // Payload for Facebook
-                })),
-              bodyText: "Please select an account to view details.",
-              channel,
-              to: "1306151306130839", // Replace with actual recipient ID
-            };
-            break;
+           templateData = {
+  recipient: {
+    id: "1306151306130839", // Replace with dynamic recipient ID
+  },
+  message: {
+    text: "Please select an account to view details.",
+    quick_replies: rows
+      .slice(0, 10) // Limit to top 10 entries
+      .filter(row => row.title && row.payload) // Filter out invalid rows
+      .map(row => ({
+        content_type: "text",
+        title: row.title,
+        payload: row.payload, // Payload for Facebook
+      })),
+  },
+};
+    break;
 
           default:
             throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
