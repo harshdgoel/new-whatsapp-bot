@@ -53,10 +53,18 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } 
-                else if (message.quick_replies) {
-                    console.log("entering quick_replies selection in apiHandler and message is:",message);
-                    responseData = message;
-            }
+            } else if (message.message?.quick_replies) {
+  console.log("Processing Facebook quick_replies...",message);
+  responseData = {
+    messaging_type: "MESSAGE_TAG",
+    recipient: message.recipient,
+    message: {
+      text: message.message.text,
+      quick_replies: message.message.quick_replies,
+    },
+    tag: "CONFIRMED_EVENT_UPDATE",
+  };
+}
             else {
                 throw new Error("Unsupported Facebook message format.");
             }
