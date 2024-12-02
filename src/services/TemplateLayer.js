@@ -1,6 +1,8 @@
 class TemplateLayer {
     static generateTemplate(templateData) {
         const { channel, ...rest } = templateData;
+        console.log("channel is:",channel);
+        console.log("rest is: ", rest);
 
         switch (channel.toLowerCase()) {
             case "whatsapp":
