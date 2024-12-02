@@ -55,17 +55,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             } 
                 else if (message.quick_replies) {
                     console.log("entering quick_replies selection in apiHandler and message is:",message);
-                    responseData = {
-                    recipient: { id: to },
-                    message: {
-                        text: message.text || "Please select an option:",
-                        quick_replies: message.quick_replies.map(reply => ({
-                            content_type: reply.content_type || "text",
-                            title: reply.title,
-                            payload: reply.payload,
-                        })),
-                    },
-                };
+                    responseData = message;
             }
             else {
                 throw new Error("Unsupported Facebook message format.");
