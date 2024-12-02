@@ -53,7 +53,8 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 };
             } 
                 else if (message.quick_replies) {
-                responseData = {
+                    console.log("entering quick_replies selection in apiHandler and message is:",message);
+                    responseData = {
                     recipient: { id: to },
                     message: {
                         text: message.text || "Please select an option:",
