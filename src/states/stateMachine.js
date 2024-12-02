@@ -96,7 +96,7 @@ async handleBalanceInquiry(userSession) {
     {
         console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
         userSession.state = states.ACCOUNT_SELECTION;
-        return accountsResult; // Return the interactive template directly
+        return JSON.stringify(accountsResult, null, 2); // Return the interactive template directly
     } else {
         return "No accounts available.";
     }
