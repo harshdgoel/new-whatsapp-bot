@@ -57,8 +57,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
              else if (message.message?.quick_replies) {
   console.log("Processing Facebook quick_replies...",message);
   responseData = {
-    messaging_type: "MESSAGE_TAG",
-    recipient: message.recipient,
+    recipient: { id: to },
     message: {
       text: message.message.text,
       quick_replies: message.message.quick_replies,
