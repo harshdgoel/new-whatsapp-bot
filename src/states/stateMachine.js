@@ -33,6 +33,7 @@ class StateMachine {
 
     // Check if user is in OTP verification state
     if (userSession.state === states.OTP_VERIFICATION) {
+	console.log("entering OTP_VERIFICATION and messageBody is: ", messageBody);
         userSession.otp = messageBody;
         return await this.handleOTPVerification(userSession);
     }
