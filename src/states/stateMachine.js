@@ -48,7 +48,7 @@ class StateMachine {
     if (!isLoggedIn) {
 	console.log("user not logged in");
         userSession.lastIntent = intent; // Save intent for post-login processing
-	console.log("lastintent in isLoggedIn set is: ",userSession.lastIntent)
+	console.log("lastintent in isLoggedIn set is: ",userSession.lastIntent);
         userSession.state = states.OTP_VERIFICATION;
         return "Please enter the One Time Password sent to your registered number.";
     }
