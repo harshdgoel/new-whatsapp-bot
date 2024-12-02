@@ -1,3 +1,4 @@
+
 const axios = require('axios');
 const TemplateLayer = require('./TemplateLayer');
 
@@ -53,7 +54,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } 
-            } else if (message.message?.quick_replies) {
+             else if (message.message?.quick_replies) {
   console.log("Processing Facebook quick_replies...",message);
   responseData = {
     messaging_type: "MESSAGE_TAG",
