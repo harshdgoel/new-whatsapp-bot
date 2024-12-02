@@ -34,6 +34,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             console.log("WhatsApp response sent successfully:", response);
 
         } else if (channel === "facebook") {
+            console.log("entering channel facebook in apiHandler and message is:", message);
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
                 // Plain text message
