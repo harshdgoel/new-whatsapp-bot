@@ -52,7 +52,7 @@ class StateMachine {
         userSession.lastIntent = intent; // Save intent for post-login processing
 	console.log("lastintent in isLoggedIn set is: ",userSession.lastIntent);
         userSession.state = states.OTP_VERIFICATION;
-        return "Please enter the One Time Password sent to your registered number.";
+      return MessageService.getMessage('OTP_MESSAGE');
     }
 
     // Handle recognized intents
