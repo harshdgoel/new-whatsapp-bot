@@ -98,7 +98,8 @@ class BalanceService {
 
       if (error.message.includes("Missing token or cookie")) {
         userSession.state = states.OTP_VERIFICATION;
-        return "Please enter the One Time Password sent to your registered number.";
+      return MessageService.getMessage('OTP_MESSAGE');
+
       }
 
       return "An error occurred while fetching your accounts. Please try again.";
