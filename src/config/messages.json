@@ -1,5 +1,5 @@
 {
-  "OTP_PROMPT": "Please enter the One Time Password sent to your registered number.",
+  "OTP_MESSAGE": "Please enter the One Time Password sent to your registered number.",
   "NO_ACCOUNTS_FOUND": "Sorry, no accounts found.",
   "ACCOUNT_SELECTION_PROMPT": "Please select an account to view details.",
   "GENERIC_ERROR": "An error occurred. Please try again later.",
