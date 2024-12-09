@@ -141,7 +141,9 @@ async handleBalanceInquiry(userSession) {
         console.log("UserSession in handleAccountSelection is: ", userSession)
         console.log("entering handleAccountSelection and messageBody is:", messageBody) //messageBody is the selected account actual value
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
-        if (selectedAccount) {
+        console.log("the selected accounT is:", selectedAccount);
+
+	    if (selectedAccount) {
             console.log("the selected account is:", selectedAccount);
             userSession.selectedAccount = selectedAccount;
             if(userSession.lastIntent == "BALANCE"){
