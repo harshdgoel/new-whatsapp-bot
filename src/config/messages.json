@@ -1,7 +1,162 @@
 {
-  "OTP_MESSAGE": "Please enter the One Time Password sent to your registered MOBILE number.",
-  "NO_ACCOUNTS_FOUND": "Sorry, no accounts found.",
-  "ACCOUNT_SELECTION_PROMPT": "Please select an account to view details.",
-  "GENERIC_ERROR": "An error occurred. Please try again later.",
-  "AUTHENTICATION_FAILED": "Authentication failed. Please log in again."
+  "REFNO": "Reference No %s",
+  "NOTXN": "No Transactions found.",
+  "Help": {
+    "options": "You can type your questions, but using my quick reply and menu navigation is sometimes more reliable.  Who likes typing anyway? ",
+    "talkToRepresentative": "Talk to our representative",
+    "helpOptions": "Here's what I can help you with:\\n- View account balances\\n- Bill Payment\\n- Money Transfer\\n- Find a bank branch or ATM\\n- View recent transactions\\n- Inquire your spends\\n- Know your upcoming payments\\n- Inquire your dues on credit card\\n- Inquire about credit card limit\\n- Inquire your outstanding balance on loan account\\n- Inquire about next installment date and amount\\n- Get more information about banking products and services offered by Futura Bank\\n- New Account Opening info\\n- Open Term Deposit\\n- Finance Inquiry\\n- Block/Unblock Debit/Credit Cards",
+    "helpPrompt": "You can type your questions, but using my quick reply and menu navigation is sometimes more reliable.  Who likes typing anyway? \\uD83D\\uDE0A"
+  },
+  "InstantPl": {
+    "financeDetails": "Here's a quick summary of your financial information stored with me:\\nSalary Income : USD 5000\\nOther Expenses : USD 1000\\nCan you please confirm if these are correct, or you can make changes if required.",
+    "accountConfirm": "The loan amount will be disbursed in your Savings Account ending with 801. Does that sound OK?",
+    "plEmiConfirm": "Great ! And the same account for EMI payment as well ?",
+    "plQuestions": "Can you help us with little more information for your application process?",
+    "plDetails": "Alright ! Here is your application summary:",
+    "plProcessing": "Please hold on for just a moment! We're currently processing your request. Thank you for your patience!",
+    "plQuestions1": "Perfect! 2 more questions to go.\\nI will need to know how many years you have spent in your current employment?",
+    "plQuestions2": "Cool! How would you classify your current residence?",
+    "deleteSession": "Please try again.",
+    "loanTenure": "Now, could you let us know the tenure you're thinking of in years?",
+    "plTerms": "Can you please review the Terms & Conditions before accepting them:\\n",
+    "plTerms1": "1.  I have read and agree to the Loan Account Agreement.\\n2.  I have read and agree to the Loan Account Fees and Charges.",
+    "plFinalSubmit": "Done ! Your application is successfully submitted and your Application Number is %s",
+    "plOffer": "Congratulations!!\\nYour Personal Loan Offer is generated.Can you please go through and give your decision:",
+    "plInterest": "Interest Rate: %s%%",
+    "plAccount": "Your Loan Account number is: %s",
+    "plFrequency": "Installment Frequency: %s",
+    "plExpiryDate": "Offer Expiry Date: 23rd May, 2024",
+    "plTenure": "Loan Tenure: %s Year",
+    "processingFee": "Processing fees: USD 50",
+    "loanDisburse": "Upon approval of loan, the amount will be credited to your savings account ending with 801.",
+    "plAmount": "Loan Amount: USD %s",
+    "plInstallment": "Installment Amount: USD %s",
+    "plApplicationId": "I am generating your offer, please stay tuned.",
+    "offerGenerate": "Awesome ! The loan processing is complete.",
+    "documentUpload": "Thanks for sharing that with us. We'll guide you through the rest of the process.",
+    "offerNotGenerate": "I am generating your offer, please stay tuned.",
+    "loanSanctioned": "Please hang on while we are processing your information.",
+    "standardSchedule": "Thanks for letting us know. We'll proceed with the regular process for your loan application.",
+    "schedule": "How about opting for a personalized loan repayment schedule instead of the standard EMI plan?\\n Sound intriguing?"
+  },
+  "sessionEnd": "The current session has ended. Feel free to reach out if you need more help.",
+  "MoneyTransfer": {
+    "enterPaymentQuery": "Enter your Payment query (Please include payee name and amount)\\ne.g. Pay payee $200.",
+    "selectPayee": "Please select a payee to whom you want to make a payment",
+    "noPayeeFound": "Payee not found.",
+    "paymentSuccessful": "Payment Successful.",
+    "refnois": "Reference No is %s",
+    "reviewData": "%s\\n%s\\nFrom %s"
+  },
+  "LoanCalculator": {
+    "emiBalance": "The interest rate will be %s %. Your monthly EMI amount will be %s",
+    "saveApplication": "Thank You for applying for Personal Loan. Your application number is %s"
+  },
+  "Balance": {
+    "whichAccount": "For which account?",
+    "balanceIs": "Balance in %s with account number %s is %s.",
+    "noAccountsFound": "Sorry, No accounts found.",
+    "noAccountFound": "No Account found matching the required criteria.",
+    "MaturityAmount": "Maturity : %s"
+  },
+  "balanceIsBalance": {
+    "balanceIs": "Balance in %s is %s"
+  },
+  "CreditCard": {
+    "noAccountsFound": "Sorry, No cards found.",
+    "creditdue": "Net amount due on your credit card %s is %s",
+    "creditLimit": "For credit card %s \\n\\nAvailable cash is %s \\nTotal cash is %s \\nAvailable credit is %s \\nTotal credit is %s ",
+    "accountNo": "Select the Card Number",
+    "cardBlockSuccess": "Card blocked successfully",
+    "cardUnBlockSuccess": "Card unblocked successfully"
+  },
+  "Greetings": {
+    "hi": "Hi %s !!!",
+    "welcome": "I am Futura Bank Bot, ready to help you with for your banking tasks. You can talk to me in a friendly manner or choose the options. Just type 'Help me' if you need to know the options.",
+    "chooseOptions": "As you know you can talk to me in a friendly manner or choose the options.",
+    "welcomeBack": "Welcome Back %s !!!",
+    "welcomeAfterLongTime": "After a long time %s !!! Hope you were doing well.",
+    "help": "How can I help you today?",
+    "helpMe": "Just type 'Help me' if you need to know the options.",
+    "hiUser": "Hi there, I am Zibo!!!",
+    "welcomeUser": "I am a Futura Bank chatbot who can assist you in performing your Banking tasks.",
+    "helpMeUser": "You can simply type your questions or type 'Help me' to get the options.",
+    "offer": "Your offer is successfully validated."
+  },
+  "UpcomingPayments": {
+    "upcomingPayments": "Here are your Upcoming Payments.",
+    "upcomingPaymentsNotExist": "You currently do not have any Upcoming Payments.",
+    "DOMESTICFT_PAYLATER": "Domestic",
+    "SELFFT_PAYLATER": "Self",
+    "INTERNALFT_SI": "Internal",
+    "SELFFT_SI": "Self",
+    "INTERNALFT_PAYLATER": "Internal",
+    "INDIADOMESTICFT_PAYLATER": "Domestic",
+    "INTERNATIONALFT": "International"
+  },
+  "Loan": {
+    "hereAreOutstandingLoan": "Net Outstanding Balance in your loan account %s is %s",
+    "emiDetails": "Next Installment Date for account %s is %s and Next Installment Amount is %s"
+  },
+  "BillPay": {
+    "noBillerFound": "You have not registered for this biller.",
+    "billPaymentCancelled": "Your Bill Payment Cancelled.",
+    "selectBiller": "Please select biller.",
+    "billPaymentSuccess": "Bill Payment Successful!",
+    "billPaymentDetails": "Bill Payment Details",
+    "billerNotFound": "Biller not found."
+  },
+  "ATMBranchLocator": {
+    "addressNotExist": "Looks like address you just mentioned does not exist :/",
+    "enterValidAddress": "Can you please enter valid address again",
+    "getDirections": "Get Directions",
+    "whereAreYou": "Sure, where are you?",
+    "typeAddress": "You can type a locality, landmark, city or use the button below.",
+    "noOfATM": "%1$s %2$s found at location.",
+    "sendLocation": "Send Location"
+  },
+  "Transactions": {
+    "hereAreTransactions": "Here are some recent transactions for account %s",
+    "noTransactions": "No transactions found for account %s"
+  },
+  "accountNumber": "%s",
+  "errorMessage": "I am unable to process your request right now, Please try again later.",
+  "whatElse": "What else can I help you with today?",
+  "processing": "Please wait while we are fetching your information.",
+  "otpMessage": "Perfect! Now, could you kindly enter the One Time Password sent to your number?",
+  "toptMessage": "Please enter the code appearing on your soft token application",
+  "hoptMessage": "Please enter the code %s in your soft token application, and enter the generated OTP here",
+  "attemptsExceeded": "Invalid verification code. You have exceeded maximum number of attempts.",
+  "refnois": "Reference number is %s.",
+  "pendingForApproval": "Transaction has been processed and its Pending for Approval.",
+  "accountNumberNotExist": "Account number does not exist.",
+  "noAccountsFound": "Sorry, No accounts found.",
+  "selectAccount": "Select Account",
+  "Spends": {
+    "spends": "Here are your spendings.",
+    "spendingsNotExist": "You currently do not have any Spendings.",
+    "noThanks": "No,Thanks",
+    "Essentials": "Essentials",
+    "Travel": "Travel",
+    "categorySpendings": "You may click on the category names below to view the further bifurcation under the subcategories.",
+    "subcategorySpendings": "You may click on the category name to view the transactions under each category.",
+    "yourSpends": "Your Spends",
+    "amount": "Amount",
+    "yourSpendsCategory": "Your Spends in %s category"
+  },
+  "Finance": {
+    "details": "Finance Amount\\n%s\\nDue Date\\n%s\\nOutstanding Principal Amount\\n%s\\nOutstanding Interest Amount\\n%s\\nAssociated Party Name\\n%s\\nProgram Name\\n%s",
+    "refNoNotFound": "The Finance Reference Number entered is invalid. Click Yes\\uFFFD to continue with another finance reference number or click Main Menu\\uFFFD\\uFFFD",
+    "refNoNotFoundOptYes": "Yes",
+    "refNoNotFoundOptMainMenu": "Main Menu",
+    "anotherRequest": "Do you wish to enquire for another finance reference number or go back to main menu?"
+  },
+  "Approvals": {
+    "approve": "Transaction approved successfully",
+    "reject": "Transaction rejected successfully"
+  },
+  "TermDeposit": {
+    "tdOpenSuccess": "Term Deposit booked successfully"
+  },
+  "offerExpired": "This offer has expired or claims exhausted."
 }
