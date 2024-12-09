@@ -1,22 +1,21 @@
-const messages = require('../config/messages.json'); // Import messages.json
+const messages = require('../config/messages.json');
 
 class MessageService {
-  /**
-   * Retrieve a message by key and replace placeholders if needed.
-   * @param {string} key - The key of the message.
-   * @param {...any} placeholders - Placeholder values to replace in the message.
-   * @returns {string} - The retrieved message.
-   */
   static getMessage(key, ...placeholders) {
-    let message = messages[key];
+    const keys = key.split('.');
+    let message = keys.reduce((obj, k) => (obj && obj[k] !== undefined ? obj[k] : null), messages);
 
     if (!message) {
-      return `Message for key '${key}' not found.`; // Fallback for missing keys
+      return `Message for key '${key}' not found.`;
     }
 
-    // Replace placeholders (e.g., "{0}", "{1}")
+    if (typeof message !== 'string') {
+      return `Message for key '${key}' is not a valid string.`;
+    }
+
+    // Replace placeholders (e.g., "%s")
     placeholders.forEach((placeholder, index) => {
-      message = message.replace(new RegExp(`\\{${index}\\}`, 'g'), placeholder);
+      message = message.replace(new RegExp(`%s`, 'g'), placeholder);
     });
 
     return message;
