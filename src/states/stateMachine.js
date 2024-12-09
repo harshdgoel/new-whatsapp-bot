@@ -38,7 +38,9 @@ class StateMachine {
     const userSession = this.getSession(from);
     console.log("Handling message, userSession:", userSession);
 
-    if(intent == "HELP"){
+    if(intent == "HELPME"){
+
+	console.log("entering help me intent");
         return await HelpMeService.helpMe();
 
     }
