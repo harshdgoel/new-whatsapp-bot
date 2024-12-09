@@ -115,7 +115,7 @@ class BalanceService {
       console.log("entering parseAccountSelection");
       console.log("matched account is",accounts.find(account => account.id.displayValue === accountId));
 
-    return accounts.find(account => account.id.value === accountId);
+    return accounts.find(account => account.id.displayValue === accountId);
   }
 }
 module.exports = BalanceService;
