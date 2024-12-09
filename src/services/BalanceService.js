@@ -12,11 +12,7 @@ const states = {
 class BalanceService {
   static async initiateBalanceInquiry(userSession) {
     try {
-      const queryParams = new Map([
-        ["accountType", "CURRENT,SAVING"],
-        ["status", "ACTIVE"],
-        ["locale", "en"],
-      ]);
+      const queryParams = null;
 
       const response = await OBDXService.invokeService(
         endpoints.accounts,
