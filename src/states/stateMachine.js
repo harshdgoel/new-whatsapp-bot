@@ -2,6 +2,10 @@ const LoginService = require("../services/loginService");
 const BalanceService = require("../services/BalanceService");
 const MessageService = require('../services/MessageService');
 const RecentTransactionService = require("../services/RecentTransactionService");
+const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
+const HelpMeService = require("../services/HelpMeService");
+
+
 const TemplateLayer = require("../services/TemplateLayer");
 
 const states = {
@@ -10,6 +14,7 @@ const states = {
     LOGGED_OUT: "LOGGED_OUT",
     TRANSACTIONS: "TRANSACTIONS",
     UPCOMINGPAYMENTS: "UPCOMINGPAYMENTS",
+    HELP: "HELP",
     BALANCE: "BALANCE",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
     FETCHING_BALANCE: "FETCHING_BALANCE",
@@ -33,6 +38,12 @@ class StateMachine {
     const userSession = this.getSession(from);
     console.log("Handling message, userSession:", userSession);
 
+    if(intent == "HELP"){
+        return await HelpMeService.helpMe();
+
+    }
+    
+    
     // Check if user is in OTP verification state
     if (userSession.state === states.OTP_VERIFICATION) {
 	console.log("entering OTP_VERIFICATION and messageBody is: ", messageBody);
@@ -160,6 +171,14 @@ async handleBalanceInquiry(userSession) {
                 console.log("transactions are:", transactionMessage);
                 return transactionMessage;
            }
+           else if(userSession.lastIntent == "UPCOMINGPAYMENTS"){
+            console.log("entering transactions service");
+             userSession.state = states.FETCHING_TRANSACTION;
+             const transactionMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
+             userSession.state = states.LOGGED_IN;
+             console.log("transactions are:", transactionMessage);
+             return transactionMessage;
+        }
         } else {
             return "Please enter a valid account selection from the list.";
         }
