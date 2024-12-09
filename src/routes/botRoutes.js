@@ -7,6 +7,7 @@ const router = express.Router();
 const intents = {
     BALANCE: ["balance", "check balance", "my balance", "account balance"],
     TRANSACTIONS: ["recent transactions", "last transactions", "transactions"],
+    HELPME: ["help me", "help"]
     // ... add more intents as needed
 };
 
