@@ -113,7 +113,7 @@ class BalanceService {
 
   static parseAccountSelection(accountId, accounts) {
       console.log("entering parseAccountSelection");
-      console.log("matched account is",accounts.find(account => account.id.value === accountId));
+      console.log("matched account is",accounts.find(account => account.id.displayValue === accountId));
 
     return accounts.find(account => account.id.value === accountId);
   }
