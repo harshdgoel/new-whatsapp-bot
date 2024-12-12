@@ -32,7 +32,8 @@ class StateMachine {
                 otp: null, 
                 accounts: null, 
                 selectedAccount: null, 
-                isHelpTriggered: false 
+                isHelpTriggered: false,
+                currentHelpPage: 1
             });
         }
         return this.sessionCache.get(userId);
@@ -53,14 +54,11 @@ class StateMachine {
 
 
     if (userSession.state === states.HELP) {
-    if (messageBody.startsWith("view_more_")) {
-        const pageMatch = messageBody.match(/view_more_(\d+)/);
-        if (pageMatch) {
-            const page = parseInt(pageMatch[1], 10);
-            return await HelpMeService.helpMe(page);
-        } else {
-            return "Invalid page selection. Please try again.";
-        }
+    if (messageBody === "View More") { // Match the exact "View More" text
+        const currentPage = userSession.currentHelpPage || 1; // Track the current page
+        const nextPage = currentPage + 1;
+        userSession.currentHelpPage = nextPage; // Update session with the new page
+        return await HelpMeService.helpMe(nextPage);
     } else {
         const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
         if (selectedIntent && selectedIntent !== "UNKNOWN") {
@@ -71,8 +69,6 @@ class StateMachine {
         }
     }
 }
-
-
 
         // Check if user is in OTP verification state
         if (userSession.state === states.OTP_VERIFICATION) {
