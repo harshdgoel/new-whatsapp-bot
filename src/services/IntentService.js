@@ -12,7 +12,7 @@ class IntentService {
 
     identifyIntent(message) {
         const normalizedMessage = message.toLowerCase().trim();
-                return "HELP";
+                return "BALANCE";  //set to HELP
     }
 
     identifyIntentFromHelpSelection(message) {
