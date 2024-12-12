@@ -2,10 +2,7 @@
   "REFNO": "Reference No %s",
   "NOTXN": "No Transactions found.",
   "Help": {
-    "options": "You can type your questions, but using my quick reply and menu navigation is sometimes more reliable.  Who likes typing anyway? ",
-    "talkToRepresentative": "Talk to our representative",
-    "helpOptions": "Here's what I can help you with:\\n- View account balances\\n- Bill Payment\\n- Money Transfer\\n- Find a bank branch or ATM\\n- View recent transactions\\n- Inquire your spends\\n- Know your upcoming payments\\n- Inquire your dues on credit card\\n- Inquire about credit card limit\\n- Inquire your outstanding balance on loan account\\n- Inquire about next installment date and amount\\n- Get more information about banking products and services offered by Futura Bank\\n- New Account Opening info\\n- Open Term Deposit\\n- Finance Inquiry\\n- Block/Unblock Debit/Credit Cards",
-    "helpPrompt": "You can type your questions, but using my quick reply and menu navigation is sometimes more reliable.  Who likes typing anyway? \\uD83D\\uDE0A"
+    "helpOptions": "Balance\\n- Bill Payment\\n- Money Transfer\\n- Find a bank branch or ATM\\n- View recent transactions\\n- Inquire your spends\\n- Know your upcoming payments\\n- Inquire your dues on credit card\\n- Inquire about credit card limit\\n- Inquire your outstanding balance on loan account\\n- Inquire about next installment date and amount\\n- Get more information about banking products and services offered by Futura Bank\\n- New Account Opening info\\n- Open Term Deposit\\n- Finance Inquiry\\n- Block/Unblock Debit/Credit Cards",
   },
   "InstantPl": {
     "financeDetails": "Here's a quick summary of your financial information stored with me:\\nSalary Income : USD 5000\\nOther Expenses : USD 1000\\nCan you please confirm if these are correct, or you can make changes if required.",
