@@ -56,7 +56,6 @@ class StateMachine {
             const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody); 
             if (selectedIntent && selectedIntent !== "UNKNOWN") {
                 userSession.lastIntent = selectedIntent;
-              //  userSession.isHelpTriggered = false; // Reset Help trigger for next session
                 return await this.processIntent(userSession, selectedIntent);
             } else {
                 return "Invalid selection. Please choose a valid option from the menu.";
@@ -169,16 +168,19 @@ class StateMachine {
                 userSession.state = states.FETCHING_BALANCE;
                 const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
                 userSession.state = states.LOGGED_IN;
+                userSession.isHelpTriggered = false; // Reset Help trigger for next session
                 return balanceMessage; // Return balance message
             } else if (userSession.lastIntent === "TRANSACTIONS") {
                 userSession.state = states.FETCHING_TRANSACTION;
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
                 userSession.state = states.LOGGED_IN;
+                userSession.isHelpTriggered = false; // Reset Help trigger for next session
                 return transactionMessage;
             } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
                 userSession.state = states.FETCHING_TRANSACTION;
                 const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
                 userSession.state = states.LOGGED_IN;
+                userSession.isHelpTriggered = false; // Reset Help trigger for next session
                 return paymentsMessage;
             }
         } else {
