@@ -30,8 +30,8 @@ class HelpMeService {
             if (page < totalPages) {
                 rows.push({
                     id: `view_more_${page + 1}`,
-                    title: "View More",
-                    payload: `view_more_${page + 1}`,
+        title: "View More", // Simplified title
+        payload: "View More"
                 });
             }
 
