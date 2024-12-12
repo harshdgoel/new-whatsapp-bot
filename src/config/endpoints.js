@@ -3,7 +3,8 @@ module.exports = {
     recentTransactions: "/digx-common/transactions/v1/recentTransactions",
     anonymousToken: "/digx-infra/login/v1/anonymousToken",
     login: "/digx-infra/login/v1/login",
-    me: "/digx-common/user/v1/me"
-    transactions: "/digx-common/dda/v1/demandDeposit"
+    me: "/digx-common/user/v1/me",
+    transactions: "/digx-common/dda/v1/demandDeposit",
+    upcoming_payments: "/digx-payments/payment/v1/payments/instructions"
     // Add more endpoints as needed
 };
