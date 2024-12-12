@@ -31,7 +31,7 @@ class HelpMeService {
                 rows.push({
                     id: `view_more_${page + 1}`,
                     title: "View More",
-                    payload: `View More Page ${page + 1}`,
+                    payload: `view_more_${page + 1}`,
                 });
             }
 
