@@ -72,13 +72,31 @@ class UpcomingPaymentsService {
                     bodyText += `~ ~ ~ ~ ~ ~ ~ ~\n\n`;
                 });
                             console.log("Generated transaction message body:", bodyText);
-                const templateData ={
-                    type: "text",
+                let templateData = {
                     bodyText: bodyText,
-                    channel: channel,
-                    to: "916378582419"
+                    to: userSession.channelId // Pass the correct recipient for Facebook or WhatsApp
                 };
-              return TemplateLayer.generateTemplate(templateData);
+
+                // Select channel template structure based on config
+                switch (config.channel.toLowerCase()) {
+                    case "whatsapp":
+                        templateData = {
+                            type: "text",
+                            bodyText: bodyText,
+                            channel: config.channel,
+                            to: userSession.channelId // WhatsApp number here
+                        };
+                        break;
+
+                    case "facebook":
+                        return bodyText;
+
+                    default:
+                        throw new Error("Unsupported channel type");
+                }
+
+                // Pass template data to TemplateLayer
+                return TemplateLayer.generateTemplate(templateData);
             } else {
                 throw new Error("No transaction data found in the response.");
             }
