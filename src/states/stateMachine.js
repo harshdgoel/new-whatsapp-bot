@@ -51,10 +51,16 @@ class StateMachine {
             return await HelpMeService.helpMe();
         }
 
+
     if (userSession.state === states.HELP) {
-    if (messageBody.startsWith("View More Page")) {
-        const page = parseInt(messageBody.split(" ")[3], 10); // Extract the page number
-        return await HelpMeService.helpMe(page);
+    if (messageBody.startsWith("view_more_")) {
+        const pageMatch = messageBody.match(/view_more_(\d+)/);
+        if (pageMatch) {
+            const page = parseInt(pageMatch[1], 10);
+            return await HelpMeService.helpMe(page);
+        } else {
+            return "Invalid page selection. Please try again.";
+        }
     } else {
         const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
         if (selectedIntent && selectedIntent !== "UNKNOWN") {
@@ -65,6 +71,7 @@ class StateMachine {
         }
     }
 }
+
 
 
         // Check if user is in OTP verification state
