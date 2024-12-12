@@ -3,7 +3,6 @@ const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
 const endpoints = require("../config/endpoints");
 const config = require("../config/config"); // Import config.js
-const channel = config.channel;
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
 const states = {
@@ -22,27 +21,19 @@ class RecentTransactionService {
             return "Please enter the One Time Password sent to your registered number.";
         }
 
-        const queryParams = new Map([
-            ["searchBy", "CPR"],
-            ["transactionType", "A"],
-            ["locale", "en"]
-        ]);
+        const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
         console.log("Selected account in transactions:", selectedAccount.id.value);
         const endpointUrl = `${endpoints.transactions}/${selectedAccount.id.value}/transactions`;
         console.log("Transaction API URL:", endpointUrl);
+
         try {
-            const response = await OBDXService.invokeService(
-                endpointUrl,
-                "GET",
-                queryParams,
-                {},
-                LoginService
-            );
+            const response = await OBDXService.invokeService(endpointUrl, "GET", queryParams, {}, LoginService);
             console.log("Response after FETCHACCOUNTACTIVITY API CALL IS:", response);
-            // Check for valid transaction data
+
             if (response.data && response.data.items && Array.isArray(response.data.items)) {
                 const transactions = response.data.items;
-                // Prepare text for WhatsApp
+
+                // Prepare text for WhatsApp/Facebook
                 let bodyText = "*Here are your Recent Transactions:*\n";
                 transactions.forEach((transaction, index) => {
                     const accountDisplayValue = transaction.accountId?.displayValue || "N/A";
@@ -52,6 +43,7 @@ class RecentTransactionService {
                     const transactionRef = transaction.key?.transactionReferenceNumber || "N/A";
                     const transactionDate = transaction.transactionDate || "N/A";
                     const transactionType = transaction.transactionType === "C" ? "Credit" : "Debit";
+                    
                     bodyText += `*Transaction ${index + 1}:*\n`;
                     bodyText += `Account: ${accountDisplayValue}\n`;
                     bodyText += `Amount: ${currency} ${amount}\n`;
@@ -61,32 +53,43 @@ class RecentTransactionService {
                     bodyText += `Type: ${transactionType}\n`;
                     bodyText += `~ ~ ~ ~ ~ ~ ~ ~\n\n`;
                 });
+
                 console.log("Generated transaction message body:", bodyText);
 
-   const channel = config.channel.toLowerCase();
-        let templateData;
-
-        // Generate the appropriate template structure based on the channel
-        switch (channel) {
-        case "whatsapp":
-               templateData ={
-                    type: "text",
+                let templateData = {
                     bodyText: bodyText,
-                    channel: channel,
-                    to: "916378582419"
+                    to: userSession.channelId // Pass the correct recipient for Facebook or WhatsApp
                 };
-                break;
-            case "facebook":
-                 templateData ={
-                    bodyText: bodyText,
-                };
-        }
 
-            
-              return TemplateLayer.generateTemplate(templateData);
+                // Select channel template structure based on config
+                switch (config.channel.toLowerCase()) {
+                    case "whatsapp":
+                        templateData = {
+                            type: "text",
+                            bodyText: bodyText,
+                            channel: config.channel,
+                            to: userSession.channelId // WhatsApp number here
+                        };
+                        break;
+
+                    case "facebook":
+                        templateData = {
+                            bodyText: bodyText,
+                            to: userSession.channelId // Facebook recipient ID
+                        };
+                        break;
+
+                    default:
+                        throw new Error("Unsupported channel type");
+                }
+
+                // Pass template data to TemplateLayer
+                return TemplateLayer.generateTemplate(templateData);
+
             } else {
                 throw new Error("No transaction data found in the response.");
             }
+
         } catch (error) {
             console.error("Error fetching transactions:", error.message);
             return "An error occurred while fetching your transactions. Please try again.";
