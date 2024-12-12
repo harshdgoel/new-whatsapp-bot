@@ -51,16 +51,21 @@ class StateMachine {
             return await HelpMeService.helpMe();
         }
 
-        // Handle Help Me selection
-        if (userSession.state === states.HELP) {
-            const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody); 
-            if (selectedIntent && selectedIntent !== "UNKNOWN") {
-                userSession.lastIntent = selectedIntent;
-                return await this.processIntent(userSession, selectedIntent);
-            } else {
-                return "Invalid selection. Please choose a valid option from the menu.";
-            }
+    if (userSession.state === states.HELP) {
+    if (messageBody.startsWith("View More Page")) {
+        const page = parseInt(messageBody.split(" ")[3], 10); // Extract the page number
+        return await HelpMeService.helpMe(page);
+    } else {
+        const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
+        if (selectedIntent && selectedIntent !== "UNKNOWN") {
+            userSession.lastIntent = selectedIntent;
+            return await this.processIntent(userSession, selectedIntent);
+        } else {
+            return "Invalid selection. Please choose a valid option from the menu.";
         }
+    }
+}
+
 
         // Check if user is in OTP verification state
         if (userSession.state === states.OTP_VERIFICATION) {
