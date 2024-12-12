@@ -4,9 +4,7 @@ const MessageService = require('../services/MessageService');
 const RecentTransactionService = require("../services/RecentTransactionService");
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
-
-
-const TemplateLayer = require("../services/TemplateLayer");
+const IntentService = require("../services/IntentService");
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
@@ -28,95 +26,108 @@ class StateMachine {
 
     getSession(userId) {
         if (!this.sessionCache.has(userId)) {
-            this.sessionCache.set(userId, { state: states.LOGGED_OUT, lastIntent: null, otp: null, accounts: null, selectedAccount: null });
+            this.sessionCache.set(userId, { 
+                state: states.LOGGED_OUT, 
+                lastIntent: null, 
+                otp: null, 
+                accounts: null, 
+                selectedAccount: null, 
+                isHelpTriggered: false 
+            });
         }
         return this.sessionCache.get(userId);
     }
 
-   async handleMessage(from, messageBody, intent) {
-    console.log("from in handle message is:", from);
-    const userSession = this.getSession(from);
-    console.log("Handling message, userSession:", userSession);
+    async handleMessage(from, messageBody, intent) {
+        console.log("from in handleMessage is:", from);
+        const userSession = this.getSession(from);
+        console.log("Handling message, userSession:", userSession);
 
-    if(intent == "HELPME"){
-
-	console.log("entering help me intent");
-        return await HelpMeService.helpMe();
-
-    }
-    
-    
-    // Check if user is in OTP verification state
-    if (userSession.state === states.OTP_VERIFICATION) {
-	console.log("entering OTP_VERIFICATION and messageBody is: ", messageBody);
-        userSession.otp = messageBody;
-        return await this.handleOTPVerification(userSession);
-    }
-
-    // Check if user is in account selection state
-    if (userSession.state === states.ACCOUNT_SELECTION) {
-        console.log("entering account selection state, user session is:", userSession);
-        return await this.handleAccountSelection(userSession, messageBody);
-    }
-
-    // Early login check
-    const isLoggedIn = await LoginService.checkLogin();
-    if (!isLoggedIn) {
-	console.log("user not logged in");
-        userSession.lastIntent = intent; // Save intent for post-login processing
-	console.log("lastintent in isLoggedIn set is: ",userSession.lastIntent);
-        userSession.state = states.OTP_VERIFICATION;
-      return MessageService.getMessage('otpMessage');
-    }
-
-    // Handle recognized intents
-    if (intent === "BALANCE") {
-		console.log("entering BALANCE intent");
-        userSession.state = states.BALANCE;
-        userSession.lastIntent = intent;
-        return await this.handleBalanceInquiry(userSession);
-    }
-
-    if (intent === "TRANSACTIONS") {
-        userSession.state = states.TRANSACTIONS;
-        userSession.lastIntent = intent;
-        return await this.handleBalanceInquiry(userSession); // Update for TRANSACTIONS
-    }
-
-     if (intent === "UPCOMINGPAYMENTS") {
-        userSession.state = states.UPCOMINGPAYMENTS;
-        userSession.lastIntent = intent;
-        return await this.handleBalanceInquiry(userSession); // Update for Payments
-      }
-
-    // If logged in but intent is null or not recognized
-    if (!intent) {
-	    	console.log("entering !intent or unkninw intent");
-	console.log("userSession.lastIntent here is: ", userSession.lastIntent);
-        if (userSession.lastIntent) {
-            return this.handleIntentAfterLogin(userSession); // Continue previous intent
+        // If Help Me is triggered for the first time
+        if (!userSession.isHelpTriggered) {
+            console.log("Entering Help Me intent");
+            userSession.state = states.HELP;
+            userSession.isHelpTriggered = true; // Mark Help as triggered
+            return await HelpMeService.helpMe();
         }
-        return "I'm sorry, I didn't understand that. Could you please rephrase?";
+
+        // Handle Help Me selection
+        if (userSession.state === states.HELP) {
+            const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody); 
+            if (selectedIntent && selectedIntent !== "UNKNOWN") {
+                userSession.lastIntent = selectedIntent;
+              //  userSession.isHelpTriggered = false; // Reset Help trigger for next session
+                return await this.processIntent(userSession, selectedIntent);
+            } else {
+                return "Invalid selection. Please choose a valid option from the menu.";
+            }
+        }
+
+        // Check if user is in OTP verification state
+        if (userSession.state === states.OTP_VERIFICATION) {
+            console.log("Entering OTP_VERIFICATION and messageBody is:", messageBody);
+            userSession.otp = messageBody;
+            return await this.handleOTPVerification(userSession);
+        }
+
+        // Check if user is in account selection state
+        if (userSession.state === states.ACCOUNT_SELECTION) {
+            console.log("Entering account selection state, user session is:", userSession);
+            return await this.handleAccountSelection(userSession, messageBody);
+        }
+
+        // Handle recognized intents
+        return await this.processIntent(userSession, intent);
     }
 
-    // Default fallback
-    return "I'm sorry, I couldn't process your request. Please try again.";
-}
+    async processIntent(userSession, intent) {
+        if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS"].includes(intent)) {
+            const isLoggedIn = await LoginService.checkLogin();
+            if (!isLoggedIn) {
+                userSession.lastIntent = intent; // Save the intent for post-login processing
+                userSession.state = states.OTP_VERIFICATION;
+                return MessageService.getMessage("otpMessage"); // Prompt for OTP
+            }
+        }
 
-async handleBalanceInquiry(userSession) {
-    const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
-    console.log("accountsResult in handle balance inquiry is: ", accountsResult);
-    //if (accountsResult && accountsResult.type === "interactive") 
-    if (accountsResult) 
-    {
-        console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
-        userSession.state = states.ACCOUNT_SELECTION;
-        return accountsResult;
-    } else {
-        return "No accounts available.";
+        // Proceed with intent processing
+        switch (intent) {
+            case "BALANCE":
+                userSession.state = states.BALANCE;
+                return await this.handleBalanceInquiry(userSession);
+            case "TRANSACTIONS":
+                userSession.state = states.TRANSACTIONS;
+                return await this.handleTransactions(userSession);
+            case "UPCOMINGPAYMENTS":
+                userSession.state = states.UPCOMINGPAYMENTS;
+                return await this.handleUpcomingPayments(userSession);
+            default:
+                return "I'm sorry, I couldn't understand your request. Please try again.";
+        }
     }
-}
 
+    async handleBalanceInquiry(userSession) {
+        const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+        console.log("accountsResult in handleBalanceInquiry is:", accountsResult);
+
+        if (accountsResult) {
+            console.log("Returning generated interactive template directly to WhatsApp:", JSON.stringify(accountsResult, null, 2));
+            userSession.state = states.ACCOUNT_SELECTION;
+            return accountsResult;
+        } else {
+            return "No accounts available.";
+        }
+    }
+
+    async handleTransactions(userSession) {
+        // Implement the logic to fetch transactions
+        return "Transactions functionality is under development.";
+    }
+
+    async handleUpcomingPayments(userSession) {
+        // Implement the logic to fetch upcoming payments
+        return "Upcoming payments functionality is under development.";
+    }
 
     async handleOTPVerification(userSession) {
         console.log("Verifying OTP, OTP:", userSession.otp);
@@ -130,7 +141,7 @@ async handleBalanceInquiry(userSession) {
 
         if (loginResult === true) {
             userSession.state = states.LOGGED_IN;
-            return this.handleIntentAfterLogin(userSession); 
+            return this.handleIntentAfterLogin(userSession);
         } else {
             userSession.state = states.OTP_VERIFICATION;
             return "OTP verification failed. Please enter the OTP again.";
@@ -139,51 +150,41 @@ async handleBalanceInquiry(userSession) {
 
     async handleIntentAfterLogin(userSession) {
         console.log("Handling intent after login, userSession:", userSession);
-        switch (userSession.lastIntent) {
-            case "BALANCE":
-                return await this.handleBalanceInquiry(userSession);
-            case "TRANSACTIONS":
-                return await this.handleBalanceInquiry(userSession);
-            default:
-                return "Oops! I'm encountering a trouble understanding you. Please try again later"; // THIS NEEDED TO BE CHANGED it goes in default case as 1234 is not recoginezes as intent and intent set to null... add condition if intent null then set intent to the start intent of flow
-
+        if (userSession.lastIntent) {
+            return await this.processIntent(userSession, userSession.lastIntent);
         }
+        return "You're logged in! How may I assist you?";
     }
 
     async handleAccountSelection(userSession, messageBody) {
-        console.log("UserSession in handleAccountSelection is: ", userSession)
-        console.log("entering handleAccountSelection and messageBody is:", messageBody) //messageBody is the selected account actual value
+        console.log("UserSession in handleAccountSelection is:", userSession);
+        console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
-        console.log("the selected accounT is:", selectedAccount);
+        console.log("The selected account is:", selectedAccount);
 
-	    if (selectedAccount) {
-            console.log("the selected account is:", selectedAccount);
+        if (selectedAccount) {
             userSession.selectedAccount = selectedAccount;
-            if(userSession.lastIntent == "BALANCE"){
-            userSession.state = states.FETCHING_BALANCE;
-            const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
-            userSession.state = states.LOGGED_IN;
-            return balanceMessage;  // Return balance message
-            }
-           else if(userSession.lastIntent == "TRANSACTIONS"){
-               console.log("entering transactions service");
+
+            if (userSession.lastIntent === "BALANCE") {
+                userSession.state = states.FETCHING_BALANCE;
+                const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
+                userSession.state = states.LOGGED_IN;
+                return balanceMessage; // Return balance message
+            } else if (userSession.lastIntent === "TRANSACTIONS") {
                 userSession.state = states.FETCHING_TRANSACTION;
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
                 userSession.state = states.LOGGED_IN;
-                console.log("transactions are:", transactionMessage);
                 return transactionMessage;
-           }
-           else if(userSession.lastIntent == "UPCOMINGPAYMENTS"){
-            console.log("entering transactions service");
-             userSession.state = states.FETCHING_TRANSACTION;
-             const transactionMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
-             userSession.state = states.LOGGED_IN;
-             console.log("transactions are:", transactionMessage);
-             return transactionMessage;
-        }
+            } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
+                userSession.state = states.FETCHING_TRANSACTION;
+                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
+                userSession.state = states.LOGGED_IN;
+                return paymentsMessage;
+            }
         } else {
             return "Please enter a valid account selection from the list.";
         }
     }
 }
+
 module.exports = new StateMachine();
