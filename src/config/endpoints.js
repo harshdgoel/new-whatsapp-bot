@@ -4,5 +4,6 @@ module.exports = {
     anonymousToken: "/digx-infra/login/v1/anonymousToken",
     login: "/digx-infra/login/v1/login",
     me: "/digx-common/user/v1/me"
+    transactions: "/digx-common/dda/v1/demandDeposit"
     // Add more endpoints as needed
 };
