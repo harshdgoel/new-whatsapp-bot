@@ -29,7 +29,7 @@ class RecentTransactionService {
         ]);
 
         console.log("Selected account in transactions:", selectedAccount.id.value);
-        const endpointUrl = `${endpoints.accounts}/${selectedAccount.id.value}/transactions`;
+        const endpointUrl = `${endpoints.transactions}/${selectedAccount.id.value}/transactions`;
         console.log("Transaction API URL:", endpointUrl);
 
         try {
