@@ -136,7 +136,7 @@ class LoginService {
                         "POST",
                         new Map([
                             ["Content-Type", "application/json"],
-                            ["x-authentication-type", "CHATBOT"],
+                            ["x-digx-authentication-type", "CHATBOT"],
                             ["TOKEN_ID", otp],
                             ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                             ["X-Token-Type", "JWT"],
