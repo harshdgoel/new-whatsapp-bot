@@ -104,10 +104,10 @@ class StateMachine {
                 return await this.handleBalanceInquiry(userSession);
             case "TRANSACTIONS":
                 userSession.state = states.TRANSACTIONS;
-                return await this.handleTransactions(userSession);
+                return await this.handleBalanceInquiry(userSession);
             case "UPCOMINGPAYMENTS":
                 userSession.state = states.UPCOMINGPAYMENTS;
-                return await this.handleUpcomingPayments(userSession);
+                return await this.handleBalanceInquiry(userSession);
             default:
                 return "I'm sorry, I couldn't understand your request. Please try again.";
         }
