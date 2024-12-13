@@ -190,20 +190,25 @@ async handleAccountSelection(userSession, messageBody) {
 
         // Fetch Help Me menu
         const helpMenu = await HelpMeService.helpMe();
+        
+        // Use TemplateLayer to format the help menu
+        const formattedHelpMenu = TemplateLayer.generateTemplate(helpMenu); 
 
         console.log("helpMenu is:", helpMenu);
         console.log("responseMessage is: ", responseMessage);
+        
         // Return balance/transaction/payment response along with Help Me menu
         if (responseMessage) {
             console.log("Returning response message and Help Me menu:", responseMessage);
-            return `${responseMessage}\n\n${helpMenu}`;
+            return `${responseMessage}\n\n${formattedHelpMenu}`; // Send the formatted help menu
         } else {
-            return helpMenu; // In case no response message is generated
+            return formattedHelpMenu; // If no responseMessage is generated, just return the help menu
         }
     } else {
         return "Please enter a valid account selection from the list.";
     }
 }
+
 
 
 
