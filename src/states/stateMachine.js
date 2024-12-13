@@ -167,6 +167,8 @@ class StateMachine {
 async handleAccountSelection(userSession, messageBody) {
     console.log("UserSession in handleAccountSelection is:", userSession);
     console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
+
+    // Parse the selected account from the provided messageBody
     const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
     console.log("The selected account is:", selectedAccount);
 
@@ -174,6 +176,8 @@ async handleAccountSelection(userSession, messageBody) {
         userSession.selectedAccount = selectedAccount;
 
         let responseMessage;
+        
+        // Determine what response to fetch based on the user's last intent
         if (userSession.lastIntent === "BALANCE") {
             userSession.state = states.FETCHING_BALANCE;
             responseMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
@@ -195,15 +199,22 @@ async handleAccountSelection(userSession, messageBody) {
         // Return the response message (text) followed by the help menu (template)
         if (responseMessage) {
             console.log("Returning response message and Help Me menu:", responseMessage);
-            return [responseMessage, helpMenu]; // Return as an array to send both separately
+            return {
+                response: responseMessage, // Send response message first
+                helpMenu: helpMenu, // Send help menu separately (if available)
+            };
         } else {
             console.log("Returning only Help Me menu.");
-            return [helpMenu]; // If no responseMessage, only return the help menu
+            return {
+                helpMenu: helpMenu, // If no responseMessage, only return the help menu
+            };
         }
     } else {
+        // If no valid account selection is made, return an error message
         return "Please enter a valid account selection from the list.";
     }
 }
+
 
 
 
