@@ -189,26 +189,22 @@ async handleAccountSelection(userSession, messageBody) {
         userSession.state = states.LOGGED_IN;
         userSession.isHelpTriggered = false; // Reset Help trigger for next session
 
-        // Fetch Help Me menu
+        // Fetch the help menu
         const helpMenu = await HelpMeService.helpMe();
 
-        // Use TemplateLayer to format the help menu
-
-        console.log("helpMenu is:", helpMenu);
-        console.log("responseMessage is: ", responseMessage);
-
-        // Return balance/transaction/payment response along with Help Me menu
+        // Return the response message (text) followed by the help menu (template)
         if (responseMessage) {
             console.log("Returning response message and Help Me menu:", responseMessage);
-            return `${responseMessage}\n\n${helpMenu}`; // Send the formatted help menu
+            return [responseMessage, helpMenu]; // Return as an array to send both separately
         } else {
-                        console.log("returning Help Me menu:", responseMessage);
-            return helpMenu; // If no responseMessage is generated, just return the help menu
+            console.log("Returning only Help Me menu.");
+            return [helpMenu]; // If no responseMessage, only return the help menu
         }
     } else {
         return "Please enter a valid account selection from the list.";
     }
 }
+
 
 
 
