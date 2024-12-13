@@ -163,7 +163,7 @@ class StateMachine {
         return "You're logged in! How may I assist you?";
     }
 
- async handleAccountSelection(userSession, messageBody) {
+async handleAccountSelection(userSession, messageBody) {
     console.log("UserSession in handleAccountSelection is:", userSession);
     console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
     const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
@@ -187,12 +187,28 @@ class StateMachine {
         // After processing the selected intent, reset state and show Help Me menu
         userSession.state = states.LOGGED_IN;
         userSession.isHelpTriggered = false; // Reset Help trigger for next session
-        const helpMenu = await HelpMeService.helpMe(); // Fetch Help Me menu
-        return `${responseMessage}\n\n${helpMenu}`; // Combine response with Help Me menu
+
+        // Fetch Help Me menu
+        const helpMenu = await HelpMeService.helpMe();
+
+        // Send balance/transaction/payment message first
+        if (responseMessage) {
+            console.log("Response message to be sent:", responseMessage);
+            await MessageService.sendMessage(responseMessage); // Adjust MessageService logic as needed
+        }
+
+        // Send Help Me menu as a separate message
+        if (helpMenu) {
+            console.log("Help Me menu to be sent:", helpMenu);
+            await MessageService.sendMessage(helpMenu); // Adjust MessageService logic as needed
+        }
+
+        return; // Explicitly end the flow here
     } else {
         return "Please enter a valid account selection from the list.";
     }
 }
+
 
 }
 
