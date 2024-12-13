@@ -165,7 +165,8 @@ class StateMachine {
 
 async handleAccountSelection(userSession, messageBody) {
     console.log("UserSession in handleAccountSelection is:", userSession);
-    console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
+    console.log("Entering handleAccountSelection and messageBody is:", messageBody);
+
     const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
     console.log("The selected account is:", selectedAccount);
 
@@ -173,34 +174,47 @@ async handleAccountSelection(userSession, messageBody) {
         userSession.selectedAccount = selectedAccount;
 
         let responseMessage;
-        if (userSession.lastIntent === "BALANCE") {
-            userSession.state = states.FETCHING_BALANCE;
-            responseMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
-        } else if (userSession.lastIntent === "TRANSACTIONS") {
-            userSession.state = states.FETCHING_TRANSACTION;
-            responseMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
-        } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
-            userSession.state = states.FETCHING_TRANSACTION;
-            responseMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
+        try {
+            if (userSession.lastIntent === "BALANCE") {
+                userSession.state = states.FETCHING_BALANCE;
+                responseMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
+            } else if (userSession.lastIntent === "TRANSACTIONS") {
+                userSession.state = states.FETCHING_TRANSACTION;
+                responseMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
+            } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
+                userSession.state = states.FETCHING_TRANSACTION;
+                responseMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
+            }
+
+            // Log the response message for debugging
+            console.log("Response message generated:", responseMessage);
+
+            // Send the balance/transaction/payment message first
+            if (responseMessage) {
+                await MessageService.sendMessage(responseMessage); // Adjust `MessageService` logic as needed
+                console.log("Balance/Transaction/Payment message sent successfully.");
+            } else {
+                console.warn("No response message generated. Please check your service logic.");
+            }
+        } catch (error) {
+            console.error("Error fetching account details:", error.message);
+            return "An error occurred while fetching the account details. Please try again later.";
         }
 
-        // After processing the selected intent, reset state and show Help Me menu
+        // Reset state and prepare Help Me menu
         userSession.state = states.LOGGED_IN;
         userSession.isHelpTriggered = false; // Reset Help trigger for next session
 
-        // Fetch Help Me menu
-        const helpMenu = await HelpMeService.helpMe();
-
-        // Send balance/transaction/payment message first
-        if (responseMessage) {
-            console.log("Response message to be sent:", responseMessage);
-            await MessageService.sendMessage(responseMessage); // Adjust MessageService logic as needed
-        }
-
-        // Send Help Me menu as a separate message
-        if (helpMenu) {
-            console.log("Help Me menu to be sent:", helpMenu);
-            await MessageService.sendMessage(helpMenu); // Adjust MessageService logic as needed
+        // Fetch and send the Help Me menu
+        try {
+            const helpMenu = await HelpMeService.helpMe();
+            if (helpMenu) {
+                await MessageService.sendMessage(helpMenu); // Send Help Me menu as a separate message
+                console.log("Help Me menu sent successfully.");
+            }
+        } catch (error) {
+            console.error("Error generating or sending Help Me menu:", error.message);
+            return "An error occurred while displaying the Help Me menu. Please try again later.";
         }
 
         return; // Explicitly end the flow here
@@ -208,6 +222,7 @@ async handleAccountSelection(userSession, messageBody) {
         return "Please enter a valid account selection from the list.";
     }
 }
+
 
 
 }
