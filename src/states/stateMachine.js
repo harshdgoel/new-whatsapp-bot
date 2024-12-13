@@ -114,12 +114,14 @@ class StateMachine {
 
             // Return the response message along with the help menu (if available)
             if (responseMessage) {
-                return {
-                    response: responseMessage,
-                    helpMenu: helpMenu,
-                };
+               return responseMessage;
+                // return {
+                //     response: responseMessage,
+                //     helpMenu: helpMenu,
+                // };
             } else {
-                return { helpMenu: helpMenu };
+               return helpMenu;
+                // return { helpMenu: helpMenu };
             }
         } else {
             return "Please enter a valid account selection from the list.";
