@@ -201,7 +201,7 @@ async handleAccountSelection(userSession, messageBody) {
         // Return balance/transaction/payment response along with Help Me menu
         if (responseMessage) {
             console.log("Returning response message and Help Me menu:", responseMessage);
-            return `${responseMessage}\n\n${formattedHelpMenu}`; // Send the formatted help menu
+            return `${responseMessage}`; // Send the formatted help menu
         } else {
             return responseMessage; // If no responseMessage is generated, just return the help menu
         }
