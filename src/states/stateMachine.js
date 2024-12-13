@@ -203,7 +203,7 @@ async handleAccountSelection(userSession, messageBody) {
             console.log("Returning response message and Help Me menu:", responseMessage);
             return `${responseMessage}\n\n${formattedHelpMenu}`; // Send the formatted help menu
         } else {
-            return formattedHelpMenu; // If no responseMessage is generated, just return the help menu
+            return responseMessage; // If no responseMessage is generated, just return the help menu
         }
     } else {
         return "Please enter a valid account selection from the list.";
