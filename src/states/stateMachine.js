@@ -1,6 +1,7 @@
 const LoginService = require("../services/loginService");
 const BalanceService = require("../services/BalanceService");
 const MessageService = require('../services/MessageService');
+const TemplateLayer = require("../services/TemplateLayer");
 const RecentTransactionService = require("../services/RecentTransactionService");
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
@@ -163,38 +164,56 @@ class StateMachine {
         return "You're logged in! How may I assist you?";
     }
 
-    async handleAccountSelection(userSession, messageBody) {
-        console.log("UserSession in handleAccountSelection is:", userSession);
-        console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
-        const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
-        console.log("The selected account is:", selectedAccount);
+async handleAccountSelection(userSession, messageBody) {
+    console.log("UserSession in handleAccountSelection is:", userSession);
+    console.log("Entering handleAccountSelection and messageBody is:", messageBody); // messageBody is the selected account actual value
+    const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+    console.log("The selected account is:", selectedAccount);
 
-        if (selectedAccount) {
-            userSession.selectedAccount = selectedAccount;
+    if (selectedAccount) {
+        userSession.selectedAccount = selectedAccount;
 
-            if (userSession.lastIntent === "BALANCE") {
-                userSession.state = states.FETCHING_BALANCE;
-                const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
-                userSession.state = states.LOGGED_IN;
-                userSession.isHelpTriggered = false; // Reset Help trigger for next session
-                return balanceMessage; // Return balance message
-            } else if (userSession.lastIntent === "TRANSACTIONS") {
-                userSession.state = states.FETCHING_TRANSACTION;
-                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
-                userSession.state = states.LOGGED_IN;
-                userSession.isHelpTriggered = false; // Reset Help trigger for next session
-                return transactionMessage;
-            } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
-                userSession.state = states.FETCHING_TRANSACTION;
-                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
-                userSession.state = states.LOGGED_IN;
-                userSession.isHelpTriggered = false; // Reset Help trigger for next session
-                return paymentsMessage;
-            }
-        } else {
-            return "Please enter a valid account selection from the list.";
+        let responseMessage;
+        if (userSession.lastIntent === "BALANCE") {
+            userSession.state = states.FETCHING_BALANCE;
+            responseMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
+        } else if (userSession.lastIntent === "TRANSACTIONS") {
+            userSession.state = states.FETCHING_TRANSACTION;
+            responseMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
+        } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
+            userSession.state = states.FETCHING_TRANSACTION;
+            responseMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
         }
+
+        // After processing the selected intent, reset state
+        userSession.state = states.LOGGED_IN;
+        userSession.isHelpTriggered = false; // Reset Help trigger for next session
+
+        // Fetch Help Me menu
+        const helpMenu = await HelpMeService.helpMe();
+
+        // Use TemplateLayer to format the help menu
+        const formattedHelpMenu = TemplateLayer.generateTemplate(helpMenu); 
+
+        console.log("helpMenu is:", helpMenu);
+        console.log("responseMessage is: ", responseMessage);
+
+        // Return balance/transaction/payment response along with Help Me menu
+        if (responseMessage) {
+            console.log("Returning response message and Help Me menu:", responseMessage);
+            return `${responseMessage}\n\n${formattedHelpMenu}`; // Send the formatted help menu
+        } else {
+                        console.log("returning Help Me menu:", responseMessage);
+            return formattedHelpMenu; // If no responseMessage is generated, just return the help menu
+        }
+    } else {
+        return "Please enter a valid account selection from the list.";
     }
+}
+
+
+
+
 }
 
 module.exports = new StateMachine();
