@@ -69,6 +69,8 @@ class StateMachine {
         // Handle user selection from Help Me menu
         if (userSession.state === states.HELP) {
             const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
+                    console.log("selectedintent intent is:", selectedIntent);
+
             if (selectedIntent && selectedIntent !== "UNKNOWN") {
                 userSession.lastIntent = selectedIntent;
                 userSession.state = states.LOGGED_IN; // Move to intent handling state
@@ -83,6 +85,7 @@ class StateMachine {
     }
 
     async handleIntent(userSession, intent) {
+        console.log("intent in handle intent is:", intent);
         let response;
 
         switch (intent) {
