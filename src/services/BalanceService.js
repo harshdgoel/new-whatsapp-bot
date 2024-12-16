@@ -8,6 +8,7 @@ const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
     LOGGED_OUT: "LOGGED_OUT"
+    HELP: "HELP"
 };
 class BalanceService {
   static async initiateBalanceInquiry(userSession) {
@@ -96,7 +97,9 @@ class BalanceService {
         userSession.state = states.OTP_VERIFICATION;
       return MessageService.getMessage('otpMessage');
       }
-userSession.state === states.HELP // just for trial
+      console.log("state in balance service catch is:",userSession.state);
+        userSession.state === states.HELP // just for trial
+        console.log("state in balance service catch is:",userSession.state);
       return "An error occurred while fetching your accounts. Please try again.";
     }
   }
