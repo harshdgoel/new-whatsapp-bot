@@ -162,17 +162,17 @@ class StateMachine {
             if (userSession.lastIntent === "BALANCE") {
                 const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
                 userSession.isHelpTriggered = false;
-                userSession.state = states.LOGGED_IN;
+                userSession.state = states.HELP;
                 return balanceMessage;
             } else if (userSession.lastIntent === "TRANSACTIONS") {
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount);
                 userSession.isHelpTriggered = false;
-                userSession.state = states.LOGGED_IN;
+                userSession.state = states.HELP;
                 return transactionMessage;
             } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
                 const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount);
                 userSession.isHelpTriggered = false;
-                userSession.state = states.LOGGED_IN;
+                userSession.state = states.HELP;
                 return paymentsMessage;
             }
         } else {
