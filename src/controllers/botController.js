@@ -19,8 +19,9 @@ const handleIncomingMessage = async (phoneNumberId, from, message) => {
     // Check if the state is HELP (indicating that the flow is done) and send help menu
     const userSession = stateMachine.getSession(from); // Get the user's session state
     if (userSession.state === "HELP") { // Only send the help menu if the flow is complete
-        const helpMenu = await stateMachine.getHelpMenu();
-        await sendResponseToChannel(channel, phoneNumberId, from, helpMenu);
+     const page = 1;  // You can adjust this based on user interaction
+        const helpMenu = await HelpMeService.helpMe(page);
+        await sendResponseToChannel("facebook", phoneNumberId, from, helpMenu);
     }
 };
 
