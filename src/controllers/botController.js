@@ -15,6 +15,7 @@ const handleIncomingMessage = async (phoneNumberId, from, message) => {
 
     // Send the main response
     await sendResponseToChannel(channel, phoneNumberId, from, mainResponse);
+    console.log("State in botcontroller is: ", stateMachine.getSession(from););
 
     // Check if the state is HELP (indicating that the flow is done) and send help menu
     const userSession = stateMachine.getSession(from); // Get the user's session state
