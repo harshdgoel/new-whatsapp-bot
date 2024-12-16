@@ -96,13 +96,13 @@ class StateMachine {
 
             // Determine what response to fetch based on the user's last intent
             if (userSession.lastIntent === "BALANCE") {
-                userSession.state = states.FETCHING_BALANCE;
+                userSession.state = states.HELP;
                 responseMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount);
             } else if (userSession.lastIntent === "TRANSACTIONS") {
-                userSession.state = states.FETCHING_TRANSACTION;
+                userSession.state = states.HELP;
                 responseMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount, messageBody);
             } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
-                userSession.state = states.FETCHING_TRANSACTION;
+                userSession.state = states.HELP;
                 responseMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
             }
 
