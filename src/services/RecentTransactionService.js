@@ -60,6 +60,7 @@ class RecentTransactionService {
                     bodyText: bodyText,
                     to: userSession.channelId // Pass the correct recipient for Facebook or WhatsApp
                 };
+                console.log("CHANNEL IN RECENT TRANSACTION IS::", config.channel.toLowerCase());
 
                 // Select channel template structure based on config
                 switch (config.channel.toLowerCase()) {
@@ -78,7 +79,7 @@ class RecentTransactionService {
                     default:
                         throw new Error("Unsupported channel type");
                 }
-
+console.log("templatedata in recent transactions is: ", templateData);
                 // Pass template data to TemplateLayer
                 return TemplateLayer.generateTemplate(templateData);
 
