@@ -106,23 +106,10 @@ class StateMachine {
                 responseMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount, messageBody);
             }
 
-            // After processing the selected intent, reset state to LOGGED_IN
-            userSession.state = states.LOGGED_IN;
-
-            // Fetch the help menu if necessary (if help flow is triggered)
-            const helpMenu = await HelpMeService.helpMe();
-
             // Return the response message along with the help menu (if available)
             if (responseMessage) {
                return responseMessage;
-                // return {
-                //     response: responseMessage,
-                //     helpMenu: helpMenu,
-                // };
-            } else {
-               return helpMenu;
-                // return { helpMenu: helpMenu };
-            }
+            } 
         } else {
             return "Please enter a valid account selection from the list.";
         }
