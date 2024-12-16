@@ -145,7 +145,7 @@ class StateMachine {
     async handleBalanceInquiry(userSession) {
         const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
         if (accountsResult) {
-            userSession.state = states.ACCOUNT_SELECTION;
+            userSession.state = states.HELP; //just for trila change to ACCOUNT_SELECTION LATER
             return accountsResult;
         } else {
             return "No accounts available.";
