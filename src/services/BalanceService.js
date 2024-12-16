@@ -7,7 +7,7 @@ const channel = config.channel;
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
-    LOGGED_OUT: "LOGGED_OUT"
+    LOGGED_OUT: "LOGGED_OUT",
     HELP: "HELP"
 };
 class BalanceService {
