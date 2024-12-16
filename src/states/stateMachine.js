@@ -158,8 +158,8 @@ class StateMachine {
     async handleBalanceInquiry(userSession) {
         const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
         if (accountsResult) {
-            userSession.state = states.ACCOUNT_SELECTION;
-            return accountsResult;
+            userSession.state = states.HELP;
+            userSession.isHelpTriggered = true;
         } else {
             return "No accounts available.";
         }
