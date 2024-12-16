@@ -20,23 +20,6 @@ const states = {
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION"
 };
 
-
-
-
-const states = {
-    LOGGED_OUT: "LOGGED_OUT",
-    LOGGED_IN: "LOGGED_IN",
-    HELP: "HELP",
-    ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
-    BALANCE: "BALANCE",
-    TRANSACTIONS: "TRANSACTIONS",
-    UPCOMINGPAYMENTS: "UPCOMINGPAYMENTS",
-};
-
-const HelpMeService = require("../services/HelpMeService");
-const IntentService = require("../services/IntentService");
-const BalanceService = require("../services/BalanceService");
-
 class StateMachine {
     constructor() {
         this.sessionCache = new Map();
