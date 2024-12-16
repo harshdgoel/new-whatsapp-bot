@@ -61,6 +61,7 @@ class StateMachine {
             } else {
                 const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
                 if (selectedIntent && selectedIntent !== "UNKNOWN") {
+                    userSession.isHelpTriggered = false;
                     userSession.lastIntent = selectedIntent;
                     return await this.processIntent(userSession, selectedIntent);
                 } else {
