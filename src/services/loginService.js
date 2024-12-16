@@ -8,7 +8,7 @@ const defaultHomeEntity = config.defaultHomeEntity;
 class LoginService {
     constructor() {
         this.authCache = { token: null, cookie: null, anonymousToken: null };
-        this.mobileNumber = "916378582419";
+        this.mobileNumber = "919819250898";
     }
 
     setAuthDetails(token, cookie) {
