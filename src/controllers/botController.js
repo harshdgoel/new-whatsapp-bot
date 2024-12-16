@@ -1,3 +1,5 @@
+const HelpMeService = require("../services/HelpMeService");
+
 const { sendResponseToChannel } = require("../services/apiHandler");
 const stateMachine = require("../states/stateMachine");
 
