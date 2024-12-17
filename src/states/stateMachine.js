@@ -138,6 +138,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
     async handleOTPVerification(userSession) {
         const otp = userSession.otp;
+        console.log("otp is:",otp);
         if (!otp) throw new Error("OTP is not available or initialized.");
 
        const loginResult = await LoginService.verifyOTP(userSession.userId, otp);
