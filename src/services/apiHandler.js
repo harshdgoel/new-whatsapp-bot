@@ -3,7 +3,6 @@ const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
     console.log("entering sendResponseToChannel and message is: ",message);
-    console.log("trying to access text:", message.message.text)
     let responseData;
 
     try {
@@ -38,26 +37,23 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             console.log("entering channel facebook in apiHandler and message is:", message);
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
-console.log("type is string");
                 // Plain text message
                 responseData = {
-                    recipient: { id: "1306151306130839" },
+                    messaging_type: "MESSAGE_TAG",
+                    recipient: { id: to },
                     message: { text: message },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
-                console.log("type is body");
-
                 // Text with the text body
                 responseData = {
-                    recipient: { id: "1306151306130839" },
+                    messaging_type: "MESSAGE_TAG",
+                    recipient: { id: to },
                     message: { text: message.text.body },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } 
              else if (message.message?.quick_replies) {
-                 console.log("type is quick reply");
-
   console.log("Processing Facebook quick_replies...",message);
   responseData = {
     recipient: { id: to },
@@ -69,16 +65,9 @@ console.log("type is string");
   };
 }
             else {
-                console.log("ein generate recent template");
-         responseData = {
-                    recipient: { id: to },
-                    message: { text: message.text },
-                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
-                };
-               // throw new Error("Unsupported Facebook message format.");
+                throw new Error("Unsupported Facebook message format.");
             }
 
-            console.log("response ddata for recent is:",responseData);
             console.log("Sending response to Facebook Messenger...", JSON.stringify(responseData, null, 2));
             const response = await sendToFacebookAPI(responseData);
             console.log("Facebook response sent successfully:", response);
