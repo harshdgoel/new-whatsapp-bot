@@ -98,7 +98,7 @@ class LoginService {
                         ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
-                    { 919819250898 }
+                    { mobileNumber: "919819250898" }
                 );
 
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
