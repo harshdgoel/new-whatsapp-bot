@@ -49,10 +49,7 @@ class TemplateLayer {
 
          //Remove Markdown formatting
     const responseText = bodyText
-        ? bodyText
-              .replace(/[*~_]/g, "")
-              .replace(/\n+/g, " ")  
-              .trim()             
+        ?  bodyText.replace(/[*~_]/g, "")         
         : "Please select an option:";
 
         if (!sections || !Array.isArray(sections) || sections.length === 0) {
