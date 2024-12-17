@@ -3,7 +3,7 @@
 const OBDXService = require('../services/OBDXService');
 const endpoints = require("../config/endpoints");
 const config = require("../config/config");
-const defaultHomeEntity = config.defaultHomeEntity;
+const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class LoginService {
     constructor() {
