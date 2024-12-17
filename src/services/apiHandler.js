@@ -4,6 +4,7 @@ const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
     console.log("entering sendResponseToChannel and message is: ",message);
+    console.log("trying to access text:", message.message.text)
     let responseData;
 
     try {
