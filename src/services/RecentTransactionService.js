@@ -74,7 +74,11 @@ class RecentTransactionService {
                         break;
 
                     case "facebook":
-                        return bodyText;
+                        templateData = {
+                            bodyText: bodyText,
+                            to: userSession.channelId // Facebook recipient ID
+                        };
+                        break;
 
                     default:
                         throw new Error("Unsupported channel type");
