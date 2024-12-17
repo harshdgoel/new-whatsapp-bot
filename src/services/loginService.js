@@ -6,66 +6,73 @@ const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class LoginService {
     constructor() {
-        this.authCache = { token: null, cookie: null, anonymousToken: null };
-        this.mobileNumber = "919819250898";
-    }
-    setAuthDetails(token, cookie) {
-        this.authCache.token = token;
-        this.authCache.cookie = cookie;
-    }
-    setAnonymousToken(token) {
-        this.authCache.anonymousToken = token;
-    }
-    getToken() {
-        return this.authCache.token;
-    }
-    getCookie() {
-        return this.authCache.cookie;
-    }
-    getAnonymousToken() {
-        return this.authCache.anonymousToken;
-    }
-    clearAuthCache() {
-        this.authCache = { token: null, cookie: null, anonymousToken: null };
-    }
-    isTokenExpired() {
-        const token = this.getToken();
-        if (!token) return true;
-        try {
-            const payloadBase64 = token.split('.')[1];
-            const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
-            const exp = decodedPayload.exp;
-            if (!exp) {
-                this.clearAuthCache();
-                return true;
+        // Private Map to store tokens and cookies based on phoneNumber or facebookId
+        const authSessions = new Map();
+
+        // Helper function to generate the session key based on channel
+        const generateSessionKey = (userId, channel) => {
+            return channel === "facebook" ? `facebook_${userId}` : `whatsapp_${userId}`;
+        };
+
+        // Add or update user session
+        this.setSession = (userId, channel, token, cookie) => {
+            const sessionKey = generateSessionKey(userId, channel);
+            authSessions.set(sessionKey, { token, cookie });
+        };
+
+        // Get user session
+        this.getSession = (userId, channel) => {
+            const sessionKey = generateSessionKey(userId, channel);
+            return authSessions.get(sessionKey) || { token: null, cookie: null };
+        };
+
+        // Delete user session
+        this.deleteSession = (userId, channel) => {
+            const sessionKey = generateSessionKey(userId, channel);
+            authSessions.delete(sessionKey);
+        };
+
+        // Check if token is expired
+        this.isTokenExpired = (token) => {
+            if (!token) return true;
+            try {
+                const payloadBase64 = token.split('.')[1];
+                const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+                const exp = decodedPayload.exp;
+                if (!exp) return true; // Expiry missing, assume expired
+
+                const isExpired = Date.now() >= exp * 1000;
+                return isExpired;
+            } catch (error) {
+                console.error("Error decoding token:", error.message);
+                return true; // Treat as expired if decoding fails
             }
+        };
 
-            const isExpired = Date.now() >= exp * 1000;
-            if (isExpired) {
-                this.clearAuthCache();
+        // Clear expired sessions
+        this.cleanupSessions = () => {
+            for (const [key, session] of authSessions.entries()) {
+                if (this.isTokenExpired(session.token)) {
+                    console.log(`Session expired for key: ${key}, removing it.`);
+                    authSessions.delete(key);
+                }
             }
+        };
 
-            return isExpired;
-        } catch (error) {
-            console.error("Error decoding token:", error.message);
-            this.clearAuthCache();
-            return true;
-        }
+        // Periodic cleanup every 10 minutes
+        setInterval(this.cleanupSessions, 10 * 60 * 1000);
     }
-    async checkLogin() {
-        const token = this.getToken();
-        const cookie = this.getCookie();
-        if (!token || !cookie) {
-            return false;
-        }
 
-        if (this.isTokenExpired()) {
+    async checkLogin(userId, channel) {
+        const { token, cookie } = this.getSession(userId, channel);
+        if (!token || !cookie || this.isTokenExpired(token)) {
+            this.deleteSession(userId, channel);
             return false;
         }
         return true;
     }
 
-    async verifyOTP(otp) {
+    async verifyOTP(userId, channel, otp, mobileNumber) {
         try {
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
@@ -76,11 +83,8 @@ class LoginService {
             );
 
             if (tokenResponse) {
-                this.setAnonymousToken(tokenResponse.headers.authorization);
+                const anonymousToken = tokenResponse.headers.authorization;
                 const setCookie = tokenResponse.headers['set-cookie'];
-                if (setCookie) {
-                    this.authCache.cookie = setCookie;
-                }
 
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
@@ -89,23 +93,21 @@ class LoginService {
                         ["Content-Type", "application/json"],
                         ["x-digx-authentication-type", "CHATBOT"],
                         ["TOKEN_ID", otp],
-                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                        ["Authorization", `Bearer ${anonymousToken}`],
                         ["X-Token-Type", "JWT"],
                         ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
-                    { mobileNumber: this.mobileNumber }
+                    { mobileNumber }
                 );
 
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
                     const registrationId = otpResponse.data.registrationId;
-
                     if (!registrationId) {
-                        console.error("Registration ID missing in OTP response:", otpResponse);
-                        return "Final login failed due to missing registration ID. Please try again.";
+                        console.error("Registration ID missing in OTP response");
+                        return "Final login failed. Please try again.";
                     }
-                    this.registrationId = registrationId;
-                    const queryParams = new Map([["locale", "en"]]);
+
                     const finalLoginResponse = await OBDXService.serviceMeth(
                         endpoints.login,
                         "POST",
@@ -113,46 +115,43 @@ class LoginService {
                             ["Content-Type", "application/json"],
                             ["x-digx-authentication-type", "CHATBOT"],
                             ["TOKEN_ID", otp],
-                            ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                            ["Authorization", `Bearer ${anonymousToken}`],
                             ["X-Token-Type", "JWT"],
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
-                        queryParams,
-                        { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
+                        new Map([["locale", "en"]]),
+                        { mobileNumber, registrationId }
                     );
 
+                    const finalToken = finalLoginResponse.data.token;
                     const setCookieFinal = finalLoginResponse.headers['set-cookie'];
-                    if (setCookieFinal) {
-                        this.authCache.cookie = setCookieFinal.join('; ');
+
+                    if (finalToken && setCookieFinal) {
+                        this.setSession(userId, channel, finalToken, setCookieFinal.join('; '));
+                        return "Login successful.";
                     } else {
-                        console.error("Cookie setting failed in final login.");
                         return "Final login failed. Please try again.";
                     }
-                    this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
-                    // Make the additional API call to fetch user details
-                    const userDetails = await this.fetchUserDetails();
-                    return true;
                 } else {
-                    console.error("OTP verification failed:", otpResponse);
                     return "OTP verification failed. Please try again.";
                 }
-            } else {
-                console.error("Failed to obtain anonymous token:", tokenResponse);
-                return "Failed to initiate login. Please try again.";
             }
         } catch (error) {
-            console.error("Error during login process:", error.message);
-            return "An error occurred during verification. Please try again.";
+            console.error("Error during OTP verification:", error.message);
+            return "An error occurred during login. Please try again.";
         }
     }
 
-    async fetchUserDetails() {
+    async fetchUserDetails(userId, channel) {
+        const { token, cookie } = this.getSession(userId, channel);
+
         const headers = new Map([
-            ["Authorization", `Bearer ${this.getToken()}`],
-            ["Cookie", this.getCookie()],
+            ["Authorization", `Bearer ${token}`],
+            ["Cookie", cookie],
             ["Content-Type", "application/json"],
             ["X-Token-Type", "JWT"]
         ]);
+
         const response = await OBDXService.serviceMeth(
             endpoints.me,
             "GET",
