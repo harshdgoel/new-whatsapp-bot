@@ -40,7 +40,6 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             if (typeof message === "string") {
                 // Plain text message
                 responseData = {
-                    messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
                     message: { text: message },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
@@ -48,7 +47,6 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             } else if (message.text?.body) {
                 // Text with the text body
                 responseData = {
-                    messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
                     message: { text: message.text.body },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
