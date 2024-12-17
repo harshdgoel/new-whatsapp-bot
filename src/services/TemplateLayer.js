@@ -47,6 +47,11 @@ class TemplateLayer {
     static generateTemplateForFacebook({ sections, bodyText, to }) {
         console.log("Generating Facebook quick reply template for:", to);
 
+         //Remove Markdown formatting
+    const responseText = bodyText
+        ? bodyText.replace(/[*~_]/g, "") // Remove *, ~, and _
+        : "Please select an option:";
+
         if (!sections || !Array.isArray(sections) || sections.length === 0) {
             console.log("Sections are missing. Generating fallback text message.");
             return {
@@ -54,7 +59,7 @@ class TemplateLayer {
                     id: to,
                 },
                 message: {
-                    text: bodyText,
+                    text: responseText,
                 },
             };
         }
