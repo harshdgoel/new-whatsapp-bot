@@ -55,11 +55,6 @@ class RecentTransactionService {
                 });
 
                 console.log("Generated transaction message body:", bodyText);
-
-                let templateData = {
-                    bodyText: bodyText,
-                    to: userSession.channelId // Pass the correct recipient for Facebook or WhatsApp
-                };
                 console.log("CHANNEL IN RECENT TRANSACTION IS::", config.channel.toLowerCase());
 
                 // Select channel template structure based on config
