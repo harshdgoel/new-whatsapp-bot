@@ -74,7 +74,7 @@ router.post("/webhook", async (req, res) => {
                         const intent = identifyIntent(messageBody);
 
                         // Handle the message with the intent and from user
-                        await handleIncomingMessage(config.phoneNumberId, from, { body: messageBody, intent });
+                        await handleIncomingMessage(process.env.PHONE_NUMBER_ID, from, { body: messageBody, intent });
                     } else {
                         console.log("Unhandled change for WhatsApp:", JSON.stringify(change, null, 2));
                     }
