@@ -56,7 +56,7 @@ class RecentTransactionService {
 
                 console.log("Generated transaction message body:", bodyText);
                 console.log("CHANNEL IN RECENT TRANSACTION IS::", config.channel.toLowerCase());
-
+                let templateData;
                 // Select channel template structure based on config
                 switch (config.channel.toLowerCase()) {
                     case "whatsapp":
