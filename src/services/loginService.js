@@ -72,7 +72,7 @@ class LoginService {
         return true;
     }
 
-    async verifyOTP(userId, otp) {
+    async verifyOTP(userId, otp, channel) {
         try {
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
