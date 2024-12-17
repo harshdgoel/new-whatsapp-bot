@@ -1,6 +1,5 @@
 const express = require("express");
 const { handleIncomingMessage } = require("../controllers/botController");
-const config = require("../config/config"); // Import config.js
 require('dotenv').config(); // Ensure this is loaded to access process.env values
 const router = express.Router();
 

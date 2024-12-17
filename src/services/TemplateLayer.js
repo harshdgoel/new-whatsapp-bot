@@ -1,4 +1,3 @@
-const config = require("../config/config"); // Import config.js
 
 class TemplateLayer {
     static generateTemplate(templateData) {

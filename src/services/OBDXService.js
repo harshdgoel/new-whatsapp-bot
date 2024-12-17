@@ -1,5 +1,4 @@
 "use strict";
-const config = require("../config/config"); // Import config.js
 const axios = require("axios");
 const URL = process.env.BASE_URL; // Use the correct key from config
 const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;

@@ -2,7 +2,6 @@ const TemplateLayer = require('./TemplateLayer');
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
 const endpoints = require("../config/endpoints");
-const config = require("../config/config"); // Import config.js
 const channel = process.env.CHANNEL;
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
