@@ -69,9 +69,13 @@ console.log("type is string");
   };
 }
             else {
-                console.log("error in recent template");
-
-                throw new Error("Unsupported Facebook message format.");
+                console.log("ein generate recent template");
+         responseData = {
+                    recipient: { id: to },
+                    message: { text: message.text.body },
+                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
+                };
+               // throw new Error("Unsupported Facebook message format.");
             }
 
             console.log("response ddata for recent is:",responseData);
