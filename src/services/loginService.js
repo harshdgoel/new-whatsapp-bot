@@ -120,7 +120,8 @@ class LoginService {
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         new Map([["locale", "en"]]),
-                        { 919819250898, registrationId }
+                        { mobileNumber: "919819250898", registrationId }
+
                     );
 
                     const finalToken = finalLoginResponse.data.token;
