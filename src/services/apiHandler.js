@@ -38,6 +38,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             console.log("entering channel facebook in apiHandler and message is:", message);
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
+console.log("type is string");
                 // Plain text message
                 responseData = {
                     recipient: { id: "1306151306130839" },
@@ -45,6 +46,8 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
+                console.log("type is body");
+
                 // Text with the text body
                 responseData = {
                     recipient: { id: "1306151306130839" },
@@ -53,6 +56,8 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 };
             } 
              else if (message.message?.quick_replies) {
+                 console.log("type is quick reply");
+
   console.log("Processing Facebook quick_replies...",message);
   responseData = {
     recipient: { id: to },
@@ -64,9 +69,12 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
   };
 }
             else {
+                console.log("error in recent template");
+
                 throw new Error("Unsupported Facebook message format.");
             }
 
+            console.log("response ddata for recent is:",responseData);
             console.log("Sending response to Facebook Messenger...", JSON.stringify(responseData, null, 2));
             const response = await sendToFacebookAPI(responseData);
             console.log("Facebook response sent successfully:", response);
