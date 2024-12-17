@@ -30,6 +30,7 @@ class StateMachine {
         if (!this.sessionCache.has(userId)) {
             logger.log(`Creating a new session for user: ${userId}`);
             this.sessionCache.set(userId, { 
+                userId: userId,
                 state: states.LOGGED_OUT, 
                 lastIntent: null, 
                 otp: null, 
