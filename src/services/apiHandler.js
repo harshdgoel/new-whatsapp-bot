@@ -3,6 +3,7 @@ const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
     console.log("entering sendResponseToChannel and message is: ",message);
+
     let responseData;
 
     try {
@@ -65,7 +66,14 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
   };
 }
             else {
-                throw new Error("Unsupported Facebook message format.");
+                        console.log("text for recent is ",message.message.text);
+
+                  responseData = {
+                    messaging_type: "MESSAGE_TAG",
+                    recipient: { id: to },
+                    message: { text: message.text },
+                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
+                };
             }
 
             console.log("Sending response to Facebook Messenger...", JSON.stringify(responseData, null, 2));
