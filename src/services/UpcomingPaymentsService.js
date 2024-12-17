@@ -3,7 +3,7 @@ const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
 const endpoints = require("../config/endpoints");
 const config = require("../config/config"); // Import config.js
-const channel = config.channel;
+const channel = process.env.CHANNEL;
 const { sendResponseToWhatsApp } = require('./apiHandler');
 
 const states = {
@@ -78,12 +78,12 @@ class UpcomingPaymentsService {
                 };
 
                 // Select channel template structure based on config
-                switch (config.channel.toLowerCase()) {
+                switch (process.env.CHANNEL.toLowerCase()) {
                     case "whatsapp":
                         templateData = {
                             type: "text",
                             bodyText: bodyText,
-                            channel: config.channel,
+                            channel: process.env.CHANNEL,
                             to: userSession.channelId // WhatsApp number here
                         };
                         break;

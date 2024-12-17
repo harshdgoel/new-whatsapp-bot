@@ -3,7 +3,7 @@ const OBDXService = require("./OBDXService");
 const LoginService = require("./loginService");
 const endpoints = require("../config/endpoints");
 const config = require("../config/config"); // Import config.js
-const channel = config.channel;
+const channel = process.env.CHANNEL;
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
     LOGGED_IN: "LOGGED_IN",
@@ -45,7 +45,7 @@ class BalanceService {
           title: account.id?.displayValue || `Account ${index + 1}`, // Display name
           payload: account.id?.displayValue || `Account ${index + 1}`, // Payload for Messenger
         }));
-        const channel = config.channel.toLowerCase();
+        const channel = process.env.CHANNEL.toLowerCase();
         let templateData;
 
         // Generate the appropriate template structure based on the channel

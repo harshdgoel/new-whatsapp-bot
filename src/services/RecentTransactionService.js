@@ -53,17 +53,14 @@ class RecentTransactionService {
                     bodyText += `Type: ${transactionType}\n`;
                     bodyText += `~ ~ ~ ~ ~ ~ ~ ~\n\n`;
                 });
-
-                console.log("Generated transaction message body:", bodyText);
-                console.log("CHANNEL IN RECENT TRANSACTION IS::", config.channel.toLowerCase());
                 let templateData;
                 // Select channel template structure based on config
-                switch (config.channel.toLowerCase()) {
+                switch (process.env.CHANNEL.toLowerCase()) {
                     case "whatsapp":
                         templateData = {
                             type: "text",
                             bodyText: bodyText,
-                            channel: config.channel,
+                            channel: process.env.CHANNEL,
                             to: "916378582419" // WhatsApp number here
                         };
                         break;

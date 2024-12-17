@@ -6,7 +6,7 @@ class TemplateLayer {
         console.log("channel is:", channel);
         console.log("rest is: ", rest);
 
-        switch (config.channel.toLowerCase()) {
+        switch (process.env.CHANNEL.toLowerCase()) {
             case "whatsapp":
                 return this.generateTemplateForWhatsApp(rest);
             case "facebook":
