@@ -48,8 +48,15 @@ class TemplateLayer {
         console.log("Generating Facebook quick reply template for:", to);
 
         if (!sections || !Array.isArray(sections) || sections.length === 0) {
-            console.log("missing sections error occured in template generation");
-            throw new Error("Missing or invalid sections for quick reply template.");
+            console.log("Sections are missing. Generating fallback text message.");
+            return {
+                recipient: {
+                    id: to,
+                },
+                message: {
+                    text: bodyText,
+                },
+            };
         }
 
         const quickReplies = sections.map(section => ({
