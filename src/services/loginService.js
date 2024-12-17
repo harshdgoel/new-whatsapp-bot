@@ -98,7 +98,7 @@ class LoginService {
                         ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
-                    { "919819250898" }
+                    { 919819250898 }
                 );
 
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
@@ -120,7 +120,7 @@ class LoginService {
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         new Map([["locale", "en"]]),
-                        { "919819250898", registrationId }
+                        { 919819250898, registrationId }
                     );
 
                     const finalToken = finalLoginResponse.data.token;
