@@ -9,7 +9,6 @@ const numCPUs = Math.min(os.cpus().length, 2); // Limit workers to 2 (based on 5
 
 // Check if the process is the master
 if (cluster.isMaster) {
-    console.log(`Master process is running. Spawning ${numCPUs} workers...`);
 
     // Fork worker processes
     for (let i = 0; i < numCPUs; i++) {
@@ -17,7 +16,6 @@ if (cluster.isMaster) {
     }
 
     cluster.on("exit", (worker, code, signal) => {
-        console.log(`Worker ${worker.process.pid} died, forking a new one...`);
         cluster.fork(); // Restart worker on failure
     });
 } else {
@@ -36,12 +34,10 @@ if (cluster.isMaster) {
         const challenge = req.query["hub.challenge"];
         const token = req.query["hub.verify_token"];
 
-        console.log("verify token is:", VERIFY_TOKEN);
         // Fetch VERIFY_TOKEN from environment variables
         const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
         if (mode && token === VERIFY_TOKEN) {
-            console.log("Webhook verified successfully!");
             res.status(200).send(challenge); // Respond with the challenge
         } else {
             console.error("Webhook verification failed. Invalid token.");

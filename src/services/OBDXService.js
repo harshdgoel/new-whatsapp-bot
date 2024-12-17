@@ -25,9 +25,7 @@ class OBDXService {
 
     // Main method to invoke services
     async invokeService(ctxPath, method, queryParam, body, loginService) {
-        console.log("Entering invokeService method");
         const headers = this.populateHeaders(loginService);
-        console.log("Headers constructed successfully.");
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
         return responseData;
     }
@@ -36,10 +34,6 @@ class OBDXService {
     async serviceMeth(ctxPath, method, headers, queryParam, body) {
         const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
         const headersObj = Object.fromEntries(headers);
-
-        console.log("Making request with headers:", headersObj);
-        console.log("Request URL:", url);
-
         try {
             const response = await axios({
                 url,
@@ -48,7 +42,6 @@ class OBDXService {
                 data: body
             });
 
-            console.log("Response from API:", response.data);
             return response;
         } catch (error) {
             console.error("Service request failed:", error.message);

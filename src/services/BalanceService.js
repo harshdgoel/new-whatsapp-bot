@@ -23,7 +23,6 @@ class BalanceService {
         LoginService
       );
 
-      console.log("Response after FETCHACCOUNT API CALL IS", response);
 
       if (response.data && response.data.accounts) {
         const accounts = response.data.accounts;
@@ -83,7 +82,6 @@ class BalanceService {
             throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
         }
 
-        console.log("Template data is:", templateData);
         // Pass the constructed template data to the TemplateLayer
         return TemplateLayer.generateTemplate(templateData);
 
@@ -97,9 +95,7 @@ class BalanceService {
         userSession.state = states.OTP_VERIFICATION;
       return MessageService.getMessage('otpMessage');
       }
-      console.log("state in balance service catch is:",userSession.state);
-        userSession.state === states.HELP // just for trial
-        console.log("state in balance service catch is:",userSession.state);
+      userSession.state === states.HELP // just for trial
       return "An error occurred while fetching your accounts. Please try again.";
     }
   }
@@ -115,9 +111,6 @@ class BalanceService {
   }
 
   static parseAccountSelection(accountId, accounts) {
-      console.log("entering parseAccountSelection");
-      console.log("matched account is",accounts.find(account => account.id.displayValue === accountId));
-
     return accounts.find(account => account.id.displayValue === accountId);
   }
 }

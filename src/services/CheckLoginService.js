@@ -12,7 +12,6 @@ class CheckLoginService {
         const cookie = this.obdxService.authCache.getCookie();
 
         if (!token || !cookie) {
-            console.log("No token or cookie found. Asking for OTP...");
             return {
                 status: "failure",
                 message: "Your session has expired or no session found. Please enter your OTP to login again."
@@ -22,7 +21,6 @@ class CheckLoginService {
         // Check if the token is expired using the `exp` field from the JWT payload
         const isTokenExpired = this.isTokenExpired(token);
         if (isTokenExpired) {
-            console.log("Token expired. Asking for OTP...");
             this.obdxService.clearAuthDetails(); // Clear the expired token and cookie
             return {
                 status: "failure",
@@ -30,7 +28,6 @@ class CheckLoginService {
             };
         }
 
-        console.log("Token is valid. Proceeding with the intent...");
         return {
             status: "success",
             message: "Login successful. You can now proceed with your request."

@@ -14,7 +14,6 @@ const states = {
 
 class UpcomingPaymentsService {
     static async fetchPaymentsForSelectedAccount(selectedAccount, userSession) {
-        console.log("Entering fetchTransactionsForSelectedAccount");
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
         if (!token || !cookie) {
@@ -35,9 +34,7 @@ class UpcomingPaymentsService {
             ["locale", "en"]
         ]);
 
-        console.log("Selected account in transactions:", selectedAccount.id.value);
         const endpointUrl = `${endpoints.upcoming_payments}`;
-        console.log("Transaction API URL:", endpointUrl);
 
         try {
             const response = await OBDXService.invokeService(
@@ -48,7 +45,6 @@ class UpcomingPaymentsService {
                 LoginService
             );
 
-            console.log("Response after FETCHPAYMENTSACTIVITY API CALL IS:", response);
 
             // Check for valid transaction data
             if (response.data && response.data.items && Array.isArray(response.data.items)) {
@@ -71,7 +67,6 @@ class UpcomingPaymentsService {
                     bodyText += `Start Date: ${startDate}\n`;
                     bodyText += `~ ~ ~ ~ ~ ~ ~ ~\n\n`;
                 });
-                            console.log("Generated transaction message body:", bodyText);
                 let templateData = {
                     bodyText: bodyText,
                     to: userSession.channelId // Pass the correct recipient for Facebook or WhatsApp

@@ -3,8 +3,6 @@ const config = require("../config/config"); // Import config.js
 class TemplateLayer {
     static generateTemplate(templateData) {
         const { channel, ...rest } = templateData;
-        console.log("channel is:", channel);
-        console.log("rest is: ", rest);
 
         switch (process.env.CHANNEL.toLowerCase()) {
             case "whatsapp":
@@ -17,7 +15,6 @@ class TemplateLayer {
     }
 
     static generateTemplateForWhatsApp({ sections, bodyText, buttonText, to }) {
-        console.log("Generating WhatsApp list template for:", to);
 
         if (!sections || !Array.isArray(sections) || sections.length === 0) {
             throw new Error("Missing or invalid sections for list template.");
@@ -40,12 +37,10 @@ class TemplateLayer {
             },
         };
 
-        console.log("Generated WhatsApp template:", JSON.stringify(template, null, 2));
         return template;
     }
 
     static generateTemplateForFacebook({ sections, bodyText, to }) {
-        console.log("Generating Facebook quick reply template for:", to);
 
          //Remove Markdown formatting
     const responseText = bodyText
@@ -53,7 +48,6 @@ class TemplateLayer {
         : "Please select an option:";
 
         if (!sections || !Array.isArray(sections) || sections.length === 0) {
-            console.log("Sections are missing. Generating fallback text message.");
             return {
                 recipient: {
                     id: to,
@@ -80,7 +74,6 @@ class TemplateLayer {
             },
         };
 
-        console.log("Generated Facebook template:", JSON.stringify(template, null, 2));
         return template;
     }
 }

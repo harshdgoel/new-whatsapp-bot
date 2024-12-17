@@ -30,7 +30,6 @@ router.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN; // Use the correct key from config
 
     if (mode && token === VERIFY_TOKEN) {
-        console.log('Webhook verified successfully');
         res.status(200).send(challenge);
     } else {
         console.error("Invalid verify token or mode mismatch:", { mode, token });

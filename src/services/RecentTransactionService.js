@@ -13,7 +13,6 @@ const states = {
 
 class RecentTransactionService {
     static async fetchTransactionsForSelectedAccount(selectedAccount, userSession) {
-        console.log("Entering fetchTransactionsForSelectedAccount");
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
         if (!token || !cookie) {
@@ -22,13 +21,10 @@ class RecentTransactionService {
         }
 
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
-        console.log("Selected account in transactions:", selectedAccount.id.value);
         const endpointUrl = `${endpoints.transactions}/${selectedAccount.id.value}/transactions`;
-        console.log("Transaction API URL:", endpointUrl);
 
         try {
             const response = await OBDXService.invokeService(endpointUrl, "GET", queryParams, {}, LoginService);
-            console.log("Response after FETCHACCOUNTACTIVITY API CALL IS:", response);
 
             if (response.data && response.data.items && Array.isArray(response.data.items)) {
                 const transactions = response.data.items;
@@ -74,7 +70,6 @@ class RecentTransactionService {
                     default:
                         throw new Error("Unsupported channel type");
                 }
-console.log("templatedata in recent transactions is: ", templateData);
                 // Pass template data to TemplateLayer
                 return TemplateLayer.generateTemplate(templateData);
 

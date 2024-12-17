@@ -28,7 +28,6 @@ class LoginService {
     }
     clearAuthCache() {
         this.authCache = { token: null, cookie: null, anonymousToken: null };
-        console.log("Auth cache cleared due to expired token.");
     }
     isTokenExpired() {
         const token = this.getToken();
@@ -58,21 +57,17 @@ class LoginService {
         const token = this.getToken();
         const cookie = this.getCookie();
         if (!token || !cookie) {
-            console.log("Token or cookie is missing. Prompting for OTP.");
             return false;
         }
 
         if (this.isTokenExpired()) {
-            console.log("Token is expired. Prompting for OTP.");
             return false;
         }
-        console.log("Token and cookie are valid.");
         return true;
     }
 
     async verifyOTP(otp) {
         try {
-            console.log("First API call to obtain anonymous token.");
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
                 "POST",
@@ -86,10 +81,8 @@ class LoginService {
                 const setCookie = tokenResponse.headers['set-cookie'];
                 if (setCookie) {
                     this.authCache.cookie = setCookie;
-                    console.log("Cookies successfully stored:", this.authCache.cookie);
                 }
 
-                console.log("Second call with anonymous token:", this.getAnonymousToken());
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
                     "POST",
@@ -105,9 +98,7 @@ class LoginService {
                     { mobileNumber: this.mobileNumber }
                 );
 
-                console.log("OTP Response for second call:", otpResponse);
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
-                    console.log("OTP verified successfully.", otpResponse.data);
                     const registrationId = otpResponse.data.registrationId;
 
                     if (!registrationId) {
@@ -116,7 +107,6 @@ class LoginService {
                     }
                     this.registrationId = registrationId;
                     const queryParams = new Map([["locale", "en"]]);
-                    console.log("Third and final login API call.");
                     const finalLoginResponse = await OBDXService.serviceMeth(
                         endpoints.login,
                         "POST",
@@ -132,21 +122,16 @@ class LoginService {
                         { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
                     );
 
-                    console.log("Final Login Response:", finalLoginResponse);
                     const setCookieFinal = finalLoginResponse.headers['set-cookie'];
                     if (setCookieFinal) {
-                        console.log("Cookies found in final response:", setCookieFinal);
                         this.authCache.cookie = setCookieFinal.join('; ');
-                        console.log("Final cookies successfully stored:", this.authCache.cookie);
                     } else {
                         console.error("Cookie setting failed in final login.");
                         return "Final login failed. Please try again.";
                     }
-                    console.log("Final token set:", finalLoginResponse.data.token);
                     this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
                     // Make the additional API call to fetch user details
                     const userDetails = await this.fetchUserDetails();
-                    console.log(" Me call made succesfully and the User details retrieved successfully:", userDetails);
                     return true;
                 } else {
                     console.error("OTP verification failed:", otpResponse);
@@ -163,7 +148,6 @@ class LoginService {
     }
 
     async fetchUserDetails() {
-        console.log("Making API call to fetch user details.");
         const headers = new Map([
             ["Authorization", `Bearer ${this.getToken()}`],
             ["Cookie", this.getCookie()],

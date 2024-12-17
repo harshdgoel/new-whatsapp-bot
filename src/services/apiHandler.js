@@ -2,7 +2,6 @@ const axios = require('axios');
 const TemplateLayer = require('./TemplateLayer');
 
 const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
-    console.log("entering sendResponseToChannel and message is: ",message);
 
     let responseData;
 
@@ -29,13 +28,9 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                     text: { body: String(message) },
                 };
             }
-
-            console.log("Sending response to WhatsApp...", JSON.stringify(responseData, null, 2));
-            const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
-            console.log("WhatsApp response sent successfully:", response);
+           const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
 
         } else if (channel === "facebook") {
-            console.log("entering channel facebook in apiHandler and message is:", message);
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
                 // Plain text message
@@ -55,7 +50,6 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 };
             } 
              else if (message.message?.quick_replies) {
-  console.log("Processing Facebook quick_replies...",message);
   responseData = {
     recipient: { id: to },
     message: {
@@ -66,7 +60,6 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
   };
 }
             else if (message.message?.text){
-                        console.log("text for recent is ",message.message.text);
 
                   responseData = {
                     messaging_type: "MESSAGE_TAG",
@@ -76,9 +69,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 };
             }
 
-            console.log("Sending response to Facebook Messenger...", JSON.stringify(responseData, null, 2));
             const response = await sendToFacebookAPI(responseData);
-            console.log("Facebook response sent successfully:", response);
         } else {
             throw new Error("Unsupported channel specified.");
         }
@@ -105,7 +96,6 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
 };
 
 const sendToFacebookAPI = async (messageData) => {
-    console.log("entering sendToFacebookAPI and messageData is: ",messageData);
     try {
         const response = await axios.post(
             `https://graph.facebook.com/v20.0/me/messages`, // Correct endpoint
@@ -117,7 +107,6 @@ const sendToFacebookAPI = async (messageData) => {
                 },
             }
         );
-        console.log("sendToFacebookAPI response is: ",response);
         return response.data;
     } catch (error) {
         console.error("Error in sendToFacebookAPI:", error.response?.data || error.message);
