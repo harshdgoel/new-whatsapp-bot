@@ -7,166 +7,177 @@ const defaultHomeEntity = config.defaultHomeEntity;
 
 class LoginService {
     constructor() {
-        // Closure: Map to persist token and cookie against user identifiers
-        const authMap = new Map();
-
-        // Helper to check if a JWT token is expired
-        const isTokenExpired = (token) => {
-            if (!token) return true;
-            try {
-                const payloadBase64 = token.split('.')[1];
-                const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
-                const exp = decodedPayload.exp;
-                return !exp || Date.now() >= exp * 1000; // Check expiration
-            } catch (error) {
-                console.error("Error decoding token:", error.message);
+        this.authCache = { token: null, cookie: null, anonymousToken: null };
+        this.mobileNumber = "919819250898";
+    }
+    setAuthDetails(token, cookie) {
+        this.authCache.token = token;
+        this.authCache.cookie = cookie;
+    }
+    setAnonymousToken(token) {
+        this.authCache.anonymousToken = token;
+    }
+    getToken() {
+        return this.authCache.token;
+    }
+    getCookie() {
+        return this.authCache.cookie;
+    }
+    getAnonymousToken() {
+        return this.authCache.anonymousToken;
+    }
+    clearAuthCache() {
+        this.authCache = { token: null, cookie: null, anonymousToken: null };
+        console.log("Auth cache cleared due to expired token.");
+    }
+    isTokenExpired() {
+        const token = this.getToken();
+        if (!token) return true;
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+            const exp = decodedPayload.exp;
+            if (!exp) {
+                this.clearAuthCache();
                 return true;
             }
-        };
 
-        // Store token and cookie for a given user
-        this.setAuthDetails = (channel, userId, token, cookie) => {
-            if (!userId || !token || !cookie) {
-                console.error("Invalid parameters for setting auth details.");
-                return;
+            const isExpired = Date.now() >= exp * 1000;
+            if (isExpired) {
+                this.clearAuthCache();
             }
 
-            authMap.set(userId, { token, cookie, timestamp: Date.now() });
-            console.log(`Auth details set for ${channel}:${userId}`);
-        };
-
-        // Get token and cookie for a given user
-        this.getAuthDetails = (channel, userId) => {
-            if (!authMap.has(userId)) {
-                console.log(`No auth details found for ${channel}:${userId}`);
-                return { token: null, cookie: null };
-            }
-
-            const { token, cookie } = authMap.get(userId);
-            if (isTokenExpired(token)) {
-                console.log(`Token expired for ${channel}:${userId}, clearing details.`);
-                authMap.delete(userId);
-                return { token: null, cookie: null };
-            }
-
-            return { token, cookie };
-        };
-
-        // Clear auth details for a given user
-        this.clearAuthDetails = (channel, userId) => {
-            if (authMap.has(userId)) {
-                authMap.delete(userId);
-                console.log(`Cleared auth details for ${channel}:${userId}`);
-            }
-        };
-
-        // Verify if the user is logged in
-        this.checkLogin = (channel, userId) => {
-            const { token, cookie } = this.getAuthDetails(channel, userId);
-            if (!token || !cookie) {
-                console.log(`Login required for ${channel}:${userId}`);
-                return false;
-            }
+            return isExpired;
+        } catch (error) {
+            console.error("Error decoding token:", error.message);
+            this.clearAuthCache();
             return true;
-        };
+        }
+    }
+    async checkLogin() {
+        const token = this.getToken();
+        const cookie = this.getCookie();
+        if (!token || !cookie) {
+            console.log("Token or cookie is missing. Prompting for OTP.");
+            return false;
+        }
 
-        // OTP Verification and Login Flow
-        this.verifyOTP = async (channel, userId, otp, mobileNumber) => {
-            try {
-                console.log("First API call to obtain anonymous token.");
-                const tokenResponse = await OBDXService.serviceMeth(
-                    endpoints.anonymousToken,
+        if (this.isTokenExpired()) {
+            console.log("Token is expired. Prompting for OTP.");
+            return false;
+        }
+        console.log("Token and cookie are valid.");
+        return true;
+    }
+
+    async verifyOTP(otp) {
+        try {
+            console.log("First API call to obtain anonymous token.");
+            const tokenResponse = await OBDXService.serviceMeth(
+                endpoints.anonymousToken,
+                "POST",
+                new Map([["Content-Type", "application/json"], ["x-digx-authentication-type", "JWT"]]),
+                new Map(),
+                {}
+            );
+
+            if (tokenResponse) {
+                this.setAnonymousToken(tokenResponse.headers.authorization);
+                const setCookie = tokenResponse.headers['set-cookie'];
+                if (setCookie) {
+                    this.authCache.cookie = setCookie;
+                    console.log("Cookies successfully stored:", this.authCache.cookie);
+                }
+
+                console.log("Second call with anonymous token:", this.getAnonymousToken());
+                const otpResponse = await OBDXService.serviceMeth(
+                    endpoints.login,
                     "POST",
-                    new Map([["Content-Type", "application/json"], ["x-digx-authentication-type", "JWT"]]),
+                    new Map([
+                        ["Content-Type", "application/json"],
+                        ["x-digx-authentication-type", "CHATBOT"],
+                        ["TOKEN_ID", otp],
+                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                        ["X-Token-Type", "JWT"],
+                        ["X-Target-Unit", defaultHomeEntity]
+                    ]),
                     new Map(),
-                    {}
+                    { mobileNumber: this.mobileNumber }
                 );
 
-                if (tokenResponse) {
-                    const anonymousToken = tokenResponse.headers.authorization;
-                    const setCookie = tokenResponse.headers['set-cookie'];
+                console.log("OTP Response for second call:", otpResponse);
+                if (otpResponse.data.status.result === "SUCCESSFUL") {
+                    console.log("OTP verified successfully.", otpResponse.data);
+                    const registrationId = otpResponse.data.registrationId;
 
-                    console.log("Second API call to verify OTP.");
-                    const otpResponse = await OBDXService.serviceMeth(
+                    if (!registrationId) {
+                        console.error("Registration ID missing in OTP response:", otpResponse);
+                        return "Final login failed due to missing registration ID. Please try again.";
+                    }
+                    this.registrationId = registrationId;
+                    const queryParams = new Map([["locale", "en"]]);
+                    console.log("Third and final login API call.");
+                    const finalLoginResponse = await OBDXService.serviceMeth(
                         endpoints.login,
                         "POST",
                         new Map([
                             ["Content-Type", "application/json"],
                             ["x-digx-authentication-type", "CHATBOT"],
                             ["TOKEN_ID", otp],
-                            ["Authorization", `Bearer ${anonymousToken}`],
+                            ["Authorization", `Bearer ${this.getAnonymousToken()}`],
                             ["X-Token-Type", "JWT"],
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
-                        new Map(),
-                        { mobileNumber }
+                        queryParams,
+                        { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
                     );
 
-                    if (otpResponse.data.status.result === "SUCCESSFUL") {
-                        console.log("OTP verified successfully.");
-                        const registrationId = otpResponse.data.registrationId;
-
-                        console.log("Final API call to complete login.");
-                        const finalLoginResponse = await OBDXService.serviceMeth(
-                            endpoints.login,
-                            "POST",
-                            new Map([
-                                ["Content-Type", "application/json"],
-                                ["x-digx-authentication-type", "CHATBOT"],
-                                ["TOKEN_ID", otp],
-                                ["Authorization", `Bearer ${anonymousToken}`],
-                                ["X-Token-Type", "JWT"],
-                                ["X-Target-Unit", defaultHomeEntity]
-                            ]),
-                            new Map([["locale", "en"]]),
-                            { mobileNumber, registrationId }
-                        );
-
-                        const finalToken = finalLoginResponse.data.token;
-                        const finalCookie = finalLoginResponse.headers['set-cookie'].join('; ');
-
-                        // Save the token and cookie
-                        this.setAuthDetails(channel, userId, finalToken, finalCookie);
-
-                        console.log("Login completed successfully.");
-                        return true;
+                    console.log("Final Login Response:", finalLoginResponse);
+                    const setCookieFinal = finalLoginResponse.headers['set-cookie'];
+                    if (setCookieFinal) {
+                        console.log("Cookies found in final response:", setCookieFinal);
+                        this.authCache.cookie = setCookieFinal.join('; ');
+                        console.log("Final cookies successfully stored:", this.authCache.cookie);
                     } else {
-                        console.error("OTP verification failed.");
-                        return false;
+                        console.error("Cookie setting failed in final login.");
+                        return "Final login failed. Please try again.";
                     }
+                    console.log("Final token set:", finalLoginResponse.data.token);
+                    this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
+                    // Make the additional API call to fetch user details
+                    const userDetails = await this.fetchUserDetails();
+                    console.log(" Me call made succesfully and the User details retrieved successfully:", userDetails);
+                    return true;
+                } else {
+                    console.error("OTP verification failed:", otpResponse);
+                    return "OTP verification failed. Please try again.";
                 }
-            } catch (error) {
-                console.error("Error during OTP verification:", error.message);
-                return false;
+            } else {
+                console.error("Failed to obtain anonymous token:", tokenResponse);
+                return "Failed to initiate login. Please try again.";
             }
-        };
+        } catch (error) {
+            console.error("Error during login process:", error.message);
+            return "An error occurred during verification. Please try again.";
+        }
+    }
 
-        // Fetch User Details (example additional API)
-        this.fetchUserDetails = async (channel, userId) => {
-            const { token, cookie } = this.getAuthDetails(channel, userId);
-            if (!token || !cookie) {
-                console.error("User is not logged in.");
-                return null;
-            }
-
-            const headers = new Map([
-                ["Authorization", `Bearer ${token}`],
-                ["Cookie", cookie],
-                ["Content-Type", "application/json"],
-                ["X-Token-Type", "JWT"]
-            ]);
-
-            const response = await OBDXService.serviceMeth(
-                endpoints.me,
-                "GET",
-                headers,
-                new Map([["locale", "en"]]),
-                null
-            );
-
-            console.log("User details fetched successfully.");
-            return response.data;
-        };
+    async fetchUserDetails() {
+        console.log("Making API call to fetch user details.");
+        const headers = new Map([
+            ["Authorization", `Bearer ${this.getToken()}`],
+            ["Cookie", this.getCookie()],
+            ["Content-Type", "application/json"],
+            ["X-Token-Type", "JWT"]
+        ]);
+        const response = await OBDXService.serviceMeth(
+            endpoints.me,
+            "GET",
+            headers,
+            new Map([["locale", "en"]]),
+            null
+        );
+        return response.data;
     }
 }
 
