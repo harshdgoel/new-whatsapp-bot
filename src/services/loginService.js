@@ -103,6 +103,7 @@ class LoginService {
 
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
                     const registrationId = otpResponse.data.registrationId;
+                    console.log("registrationId is:",registrationId);
                     if (!registrationId) {
                         console.error("Registration ID missing in OTP response");
                         return "Final login failed. Please try again.";
@@ -120,7 +121,7 @@ class LoginService {
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         new Map([["locale", "en"]]),
-                        { mobileNumber: "919819250898", registrationId }
+                        { mobileNumber: "919819250898", registrationId: registrationId}
 
                     );
 
