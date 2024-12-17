@@ -40,14 +40,14 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             if (typeof message === "string") {
                 // Plain text message
                 responseData = {
-                    recipient: { id: to },
+                    recipient: { id: "1306151306130839" },
                     message: { text: message },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
                 // Text with the text body
                 responseData = {
-                    recipient: { id: to },
+                    recipient: { id: "1306151306130839" },
                     message: { text: message.text.body },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
