@@ -59,7 +59,7 @@ class TemplateLayer {
                     id: to,
                 },
                 message: {
-                    text: responseText,
+                    text: "Here are your Recent Transactions: Transaction 1: Account: xxxxxxxxxxxx0016 Amount: EUR 59090.91 Description: 000 Reference: HELZXRD200901PH2 Date: 2020-03-30T00:00:00 Type: Credit",
                 },
             };
         }
