@@ -82,7 +82,7 @@ class StateMachine {
 
     async processIntent(userSession, intent) {
         if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS"].includes(intent)) {
-            const isLoggedIn = await LoginService.checkLogin();
+const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
                 userSession.state = states.OTP_VERIFICATION;
