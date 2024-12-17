@@ -6,6 +6,7 @@ const RecentTransactionService = require("../services/RecentTransactionService")
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
 const IntentService = require("../services/IntentService");
+const logger = require("../utils/logger");
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
@@ -27,6 +28,7 @@ class StateMachine {
 
     getSession(userId) {
         if (!this.sessionCache.has(userId)) {
+            logger.log(`Creating a new session for user: ${userId}`);
             this.sessionCache.set(userId, { 
                 state: states.LOGGED_OUT, 
                 lastIntent: null, 
