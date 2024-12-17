@@ -65,13 +65,13 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
     tag: "CONFIRMED_EVENT_UPDATE",
   };
 }
-            else {
+            else if (message.message?.text){
                         console.log("text for recent is ",message.message.text);
 
                   responseData = {
                     messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
-                    message: { text: message.text },
+                    message: { text: message.message.text },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             }
