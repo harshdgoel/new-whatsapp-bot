@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 const TemplateLayer = require('./TemplateLayer');
 
@@ -73,7 +72,7 @@ console.log("type is string");
                 console.log("ein generate recent template");
          responseData = {
                     recipient: { id: to },
-                    message: { text: "Here are your rec transactions" },
+                    message: { text: message.text },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
                // throw new Error("Unsupported Facebook message format.");
