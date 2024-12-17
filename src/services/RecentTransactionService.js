@@ -69,14 +69,13 @@ class RecentTransactionService {
                             type: "text",
                             bodyText: bodyText,
                             channel: config.channel,
-                            to: userSession.channelId // WhatsApp number here
+                            to: "916378582419" // WhatsApp number here
                         };
                         break;
 
                     case "facebook":
                         templateData = {
-                            bodyText: bodyText,
-                            to: userSession.channelId // Facebook recipient ID
+                            bodyText: bodyText
                         };
                         break;
 
