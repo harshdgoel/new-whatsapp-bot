@@ -73,7 +73,7 @@ console.log("type is string");
                 console.log("ein generate recent template");
          responseData = {
                     recipient: { id: to },
-                    message: { text: message.text },
+                    message: { text: "Here are your rec transactions" },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
                // throw new Error("Unsupported Facebook message format.");
