@@ -108,6 +108,12 @@ class LoginService {
                         console.error("Registration ID missing in OTP response");
                         return "Final login failed. Please try again.";
                     }
+                    const requestBody = {
+    mobileNumber: "916378582419",
+    registrationId: String(registrationId) 
+};
+
+console.log("Final Login Request Body:", JSON.stringify(requestBody)); // Log to debug the payload
 
                     const finalLoginResponse = await OBDXService.serviceMeth(
                         endpoints.login,
@@ -121,8 +127,7 @@ class LoginService {
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         new Map([["locale", "en"]]),
-                        { mobileNumber: "919819250898", registrationId: registrationId}
-
+                       requestBody
                     );
 
                     const finalToken = finalLoginResponse.data.token;
