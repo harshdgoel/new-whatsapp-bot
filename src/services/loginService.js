@@ -115,6 +115,9 @@ class LoginService {
 
 console.log("Final Login Request Body:", JSON.stringify(requestBody)); // Log to debug the payload
 
+                    console.log("otp:",otp);
+                    console.log("X-Target-Unit:", defaultHomeEntity);
+                    
                     const finalLoginResponse = await OBDXService.serviceMeth(
                         endpoints.login,
                         "POST",
