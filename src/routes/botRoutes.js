@@ -27,7 +27,7 @@ router.get("/webhook", (req, res) => {
     const challenge = req.query['hub.challenge'];
     const token = req.query['hub.verify_token'];
 
-    const VERIFY_TOKEN = config.verifyToken; // Use the correct key from config
+    const VERIFY_TOKEN = process.env.VERIFY_TOKEN; // Use the correct key from config
 
     if (mode && token === VERIFY_TOKEN) {
         console.log('Webhook verified successfully');
