@@ -95,8 +95,13 @@ class StateMachine {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
+            if (process.env.CHANNEL === "facebook") {
                 userSession.state = states.FETCH_MOBILE_NUMBER;
                 return "Please enter your registered mobile number.";
+            } else {
+                userSession.state = states.OTP_VERIFICATION;
+                return MessageService.getMessage("otpMessage");
+            }
             }
         }
 
