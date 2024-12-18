@@ -93,7 +93,7 @@ class StateMachine {
     }
 
     async processIntent(userSession, intent) {
-        if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS"].includes(intent)) {
+        if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT"].includes(intent)) {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
@@ -117,6 +117,9 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "UPCOMINGPAYMENTS":
                 userSession.state = states.UPCOMINGPAYMENTS;
                 return await this.handleUpcomingPayments(userSession);
+            case "BILLPAYMENT":
+                userSession.state = states.BILLPAYMENT;
+                return await this.handleBillPayments(userSession);
             default:
                 return "I'm sorry, I couldn't understand your request. Please try again.";
         }
