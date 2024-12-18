@@ -1,12 +1,8 @@
-const TemplateLayer = require("./TemplateLayer");
-const OBDXService = require("./OBDXService");
-const LoginService = require("./loginService");
-const endpoints = require("../config/endpoints");
-const states = {
-    OTP_VERIFICATION: "OTP_VERIFICATION",
-    LOGGED_IN: "LOGGED_IN",
-    LOGGED_OUT: "LOGGED_OUT",
-};
+const OBDXService = require('./OBDXService');
+const LoginService = require('./LoginService');
+const TemplateLayer = require('../utils/TemplateLayer');
+const endpoints = require('../config/endpoints');
+const states = require('../states/stateConstants');
 
 class BillPaymentService {
     static async initiateBillPayment(userSession) {
@@ -28,20 +24,18 @@ class BillPaymentService {
             );
 
             const billers = response.billerRegistrationDTOs || [];
-            const validBillers = billers.filter(biller => biller.id && biller.billerName);
+            if (!billers.length) throw new Error("No billers found.");
 
-            if (!validBillers.length) throw new Error("No billers found.");
+            userSession.billers = billers;
 
-            userSession.billers = validBillers;
-
-            const rows = validBillers.map((biller, index) => ({
+            const rows = billers.map(biller => ({
                 id: biller.id,
                 title: biller.billerName,
             }));
 
             const templateData = {
                 type: "list",
-                sections: rows.map(row => ({ id: row.id, title: row.title })),
+                sections: [{ title: "Available Billers", rows }],
                 bodyText: "Please select a biller from the list below:",
                 buttonText: "Select Biller",
                 channel: process.env.CHANNEL,
@@ -66,6 +60,8 @@ class BillPaymentService {
         userSession.amount = amount;
 
         const accounts = userSession.accounts || [];
+        if (!accounts.length) return "No accounts available for payment.";
+
         const rows = accounts.map(account => ({
             id: account.id.value,
             title: account.id.displayValue,
@@ -73,7 +69,7 @@ class BillPaymentService {
 
         const templateData = {
             type: "list",
-            sections: rows.map(row => ({ id: row.id, title: row.title })),
+            sections: [{ title: "Available Accounts", rows }],
             bodyText: "Please select an account for payment:",
             buttonText: "Select Account",
             channel: process.env.CHANNEL,
