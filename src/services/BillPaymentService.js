@@ -32,6 +32,7 @@ class BillPaymentService {
                 LoginService
             );
 
+            console.log("billers response is:", response);
             if (response && response.billerRegistrationDTOs) {
                 const billers = response.billerRegistrationDTOs;
 
