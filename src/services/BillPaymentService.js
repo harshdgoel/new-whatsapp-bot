@@ -9,103 +9,103 @@ const states = {
 };
 
 class BillPaymentService {
-    static async fetchBillers(userSession) {
+    static async initiateBillPayment(userSession) {
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
-        // Check for authentication
         if (!token || !cookie) {
             userSession.state = states.OTP_VERIFICATION;
             return "Please enter the One Time Password sent to your registered number.";
         }
 
-        const queryParams = new Map([["locale", "en"]]);
-        const endpointUrl = `${endpoints.billers}`;
-
         try {
-            // Invoke the API
             const response = await OBDXService.invokeService(
-                endpointUrl,
+                endpoints.billers,
                 "GET",
-                queryParams,
+                null,
                 {},
                 LoginService
             );
 
-            console.log("billers response is:", response);
-            if (response && response.billerRegistrationDTOs) {
-                const billers = response.billerRegistrationDTOs;
+            const billers = response.billerRegistrationDTOs || [];
+            const validBillers = billers.filter(biller => biller.id && biller.billerName);
 
-                // Filter out billers with missing or invalid properties
-                const validBillers = billers.filter(biller => {
-                    return biller.id && biller.billerName;
-                });
+            if (!validBillers.length) throw new Error("No billers found.");
 
-                if (validBillers.length === 0) {
-                    throw new Error("No valid billers found in the response.");
-                }
+            userSession.billers = validBillers;
 
-                // Store valid billers in the user session
-                userSession.billers = validBillers;
+            const rows = validBillers.map((biller, index) => ({
+                id: biller.id,
+                title: biller.billerName,
+            }));
 
-                // Generate rows for valid billers
-                const rows = validBillers.map((biller, index) => ({
-                    id: biller.id || `biller_${index}`, // Unique biller ID
-                    title: biller.billerName || `Biller ${index + 1}`, // Display name
-                    payload: biller.billerName || `Biller ${index + 1}`, // Payload for Messenger
-                }));
+            const templateData = {
+                type: "list",
+                sections: rows.map(row => ({ id: row.id, title: row.title })),
+                bodyText: "Please select a biller from the list below:",
+                buttonText: "Select Biller",
+                channel: process.env.CHANNEL,
+                to: userSession.userId,
+            };
 
-                const channel = process.env.CHANNEL.toLowerCase();
-                let templateData;
-
-                // Generate the appropriate template structure based on the channel
-                switch (channel) {
-                    case "whatsapp":
-                        templateData = {
-                            type: "list",
-                            sections: rows.map(row => ({
-                                id: row.id,
-                                title: row.title,
-                            })), // Include only id and title for WhatsApp
-                            bodyText: "Please select a biller from the list below:",
-                            buttonText: "View Billers",
-                            channel,
-                            to: "916378582419", // Replace with actual recipient number
-                        };
-                        break;
-
-                    case "facebook":
-                        templateData = {
-                            bodyText: "Please select a biller from the list below:",
-                            sections: rows
-                                .slice(0, 10) // Limit to top 10 entries
-                                .filter(row => row.title && row.payload) // Filter out invalid rows
-                                .map(row => ({
-                                    content_type: "text",
-                                    title: row.title,
-                                    payload: row.payload, // Payload for Facebook
-                                })),
-                        };
-                        break;
-
-                    default:
-                        throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
-                }
-
-                // Pass the constructed template data to the TemplateLayer
-                return TemplateLayer.generateTemplate(templateData);
-            } else {
-                throw new Error("No billers found in the response.");
-            }
+            userSession.state = states.FETCHING_BILLERS;
+            return TemplateLayer.generateTemplate(templateData);
         } catch (error) {
             console.error("Error fetching billers:", error.message);
+            return "An error occurred while fetching billers. Please try again.";
+        }
+    }
 
-            if (error.message.includes("Missing token or cookie")) {
-                userSession.state = states.OTP_VERIFICATION;
-                return "Please enter the One Time Password sent to your registered number.";
-            }
+    static confirmAmount(userSession, selectedBiller) {
+        userSession.selectedBiller = selectedBiller;
+        userSession.state = states.CONFIRM_AMOUNT;
+        return "Enter the amount to be paid.";
+    }
 
-            return "An error occurred while fetching your billers. Please try again.";
+    static async selectAccountForPayment(userSession, amount) {
+        userSession.amount = amount;
+
+        const accounts = userSession.accounts || [];
+        const rows = accounts.map(account => ({
+            id: account.id.value,
+            title: account.id.displayValue,
+        }));
+
+        const templateData = {
+            type: "list",
+            sections: rows.map(row => ({ id: row.id, title: row.title })),
+            bodyText: "Please select an account for payment:",
+            buttonText: "Select Account",
+            channel: process.env.CHANNEL,
+            to: userSession.userId,
+        };
+
+        userSession.state = states.SELECT_ACCOUNT;
+        return TemplateLayer.generateTemplate(templateData);
+    }
+
+    static async completePayment(userSession, selectedAccountId) {
+        const selectedAccount = userSession.accounts.find(acc => acc.id.value === selectedAccountId);
+        if (!selectedAccount) return "Invalid account selected.";
+
+        try {
+            const paymentResponse = await OBDXService.invokeService(
+                endpoints.payBill,
+                "POST",
+                null,
+                {
+                    billerId: userSession.selectedBiller.id,
+                    accountId: selectedAccount.id.value,
+                    amount: userSession.amount,
+                },
+                LoginService
+            );
+
+            userSession.state = states.HELP;
+            return `Bill payment of ${userSession.amount} to ${userSession.selectedBiller.billerName} from account ${selectedAccount.id.displayValue} was successful.`;
+        } catch (error) {
+            console.error("Error completing payment:", error.message);
+            return "An error occurred during payment. Please try again.";
         }
     }
 }
