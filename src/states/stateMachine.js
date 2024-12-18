@@ -142,7 +142,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
         if (!otp) throw new Error("OTP is not available or initialized.");
 
        const loginResult = await LoginService.verifyOTP(userSession.userId, otp,process.env.CHANNEL);
-        if (loginResult) {
+        if (loginResult === true) {
             userSession.state = states.LOGGED_IN;
             return this.handleIntentAfterLogin(userSession);
         } else {
