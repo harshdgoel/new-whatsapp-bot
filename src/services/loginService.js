@@ -129,9 +129,10 @@ class LoginService {
             const finalToken = finalLoginResponse?.data?.token;
             const setCookieFinal = finalLoginResponse?.headers?.["set-cookie"];
             console.log("login success,token in:",finalToken);
+            console.log("cookie is:",setCookieFinal);
             if (finalToken && setCookieFinal) {
                 // Save token and cookie in session
-                this.setSession(userId, channel, finalToken, setCookieFinal.join("; "));
+                this.setSession(userId, channel, finalToken, setCookieFinal);
                 
                 // Fetch user details to confirm successful login
                 const userDetails = await this.fetchUserDetails(userId, channel);
@@ -152,6 +153,8 @@ class LoginService {
     async fetchUserDetails(userId, channel) {
         const { token, cookie } = this.getSession(userId, channel);
 
+        console.log("token in me call is:", token);
+        console.log("cookie is:",cookie);
         if (!token || !cookie) {
             console.error("Missing token or cookie for fetching user details.");
             return null;
