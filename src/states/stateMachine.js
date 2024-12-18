@@ -50,7 +50,6 @@ class StateMachine {
         const userSession = this.getSession(from);
 
         console.log("usersession is:",userSession);
-        // If Help Me is triggered for the first time
         if (!userSession.isHelpTriggered) {
                     console.log("help me triggered");
             userSession.state = states.HELP;
@@ -99,7 +98,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 userSession.lastIntent = intent;
             if (process.env.CHANNEL === "facebook") {
                 userSession.state = states.FETCH_MOBILE_NUMBER;
-                return "Please enter your registered mobile number.";
+                return MessageService.getMessage("mobileNumber");
             } else {
                 userSession.state = states.OTP_VERIFICATION;
                 return MessageService.getMessage("otpMessage");
