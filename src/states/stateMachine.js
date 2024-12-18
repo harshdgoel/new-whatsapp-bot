@@ -166,13 +166,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
     
     async handleBillPayments(userSession) {
-        const billersList = await BillPaymentService.fetchBillers(userSession);
-        if (billersList) {
-            userSession.state = states.ASK_AMOUNT; // Reuse account selection logic for billers
-            return billersList;
-        } else {
-            return "No BILLERS available for payment.";
-        }
+        return await BillPaymentService.initiateBillPayment(userSession);
     }
 
     async handleOTPVerification(userSession) {
