@@ -65,7 +65,8 @@ class LoginService {
         return true;
     }
 
-    async verifyOTP(otp) {
+    async verifyOTP(otp,mobileNumber) {
+        console.log("mobile number is:", mobileNumber);
         try {
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
@@ -94,7 +95,7 @@ class LoginService {
                         ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
-                    { mobileNumber: this.mobileNumber }
+                    { mobileNumber: mobileNumber }
                 );
 
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
@@ -117,7 +118,7 @@ class LoginService {
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         queryParams,
-                        { mobileNumber: this.mobileNumber, registrationId: this.registrationId }
+                        { mobileNumber: mobileNumber, registrationId: this.registrationId }
                     );
 
                     const setCookieFinal = finalLoginResponse.headers['set-cookie'];
