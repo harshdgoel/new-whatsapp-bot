@@ -5,6 +5,7 @@ module.exports = {
     login: "/digx-infra/login/v1/login",
     me: "/digx-common/user/v1/me",
     transactions: "/digx-common/dda/v1/demandDeposit",
-    upcoming_payments: "/digx-payments/payment/v1/payments/instructions"
+    upcoming_payments: "/digx-payments/payment/v1/payments/instructions",
+    billers: "/digx-payments/ebpp/v1/registeredBillers"
     // Add more endpoints as needed
 };

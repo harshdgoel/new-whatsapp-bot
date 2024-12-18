@@ -3,6 +3,8 @@ const BalanceService = require("../services/BalanceService");
 const MessageService = require('../services/MessageService');
 const TemplateLayer = require("../services/TemplateLayer");
 const RecentTransactionService = require("../services/RecentTransactionService");
+const BillPaymentService = require("../services/BillPaymentService");
+
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
 const IntentService = require("../services/IntentService");
@@ -18,6 +20,7 @@ const states = {
     BALANCE: "BALANCE",
     BILLPAYMENT: "BILLPAYMENT",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
+    ASK_AMOUNT: "ASK_AMOUNT",
     FETCHING_BALANCE: "FETCHING_BALANCE",
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
     FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER"
@@ -39,6 +42,7 @@ class StateMachine {
                 otp: null, 
                 mobileNumber: null,
                 accounts: null, 
+                billers: null,
                 selectedAccount: null, 
                 isHelpTriggered: false,
                 currentHelpPage: 1
@@ -84,6 +88,11 @@ class StateMachine {
             userSession.otp = messageBody;
             return await this.handleOTPVerification(userSession);
         }
+       
+        if (userSession.state === states.ASK_AMOUNT) {
+            return `Please enter the amount with currency`;
+        }
+
 
         if (userSession.state === states.ACCOUNT_SELECTION) {
             return await this.handleAccountSelection(userSession, messageBody);
@@ -152,6 +161,17 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             return accountsResult;
         } else {
             return "No accounts available for upcoming payments.";
+        }
+    }
+
+    
+    async handleBillPayments(userSession) {
+        const billersList = await BillPaymentService.fetchBillers(userSession);
+        if (billersList) {
+            userSession.state = states.ASK_AMOUNT; // Reuse account selection logic for billers
+            return billersList;
+        } else {
+            return "No BILLERS available for payment.";
         }
     }
 
