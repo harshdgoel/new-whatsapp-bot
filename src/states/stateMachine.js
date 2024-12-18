@@ -49,8 +49,10 @@ class StateMachine {
     async handleMessage(from, messageBody, intent) {
         const userSession = this.getSession(from);
 
+        console.log("usersession is:",userSession);
         // If Help Me is triggered for the first time
         if (!userSession.isHelpTriggered) {
+                    console.log("help me triggered");
             userSession.state = states.HELP;
             userSession.isHelpTriggered = true;
             return await HelpMeService.helpMe();
