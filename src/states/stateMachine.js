@@ -18,7 +18,9 @@ const states = {
     BALANCE: "BALANCE",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
     FETCHING_BALANCE: "FETCHING_BALANCE",
-    FETCHING_TRANSACTION: "FETCHING_TRANSACTION"
+    FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
+    FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER"
+
 };
 
 class StateMachine {
@@ -34,6 +36,7 @@ class StateMachine {
                 state: states.LOGGED_OUT, 
                 lastIntent: null, 
                 otp: null, 
+                mobileNumber: null,
                 accounts: null, 
                 selectedAccount: null, 
                 isHelpTriggered: false,
@@ -69,6 +72,12 @@ class StateMachine {
             }
         }
 
+          if (userSession.state === states.FETCH_MOBILE_NUMBER) {
+            userSession.mobileNumber = messageBody;
+            userSession.state = states.OTP_VERIFICATION;
+            return MessageService.getMessage("otpMessage");
+        }
+        
         if (userSession.state === states.OTP_VERIFICATION) {
             userSession.otp = messageBody;
             return await this.handleOTPVerification(userSession);
@@ -86,8 +95,8 @@ class StateMachine {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
-                userSession.state = states.OTP_VERIFICATION;
-                return MessageService.getMessage("otpMessage");
+                userSession.state = states.FETCH_MOBILE_NUMBER;
+                return "Please enter your registered mobile number.";
             }
         }
 
