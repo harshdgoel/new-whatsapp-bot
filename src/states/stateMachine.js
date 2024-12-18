@@ -128,7 +128,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 return await this.handleUpcomingPayments(userSession);
             case "BILLPAYMENT":
                 userSession.state = states.BILLPAYMENT;
-                return await this.handleBillPayments(userSession);
+                return await BillPaymentService.initiateBillPayment(userSession);
             default:
                 return "I'm sorry, I couldn't understand your request. Please try again.";
         }
