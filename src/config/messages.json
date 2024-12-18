@@ -116,6 +116,7 @@
     "hereAreTransactions": "Here are some recent transactions for account %s",
     "noTransactions": "No transactions found for account %s"
   },
+  "mobileNumber": "Please enter your registered Mobile Number?"
   "accountNumber": "%s",
   "errorMessage": "I am unable to process your request right now, Please try again later.",
   "whatElse": "What else can I help you with today?",
