@@ -77,6 +77,7 @@ class LoginService {
                 return "Failed to initiate login. Please try again.";
             }
 
+            console.log("first login call success");
             const anonymousToken = tokenResponse.headers.authorization;
             const setCookie = tokenResponse.headers["set-cookie"];
 
@@ -95,6 +96,7 @@ class LoginService {
                 new Map(),
                 { mobileNumber: this.mobileNumber }
             );
+            console.log("second login call success");
 
             if (otpResponse?.data?.status?.result !== "SUCCESSFUL") {
                 console.error("OTP verification failed:", otpResponse?.data);
@@ -123,9 +125,10 @@ class LoginService {
                 { mobileNumber: this.mobileNumber, registrationId: String(registrationId) }
             );
 
+            
             const finalToken = finalLoginResponse?.data?.token;
             const setCookieFinal = finalLoginResponse?.headers?.["set-cookie"];
-
+            console.log("login success,token in:",finalToken);
             if (finalToken && setCookieFinal) {
                 // Save token and cookie in session
                 this.setSession(userId, channel, finalToken, setCookieFinal.join("; "));
@@ -168,6 +171,7 @@ class LoginService {
             new Map([["locale", "en"]]),
             null
         );
+        
         return response?.data || null;
     }
 }
