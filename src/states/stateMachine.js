@@ -23,6 +23,7 @@ const states = {
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
     ASK_AMOUNT: "ASK_AMOUNT",
     FETCHING_BALANCE: "FETCHING_BALANCE",
+    RESOLVE_AMOUNT: "RESOLVE_AMOUNT",
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
     FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER"
 
@@ -44,6 +45,8 @@ class StateMachine {
                 mobileNumber: null,
                 accounts: null, 
                 billers: null,
+                amount: null,
+                currency: null,
                 selectedBiller: null,
                 selectedAccount: null, 
                 isHelpTriggered: false,
@@ -97,8 +100,21 @@ class StateMachine {
             return await this.handleOTPVerification(userSession);
         }
        
-        if (userSession.state === states.ASK_AMOUNT) {
-            return `Please enter the amount with currency`;
+        if (userSession.state === states.RESOLVE_AMOUNT) {
+const regex = /^([A-Z]{3})\s(\d+(\.\d{1,2})?)$/; // Regex to match "USD 300" format
+const match = messageBody.match(regex);
+
+if (match) {
+    userSession.currency = match[1]; // e.g., "USD"
+    userSession.amount = parseFloat(match[2]); // e.g., 300
+    console.log(`Currency: ${userSession.currency}, Amount: ${userSession.amount}`);
+
+    return await this.handleBillPayments(userSession);
+} else {
+    // Invalid format: Prompt user to re-enter
+    console.log("Invalid format for amount and currency. Re-prompting for confirmation.");
+    return await BillPaymentService.confirmAmount(userSession);
+}
         }
 
 
@@ -174,7 +190,13 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
     
     async handleBillPayments(userSession) {
-        return await BillPaymentService.initiateBillPayment(userSession);
+        const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+        if (accountsResult) {
+            userSession.state = states.ACCOUNT_SELECTION;
+            return accountsResult;
+        } else {
+            return "No accounts available for upcoming payments.";
+        }
     }
 
     async handleOTPVerification(userSession) {

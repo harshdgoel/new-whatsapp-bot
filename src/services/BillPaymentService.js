@@ -9,6 +9,7 @@ const  states = {
     LOGGED_OUT: "LOGGED_OUT",
     FETCHING_BILLERS: "FETCHING_BILLERS",
     BILLPAYMENT: "BILLPAYMENT",
+    RESOLVE_AMOUNT: "RESOLVE_AMOUNT",
     ASK_AMOUNT: "ASK_AMOUNT"
 };
 
@@ -89,7 +90,7 @@ class BillPaymentService {
     static confirmAmount(userSession, selectedBiller) {
         console.log("usersession.lastIntent in confirm amount is:",userSession.lastIntent);
         userSession.selectedBiller = selectedBiller;
-        userSession.state = states.ACCOUNT_SELECTION;
+        userSession.state = states.RESOLVE_AMOUNT;
         return "Enter the amount to be paid.";
     }
 
