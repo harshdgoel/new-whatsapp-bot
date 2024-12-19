@@ -83,6 +83,11 @@ class StateMachine {
             userSession.state = states.OTP_VERIFICATION;
             return MessageService.getMessage("otpMessage");
         }
+     if (userSession.state === states.FETCHING_BILLERS) {
+            userSession.state = states.ASK_AMOUNT;
+            return BillPaymentService.initiateBillPayment(userSession);
+        }
+        
         
         if (userSession.state === states.OTP_VERIFICATION) {
             userSession.otp = messageBody;
