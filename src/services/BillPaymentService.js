@@ -24,13 +24,13 @@ class BillPaymentService {
 
         try {
             const queryParams = new Map([["locale", "en"]]);
-            const response = await OBDXService.invokeService(
-                endpoints.billers,
-                "GET",
-                null,
-                queryParams,
-                LoginService
-            );
+             const response = await OBDXService.invokeService(
+        endpoints.billers,
+        "GET",
+        queryParams,
+        {}, // No body needed for GET request
+        LoginService
+      );
 
             console.log("response is:", response);
             const billers = response.billerRegistrationDTOs || [];
