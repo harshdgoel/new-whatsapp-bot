@@ -94,7 +94,7 @@ class BalanceService {
         userSession.state = states.OTP_VERIFICATION;
       return MessageService.getMessage('otpMessage');
       }
-      userSession.state === states.HELP // just for trial
+//      userSession.state === states.HELP // just for trial
       return "An error occurred while fetching your accounts. Please try again.";
     }
   }
