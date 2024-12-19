@@ -68,6 +68,7 @@ class StateMachine {
         }
 
         if (userSession.state === states.HELP) {
+            console.log("entering the help state");
             if (messageBody === "View More") {
                 const nextPage = (userSession.currentHelpPage || 1) + 1;
                 userSession.currentHelpPage = nextPage;
