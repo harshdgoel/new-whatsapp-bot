@@ -107,6 +107,15 @@ const match = messageBody.match(regex);
 if (match) {
     userSession.currency = match[1]; // e.g., "USD"
     userSession.amount = parseFloat(match[2]); // e.g., 300
+    userSession.state = states.ACCOUNT_SELECTION;
+      const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+        console.log("accountsResult in MATCHED BILLER is",accountsResult);
+        if (accountsResult) {
+            userSession.state = states.ACCOUNT_SELECTION;
+            return accountsResult;
+        } else {
+            return "No accounts available for upcoming payments.";
+        }
     console.log(`Currency: ${userSession.currency}, Amount: ${userSession.amount}`);
 
     return await this.handleBillPayments(userSession);
