@@ -23,11 +23,12 @@ class BillPaymentService {
         }
 
         try {
+            const queryParams = new Map([["locale", "en"]]);
             const response = await OBDXService.invokeService(
                 endpoints.billers,
                 "GET",
                 null,
-                {},
+                queryParams,
                 LoginService
             );
 
