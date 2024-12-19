@@ -88,6 +88,7 @@ class BillPaymentService {
             //     to: userSession.userId,
             // };
 
+            console.log("template data in billers list is:",templateData);
             userSession.state = states.FETCHING_BILLERS;
             return TemplateLayer.generateTemplate(templateData);
         } catch (error) {
