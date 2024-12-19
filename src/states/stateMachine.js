@@ -190,7 +190,9 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
     
     async handleBillPayments(userSession) {
+        console.log("entering bill pay handleBillPayments");
         const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
+        console.log("accountsResult in handleBillPayments is",accountsResult);
         if (accountsResult) {
             userSession.state = states.ACCOUNT_SELECTION;
             return accountsResult;
