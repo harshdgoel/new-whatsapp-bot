@@ -23,6 +23,7 @@ class BillPaymentService {
                 LoginService
             );
 
+            console.log("response is:", response);
             const billers = response.billerRegistrationDTOs || [];
             if (!billers.length) throw new Error("No billers found.");
 
