@@ -60,7 +60,7 @@ class StateMachine {
         const userSession = this.getSession(from);
 
         if (!userSession.isHelpTriggered) {
-                    console.log("help me triggered");
+                    console.log("help me triggered,usersession is:",userSession);
             userSession.state = states.HELP;
             userSession.isHelpTriggered = true;
             return await HelpMeService.helpMe();
