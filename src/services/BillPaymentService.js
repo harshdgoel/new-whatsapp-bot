@@ -88,7 +88,7 @@ class BillPaymentService {
 
     static confirmAmount(userSession, selectedBiller) {
         userSession.selectedBiller = selectedBiller;
-        userSession.state = states.CONFIRM_AMOUNT;
+        userSession.state = states.ACCOUNT_SELECTION;
         return "Enter the amount to be paid.";
     }
 
