@@ -34,6 +34,7 @@ class BillPaymentService {
 
             console.log("response is:", response);
             const billers = response.data.billerRegistrationDTOs || [];
+            console.log("billers list is:",billers);
             userSession.billers = billers;
 
             const rows = billers.map(biller => ({
