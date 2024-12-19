@@ -43,6 +43,7 @@ class StateMachine {
                 mobileNumber: null,
                 accounts: null, 
                 billers: null,
+                selectedBiller: null,
                 selectedAccount: null, 
                 isHelpTriggered: false,
                 currentHelpPage: 1
