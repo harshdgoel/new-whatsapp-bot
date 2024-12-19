@@ -1,8 +1,16 @@
 const OBDXService = require('./OBDXService');
 const LoginService = require('./loginService');
-const TemplateLayer = require('../utils/TemplateLayer');
+const TemplateLayer = require('./TemplateLayer');
 const endpoints = require('../config/endpoints');
-const states = require('../states/stateConstants');
+
+const  states = {
+    OTP_VERIFICATION: "OTP_VERIFICATION",
+    LOGGED_IN: "LOGGED_IN",
+    LOGGED_OUT: "LOGGED_OUT",
+    FETCHING_BILLERS: "FETCHING_BILLERS",
+    BILLPAYMENT: "BILLPAYMENT",
+    ASK_AMOUNT: "ASK_AMOUNT"
+};
 
 class BillPaymentService {
     static async initiateBillPayment(userSession) {
