@@ -7,7 +7,7 @@ class IntentService {
             BALANCE: ["balance", "check balance", "my balance", "account balance"],
             TRANSACTIONS: ["transactions", "recent transactions"],
             UPCOMINGPAYMENTS: ["upcoming payments"],
-            BILLPAYMENT: ["pay bill", "bill pay"]
+            BILLPAYMENT: ["pay bill", "bill pay","Bill Payment"]
         };
     }
 
