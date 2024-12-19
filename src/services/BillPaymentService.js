@@ -68,7 +68,7 @@ class BillPaymentService {
         .map(row => ({
           content_type: "text",
           title: row.title,
-          payload: row.payload,
+          payload: row.id,
         })),
   
   };
