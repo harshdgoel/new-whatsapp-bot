@@ -43,14 +43,50 @@ class BillPaymentService {
             }));
 
             console.log("biller rows is:", rows);
-            const templateData = {
+            const channel = process.env.CHANNEL.toLowerCase();
+            let templateData;
+             // Generate the appropriate template structure based on the channel
+        switch (channel) {
+            case "whatsapp":
+              templateData = {
                 type: "list",
-                sections: [{ title: "Available Billers", rows }],
-                bodyText: "Please select a biller from the list below:",
-                buttonText: "Select Biller",
-                channel: process.env.CHANNEL,
-                to: userSession.userId,
-            };
+                sections: rows.map(row => ({
+                  id: row.id,
+                  title: row.title,
+                })), // Include only id and title for WhatsApp
+                bodyText: "Please select an account to view details.",
+                buttonText: "View Accounts",
+                channel,
+                to: "916378582419", // Replace with actual recipient number
+              };
+              break;
+  
+            case "facebook":
+             templateData = {
+          bodyText: "Please select Biller",
+      sections: rows
+        .map(row => ({
+          content_type: "text",
+          title: row.title,
+          payload: row.payload,
+        })),
+  
+  };
+      break;
+  
+            default:
+              throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
+          }
+  
+          // Pass the constructed template data to the TemplateLayer
+            // const templateData = {
+            //     type: "list",
+            //     sections: [{ title: "Available Billers", rows }],
+            //     bodyText: "Please select a biller from the list below:",
+            //     buttonText: "Select Biller",
+            //     channel: process.env.CHANNEL,
+            //     to: userSession.userId,
+            // };
 
             userSession.state = states.FETCHING_BILLERS;
             return TemplateLayer.generateTemplate(templateData);
