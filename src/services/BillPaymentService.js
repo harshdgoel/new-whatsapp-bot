@@ -77,17 +77,6 @@ class BillPaymentService {
             default:
               throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
           }
-  
-          // Pass the constructed template data to the TemplateLayer
-            // const templateData = {
-            //     type: "list",
-            //     sections: [{ title: "Available Billers", rows }],
-            //     bodyText: "Please select a biller from the list below:",
-            //     buttonText: "Select Biller",
-            //     channel: process.env.CHANNEL,
-            //     to: userSession.userId,
-            // };
-
             console.log("template data in billers list is:",templateData);
             userSession.state = states.FETCHING_BILLERS;
             return TemplateLayer.generateTemplate(templateData);
