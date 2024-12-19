@@ -222,10 +222,10 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 return paymentsMessage;
             }
             else if (userSession.lastIntent === "BILLPAYMENT") {
-                const billpayMessage = "Bill pay success!!!!";
-                userSession.isHelpTriggered = false;
-                userSession.state = states.HELP;
-                return billpayMessage;
+                // const billpayMessage = "Bill pay success!!!!";
+                // userSession.isHelpTriggered = false;
+                // userSession.state = states.HELP;
+                return "Bill pay success!!!";
             }
         } else {
             return "Please enter a valid account selection from the list.";
