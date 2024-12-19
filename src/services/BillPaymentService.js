@@ -1,5 +1,5 @@
 const OBDXService = require('./OBDXService');
-const LoginService = require('./LoginService');
+const LoginService = require('./loginService');
 const TemplateLayer = require('../utils/TemplateLayer');
 const endpoints = require('../config/endpoints');
 const states = require('../states/stateConstants');
