@@ -38,10 +38,11 @@ class BillPaymentService {
             userSession.billers = billers;
 
             const rows = billers.map(biller => ({
-                id: biller.id,
-                title: biller.billerName,
+                id: biller.billerId,
+                title: biller.billerNickName,
             }));
 
+            console.log("biller rows is:", rows);
             const templateData = {
                 type: "list",
                 sections: [{ title: "Available Billers", rows }],
