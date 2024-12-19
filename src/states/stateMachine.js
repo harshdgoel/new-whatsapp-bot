@@ -226,6 +226,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
     async handleAccountSelection(userSession, messageBody) {
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+        console.log("selected account is:",selectedAccount);
         if (selectedAccount) {
             userSession.selectedAccount = selectedAccount;
 
