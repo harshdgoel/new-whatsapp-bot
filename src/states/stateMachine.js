@@ -86,8 +86,9 @@ class StateMachine {
             return MessageService.getMessage("otpMessage");
         }
      if (userSession.state === states.FETCHING_BILLERS) {
-            userSession.state = states.ASK_AMOUNT;
-            return BillPaymentService.initiateBillPayment(userSession);
+            console.log("selected biller in state FETCHING_BILLERS(messagebody):", messageBody);
+            userSession.selectedBiller = messageBody;
+            return BillPaymentService. confirmAmount(userSession);
         }
         
         
@@ -219,6 +220,12 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
                 return paymentsMessage;
+            }
+            else if (userSession.lastIntent === "BILLPAYMENT") {
+                const billpayMessage = "Bill pay success!!!!";
+                userSession.isHelpTriggered = false;
+                userSession.state = states.HELP;
+                return billpayMessage;
             }
         } else {
             return "Please enter a valid account selection from the list.";
