@@ -87,6 +87,7 @@ class BillPaymentService {
     }
 
     static confirmAmount(userSession, selectedBiller) {
+        console.log("usersession.lastIntent in confirm amount is:",userSession.lastIntent);
         userSession.selectedBiller = selectedBiller;
         userSession.state = states.ACCOUNT_SELECTION;
         return "Enter the amount to be paid.";
