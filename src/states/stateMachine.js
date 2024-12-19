@@ -151,6 +151,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 userSession.state = states.UPCOMINGPAYMENTS;
                 return await this.handleUpcomingPayments(userSession);
             case "BILLPAYMENT":
+                console.log("entered bill pay intent in processIntent");
                 userSession.state = states.BILLPAYMENT;
                 return await BillPaymentService.initiateBillPayment(userSession);
             default:
