@@ -33,9 +33,7 @@ class BillPaymentService {
       );
 
             console.log("response is:", response);
-            const billers = response.billerRegistrationDTOs || [];
-            if (!billers.length) throw new Error("No billers found.");
-
+            const billers = response.data.billerRegistrationDTOs || [];
             userSession.billers = billers;
 
             const rows = billers.map(biller => ({
