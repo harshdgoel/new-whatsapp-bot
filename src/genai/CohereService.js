@@ -6,10 +6,11 @@ const cohere = new CohereClient({
 
 class CohereService {
   static async getInsights(balance) {
+    console.log("entering getInsights");
     try {
       const prompt = `
-      The user's bank balance is ${balance.currency} ${balance.amount}.
-      Provide financial advice on how to manage their money effectively.`;
+      my bank balance is ${balance.currency} ${balance.amount}.
+      Provide financial advice on how to manage my money effectively in less than 100 words.`;
       
       const stream = await cohere.chatStream({
         model: "command",
