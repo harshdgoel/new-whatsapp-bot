@@ -81,6 +81,8 @@ class StateMachine {
                     userSession.lastIntent = selectedIntent;
                     return await this.processIntent(userSession, selectedIntent);
                 } else {
+                    userSession.isHelpTriggered = false;
+                    userSession.state = states.HELP;
                     return "Invalid selection. Please choose a valid option from the menu.";
                 }
             }
