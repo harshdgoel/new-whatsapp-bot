@@ -4,7 +4,7 @@ const MessageService = require('../services/MessageService');
 const TemplateLayer = require("../services/TemplateLayer");
 const RecentTransactionService = require("../services/RecentTransactionService");
 const BillPaymentService = require("../services/BillPaymentService");
-
+const CohereService = require('../genai/CohereService');
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
 const IntentService = require("../services/IntentService");
