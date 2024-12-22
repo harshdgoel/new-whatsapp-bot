@@ -75,6 +75,8 @@ class StateMachine {
                 return await HelpMeService.helpMe(nextPage);
             } else {
                 const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
+                console.log("message body is:", messageBody);
+                console.log("selected intent is:", selectedIntent);
                 if (selectedIntent && selectedIntent !== "UNKNOWN") {
                     userSession.lastIntent = selectedIntent;
                     return await this.processIntent(userSession, selectedIntent);
