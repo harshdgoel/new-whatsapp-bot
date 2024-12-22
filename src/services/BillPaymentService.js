@@ -96,6 +96,7 @@ class BillPaymentService {
 
     static async completePayment(userSession) {
         const { selectedAccount, amount, selectedBiller } = userSession;
+        console.log("selected account in completePayment is:", selectedAccount);
     
         if (!selectedAccount || !selectedBiller) {
             return "Missing account or biller details. Please ensure both are selected.";
