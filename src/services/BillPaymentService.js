@@ -162,7 +162,8 @@ class BillPaymentService {
 
             if (response && response.data) {
                 userSession.state = states.LOGGED_IN;
-                return "Your payment was successful. Thank you!";
+                const referenceNumber = response.data.status.referenceNumber;
+                return "Congratulations! Your Bill Payment is successful with Reference No: ${referenceNumber}";
             } else {
                 return "Payment was unsuccessful. Please try again.";
             }
