@@ -39,7 +39,7 @@ class StateMachine {
             logger.log(`Creating a new session for user: ${userId}`);
             this.sessionCache.set(userId, { 
                 userId: userId,
-                state: states.LOGGED_OUT, 
+                state: states.HELP, 
                 lastIntent: null, 
                 otp: null, 
                 mobileNumber: null,
@@ -61,7 +61,7 @@ class StateMachine {
         console.log("entering handle message and state is:", userSession.state);
 
         if ( !userSession.isHelpTriggered && 
-    userSession.state === states.LOGGED_OUT) {
+    userSession.state === states.HELP) {
                     console.log("help me triggered,usersession is:",userSession);
             userSession.state = states.HELP;
             userSession.isHelpTriggered = true;
