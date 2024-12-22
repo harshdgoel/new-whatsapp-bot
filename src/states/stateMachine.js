@@ -60,7 +60,7 @@ class StateMachine {
         const userSession = this.getSession(from);
         console.log("entering handle message and state is:", userSession.state);
 
-        if (!userSession.isHelpTriggered) {
+        if (userSession.state === states.LOGGED_OUT && !userSession.isHelpTriggered) {
                     console.log("help me triggered,usersession is:",userSession);
             userSession.state = states.HELP;
             userSession.isHelpTriggered = true;
