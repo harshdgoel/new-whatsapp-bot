@@ -148,11 +148,16 @@ if (match) {
         }
 
         if (userSession.state === states.ASK_INSIGHTS) {
+            console.log("entering state ASK_INSIGHTS");
             if (messageBody.toLowerCase() === "yes") {
-              const advice = await CohereService.getInsights(userSession.selectedAccount.availableBalance);
-              userSession.state = states.HELP; // Reset state after advice
-              userSession.isHelpTriggered = false;
-              return `Here is your financial advice:\n\n${advice}`;
+              const balance = userSession.selectedAccount.availableBalance; // Fetch balance from selected account
+        const advice = await CohereService.getInsights({
+            currency: balance.currency || "USD",
+            amount: balance.amount || 0,
+        });
+        userSession.state = states.HELP; // Reset state after providing advice
+        userSession.isHelpTriggered = false;
+        return `Here is your financial advice:\n\n${advice}`;
             } else if (messageBody.toLowerCase() === "no") {
               userSession.state = states.HELP; // Reset state
               return "Okay, let me know if you need further assistance.";
