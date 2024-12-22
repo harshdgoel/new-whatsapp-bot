@@ -161,9 +161,9 @@ class BillPaymentService {
             console.log("Payment response:", response);
 
             if (response && response.data) {
-                userSession.state = states.LOGGED_IN;
-                const referenceNumber = response.data.status.referenceNumber;
-                return "Congratulations! Your Bill Payment is successful with Reference No: ${referenceNumber}";
+            const referenceNumber = response.data.status.referenceNumber;
+            const successMessage = `Congratulations! Your Bill Payment is successful with Reference No: ${referenceNumber}`;
+            return successMessage;
             } else {
                 return "Payment was unsuccessful. Please try again.";
             }
