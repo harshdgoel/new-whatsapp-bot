@@ -178,6 +178,7 @@ class BillPaymentService {
  * @returns {Object|null} - Returns the selected biller object or null if not found.
  */
 static parseBillerSelection(billerNickName, billers) {
+        console.log("Parsing selected biller:", billerNickName);
     if (!Array.isArray(billers) || billers.length === 0) {
         console.error("Billers list is empty or invalid");
         return null;
