@@ -96,10 +96,14 @@ class StateMachine {
         }
      if (userSession.state === states.FETCHING_BILLERS) {
             console.log("selected biller in state FETCHING_BILLERS(messagebody):", messageBody);
-            userSession.selectedBiller = messageBody;
-             const billerDetails = BillPaymentService.parseBillerSelection(selectedBiller, userSession.billers);
-             console.log("billerDetails are: ", billerDetails);
-            return BillPaymentService. confirmAmount(userSession);
+    const selectedBiller = BillPaymentService.parseBillerSelection(messageBody, userSession.billers); // Parse the selected biller
+    if (selectedBiller) {
+        userSession.selectedBiller = selectedBiller; // Save selected biller to the session
+        console.log("selected biller details:", selectedBiller);
+        return BillPaymentService.confirmAmount(userSession, selectedBiller);
+    } else {
+        return "Invalid selection. Please choose a valid biller from the list.";
+    }
         }
         
         
