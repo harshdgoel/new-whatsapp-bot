@@ -265,7 +265,8 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 return paymentsMessage;
             }
             else if (userSession.lastIntent === "BILLPAYMENT") {
-                // const billpayMessage = "Bill pay success!!!!";
+                console.log("userSession in BILLPAYMENT STATE IS:", userSession);
+                 //const billpayMessage = await BillPaymentService.completePayment(selectedAccount);
                  userSession.isHelpTriggered = false;
                  userSession.state = states.HELP;
                 return "Bill pay success!!!";

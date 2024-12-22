@@ -94,31 +94,7 @@ class BillPaymentService {
         return "Enter the amount to be paid.";
     }
 
-    static async selectAccountForPayment(userSession, amount) {
-        userSession.amount = amount;
-
-        const accounts = userSession.accounts || [];
-        if (!accounts.length) return "No accounts available for payment.";
-
-        const rows = accounts.map(account => ({
-            id: account.id.value,
-            title: account.id.displayValue,
-        }));
-
-        const templateData = {
-            type: "list",
-            sections: [{ title: "Available Accounts", rows }],
-            bodyText: "Please select an account for payment:",
-            buttonText: "Select Account",
-            channel: process.env.CHANNEL,
-            to: userSession.userId,
-        };
-
-        userSession.state = states.SELECT_ACCOUNT;
-        return TemplateLayer.generateTemplate(templateData);
-    }
-
-    static async completePayment(userSession, selectedAccountId) {
+    static async completePayment(selectedAccountId,userSession) {
         const selectedAccount = userSession.accounts.find(acc => acc.id.value === selectedAccountId);
         if (!selectedAccount) return "Invalid account selected.";
 
