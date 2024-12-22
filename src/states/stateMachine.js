@@ -89,6 +89,7 @@ class StateMachine {
         }
 
           if (userSession.state === states.FETCH_MOBILE_NUMBER) {
+            userSession.isHelpTriggered = true;
             console.log("userSession in FETCH_MOBILE_NUMBER is:", userSession);
             userSession.mobileNumber = messageBody;
             userSession.state = states.OTP_VERIFICATION;
