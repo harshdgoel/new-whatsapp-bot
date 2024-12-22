@@ -105,8 +105,8 @@ class BillPaymentService {
             const requestBody = {
                 id: null,
                 debitAccount: {
-                    value: selectedAccount.value,
-                    displayValue: selectedAccount.displayValue,
+                    value: selectedAccount.id.value,
+                    displayValue: selectedAccount.id.displayValue,
                 },
                 customerName: "chatbot",
                 billerRegistrationId: null,
