@@ -102,69 +102,55 @@ class BillPaymentService {
         }
     
         try {
-            const requestBody = {
-                id: null,
-                debitAccount: {
-                    value: selectedAccount.id.value,
-                    displayValue: selectedAccount.id.displayValue,
-                },
-                customerName: userSession.displayName || selectedAccount.partyName, // Add fallback if displayName isn't set
-                billerRegistrationId: null,
-                billAmount: {
-                    currency: "USD",
-                    amount: amount,
-                },
-                paymentDate: new Date().toISOString().split("T")[0],
-                planId: null,
-                billerId: selectedBiller.billerId,
-                location: null,
-                billerName: selectedBiller.billerName,
-                billId: null,
-                partyId: null,
-                cardExpiryDate: null,
-                paymentStatus: "COM",
-                billPaymentRelDetails: [
-                    {
-                        value: "12345", // Example value; adjust if dynamic data is needed
-                        labelId: "0001345", // Example labelId
-                    },
-                ],
-                paymentType: "CASA",
-                payLater: "false",
-                recurring: "false",
-                billerType: selectedBiller.billerType,
-                locationId: null,
-                categoryId: null,
-                category: null,
-                meterId: null,
-                transactionId: "QUICK_PAY",
-                paymentHostStatus: null,
-                billerRegistration: {
-                    billerNickName: selectedBiller.billerNickName || null,
-                    autopayInstructions: {
-                        frequency: null,
-                        endDate: null,
-                    },
-                    subcategory: null,
-                },
-            };
-    
-            const paymentResponse = await OBDXService.invokeService(
-                endpoints.payBill,
-                "POST",
-                null,
-                requestBody,
-                LoginService
-            );
-    
-            // Log response for debugging
-            console.log("Payment Response:", paymentResponse);
-    
-            // Reset user session after successful payment
-            userSession.state = states.HELP;
-    
-            return `Bill payment of ${amount} USD to ${selectedBiller.billerName} from account ${selectedAccount.id.displayValue} was successful.`;
-        } catch (error) {
+           // Prepare the payment request body using selected biller details
+        const requestBody = {
+            id: null, // Populate if needed dynamically
+            debitAccount: {
+                value: selectedAccount.value, // Account identifier
+                displayValue: selectedAccount.displayValue, // Account display value
+            },
+            customerName: selectedBiller.customerName || selectedAccount.partyName, // Fallback to account name
+            billerRegistrationId: selectedBiller.id, // Biller registration ID
+            billAmount: {
+                currency: "USD", // Adjust dynamically if needed
+                amount: amount,
+            },
+            paymentDate: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD
+            planId: null, // Add plan ID if applicable
+            billerId: selectedBiller.billerId, // Biller ID
+            location: selectedBiller.location ? selectedBiller.location.areaName : null, // Use areaName for location
+            billerName: selectedBiller.billerName, // Biller name
+            billId: null, // Populate if specific bill ID is required
+            partyId: null, // Populate if needed
+            cardExpiryDate: null, // Populate for card payments if applicable
+            paymentStatus: "COM", // Payment completion status
+            billPaymentRelDetails: selectedBiller.relationshipDetails.map(rel => ({
+                value: rel.value,
+                labelId: rel.labelId,
+            })), // Map relationship details
+            paymentType: selectedBiller.autopayInstructions.paymentType || "CAS", // Default to 'CAS' if not specified
+        };
+
+        console.log("Payment request body prepared:", requestBody);
+
+        // Invoke the payment service
+        const response = await OBDXService.invokeService(
+            endpoints.billPayment, // Endpoint for bill payment
+            "POST", // Use POST for creating a payment
+            new Map(), // Add query parameters if needed
+            requestBody, // Payload
+            LoginService // Pass login service for authentication headers
+        );
+
+        console.log("Payment response:", response);
+
+        if (response && response.data) {
+            userSession.state = states.LOGGED_IN; // Reset state after successful payment
+            return "Your payment was successful. Thank you!";
+        } else {
+            return "Payment was unsuccessful. Please try again.";
+        }
+            } catch (error) {
             console.error("Error completing payment:", error.message);
             return "An error occurred during the payment. Please try again later.";
         }
