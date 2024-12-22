@@ -98,7 +98,7 @@ class BalanceService {
     }
   }
 
-  static async fetchBalanceForSelectedAccount(selectedAccount) {
+  static async fetchBalanceForSelectedAccount(selectedAccount,userSession) {
     try {
       const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}.`;
     
