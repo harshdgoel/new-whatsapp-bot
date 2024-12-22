@@ -275,8 +275,6 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
             if (userSession.lastIntent === "BALANCE") {
                 const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount,userSession);
-                userSession.isHelpTriggered = false;
-                userSession.state = states.HELP;
                 return balanceMessage;
             } else if (userSession.lastIntent === "TRANSACTIONS") {
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount);
