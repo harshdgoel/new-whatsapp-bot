@@ -58,6 +58,7 @@ class StateMachine {
 
     async handleMessage(from, messageBody, intent) {
         const userSession = this.getSession(from);
+        console.log("entering handle message and state is:", userSession.state);
 
         if (!userSession.isHelpTriggered) {
                     console.log("help me triggered,usersession is:",userSession);
@@ -101,12 +102,13 @@ class StateMachine {
         }
        
         if (userSession.state === states.RESOLVE_AMOUNT) {
+            console.log("entering resolve amount state");
 const regex = /^([A-Z]{3})\s(\d+(\.\d{1,2})?)$/; // Regex to match "USD 300" format
 const match = messageBody.match(regex);
 
 if (match) {
-    userSession.currency = match[1]; // e.g., "USD"
-    userSession.amount = parseFloat(match[2]); // e.g., 300
+    userSession.currency = match[1];
+    userSession.amount = parseFloat(match[2]);
     userSession.state = states.ACCOUNT_SELECTION;
       const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
         console.log("accountsResult in MATCHED BILLER is",accountsResult);
@@ -235,6 +237,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
     }
 
     async handleAccountSelection(userSession, messageBody) {
+        console.log("entering handleAccountSelection");
         const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
         console.log("selected account is:",selectedAccount);
         if (selectedAccount) {
@@ -258,8 +261,8 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             }
             else if (userSession.lastIntent === "BILLPAYMENT") {
                 // const billpayMessage = "Bill pay success!!!!";
-                // userSession.isHelpTriggered = false;
-                // userSession.state = states.HELP;
+                 userSession.isHelpTriggered = false;
+                 userSession.state = states.HELP;
                 return "Bill pay success!!!";
             }
         } else {
