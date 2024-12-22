@@ -240,6 +240,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
     }
 
     async handleIntentAfterLogin(userSession) {
+        userSession.isHelpTriggered = false;
         console.log("entering handleIntentAfterLogin usersession is:",userSession);
         if (userSession.lastIntent) {
             return await this.processIntent(userSession, userSession.lastIntent);
