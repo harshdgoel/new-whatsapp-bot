@@ -97,6 +97,8 @@ class StateMachine {
      if (userSession.state === states.FETCHING_BILLERS) {
             console.log("selected biller in state FETCHING_BILLERS(messagebody):", messageBody);
             userSession.selectedBiller = messageBody;
+             const billerDetails = BillPaymentService.parseBillerSelection(selectedBiller, userSession.billers);
+             console.log("billerDetails are: ", billerDetails);
             return BillPaymentService. confirmAmount(userSession);
         }
         
@@ -266,10 +268,14 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             }
             else if (userSession.lastIntent === "BILLPAYMENT") {
                 console.log("userSession in BILLPAYMENT STATE IS:", userSession);
-                 //const billpayMessage = await BillPaymentService.completePayment(selectedAccount);
-                 userSession.isHelpTriggered = false;
-                 userSession.state = states.HELP;
-                return "Bill pay success!!!";
+                console.log("userSession in BILLPAYMENT STATE IS:", userSession);
+
+    const billPaymentMessage = await BillPaymentService.completePayment(userSession);
+
+    userSession.isHelpTriggered = false;
+    userSession.state = states.HELP;
+
+    return billPaymentMessage;
             }
         } else {
             return "Please enter a valid account selection from the list.";

@@ -94,30 +94,109 @@ class BillPaymentService {
         return "Enter the amount to be paid.";
     }
 
-    static async completePayment(selectedAccountId,userSession) {
-        const selectedAccount = userSession.accounts.find(acc => acc.id.value === selectedAccountId);
-        if (!selectedAccount) return "Invalid account selected.";
-
+    static async completePayment(userSession) {
+        const { selectedAccount, amount, selectedBiller } = userSession;
+    
+        if (!selectedAccount || !selectedBiller) {
+            return "Missing account or biller details. Please ensure both are selected.";
+        }
+    
         try {
+            const requestBody = {
+                id: null,
+                debitAccount: {
+                    value: selectedAccount.id.value,
+                    displayValue: selectedAccount.id.displayValue,
+                },
+                customerName: userSession.displayName || selectedAccount.partyName, // Add fallback if displayName isn't set
+                billerRegistrationId: null,
+                billAmount: {
+                    currency: "USD",
+                    amount: amount,
+                },
+                paymentDate: new Date().toISOString().split("T")[0],
+                planId: null,
+                billerId: selectedBiller.billerId,
+                location: null,
+                billerName: selectedBiller.billerName,
+                billId: null,
+                partyId: null,
+                cardExpiryDate: null,
+                paymentStatus: "COM",
+                billPaymentRelDetails: [
+                    {
+                        value: "12345", // Example value; adjust if dynamic data is needed
+                        labelId: "0001345", // Example labelId
+                    },
+                ],
+                paymentType: "CASA",
+                payLater: "false",
+                recurring: "false",
+                billerType: selectedBiller.billerType,
+                locationId: null,
+                categoryId: null,
+                category: null,
+                meterId: null,
+                transactionId: "QUICK_PAY",
+                paymentHostStatus: null,
+                billerRegistration: {
+                    billerNickName: selectedBiller.billerNickName || null,
+                    autopayInstructions: {
+                        frequency: null,
+                        endDate: null,
+                    },
+                    subcategory: null,
+                },
+            };
+    
             const paymentResponse = await OBDXService.invokeService(
                 endpoints.payBill,
                 "POST",
                 null,
-                {
-                    billerId: userSession.selectedBiller.id,
-                    accountId: selectedAccount.id.value,
-                    amount: userSession.amount,
-                },
+                requestBody,
                 LoginService
             );
-
+    
+            // Log response for debugging
+            console.log("Payment Response:", paymentResponse);
+    
+            // Reset user session after successful payment
             userSession.state = states.HELP;
-            return `Bill payment of ${userSession.amount} to ${userSession.selectedBiller.billerName} from account ${selectedAccount.id.displayValue} was successful.`;
+    
+            return `Bill payment of ${amount} USD to ${selectedBiller.billerName} from account ${selectedAccount.id.displayValue} was successful.`;
         } catch (error) {
             console.error("Error completing payment:", error.message);
-            return "An error occurred during payment. Please try again.";
+            return "An error occurred during the payment. Please try again later.";
         }
     }
+
+    
+    /**
+ * Finds the details of a selected biller based on the provided billerNickName.
+ * @param {string} billerNickName - The nickname of the biller to search for.
+ * @param {Array} billers - The list of billers to search in.
+ * @returns {Object|null} - Returns the selected biller object or null if not found.
+ */
+static parseBillerSelection(billerNickName, billers) {
+    if (!Array.isArray(billers) || billers.length === 0) {
+        console.error("Billers list is empty or invalid");
+        return null;
+    }
+
+    // Locate the selected biller
+    const selectedBiller = billers.find(
+        biller => biller.billerNickName.toLowerCase() === billerNickName.toLowerCase()
+    );
+
+    if (!selectedBiller) {
+        console.warn(`Biller with nickname "${billerNickName}" not found.`);
+        return null;
+    }
+
+    return selectedBiller;
+}
+
+    
 }
 
 module.exports = BillPaymentService;
