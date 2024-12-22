@@ -12,6 +12,7 @@ const logger = require("../utils/logger");
 
 const states = {
     OTP_VERIFICATION: "OTP_VERIFICATION",
+    ASK_INSIGHTS: "ASK_INSIGHTS",
     LOGGED_IN: "LOGGED_IN",
     LOGGED_OUT: "LOGGED_OUT",
     TRANSACTIONS: "TRANSACTIONS",
@@ -145,6 +146,21 @@ if (match) {
         if (userSession.state === states.ACCOUNT_SELECTION) {
             return await this.handleAccountSelection(userSession, messageBody);
         }
+
+        if (userSession.state === states.ASK_INSIGHTS) {
+            if (messageBody.toLowerCase() === "yes") {
+              const advice = await CohereService.getInsights(userSession.selectedAccount.availableBalance);
+              userSession.state = states.HELP; // Reset state after advice
+              userSession.isHelpTriggered = false;
+              return `Here is your financial advice:\n\n${advice}`;
+            } else if (messageBody.toLowerCase() === "no") {
+              userSession.state = states.HELP; // Reset state
+              return "Okay, let me know if you need further assistance.";
+            } else {
+              return 'Invalid response. Please reply with "Yes" or "No".';
+            }
+          }
+          
 
         return await this.processIntent(userSession, intent);
     }

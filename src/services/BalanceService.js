@@ -94,16 +94,19 @@ class BalanceService {
         userSession.state = states.OTP_VERIFICATION;
       return MessageService.getMessage('otpMessage');
       }
-//      userSession.state === states.HELP // just for trial
       return "An error occurred while fetching your accounts. Please try again.";
     }
   }
 
   static async fetchBalanceForSelectedAccount(selectedAccount) {
     try {
-      const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}`;
-      return balanceMessage;
-    } catch (error) {
+      const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}.`;
+    
+      userSession.selectedAccount = selectedAccount;
+      userSession.state = "ASK_INSIGHTS"; // Set next state for insights
+      
+      return `${balanceMessage}\n\nWould you like financial advice based on your balance? Reply "Yes" or "No".`;
+         } catch (error) {
       console.error("Error fetching balance:", error.message);
       return "Unable to fetch balance at this time. Please try again later.";
     }
