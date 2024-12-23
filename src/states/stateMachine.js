@@ -43,7 +43,7 @@ class StateMachine {
     logger.log(`Creating a new session for user: ${userId}`);
     const newSession = { 
         userId: userId,
-        state: states.LOGGED_OUT, 
+        state: states.HELP, 
         lastIntent: null, 
         otp: null, 
         mobileNumber: null,
