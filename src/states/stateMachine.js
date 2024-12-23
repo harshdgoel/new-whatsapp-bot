@@ -163,6 +163,7 @@ if (match) {
         return `Here is your financial advice:\n\n${advice}`;
             } else if (messageBody.toLowerCase() === "no") {
               userSession.state = states.HELP; // Reset state
+              userSession.isHelpTriggered = false;
               return "Okay, let me know if you need further assistance.";
             } else {
               return 'Invalid response. Please reply with "Yes" or "No".';
