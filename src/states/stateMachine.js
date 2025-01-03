@@ -35,29 +35,27 @@ class StateMachine {
         this.sessionCache = new Map();
     }
 
-  getSession(userId) {
-    const session = this.sessionCache.get(userId);
-    if (session) {
-        return session;
+ getSession(userId) {
+    if (!this.sessionCache.has(userId)) {
+        logger.log(`Creating a new session for user: ${userId}`);
+        const newSession = {
+            userId: userId,
+            state: states.HELP,
+            lastIntent: null,
+            otp: null,
+            mobileNumber: null,
+            accounts: null,
+            billers: null,
+            amount: null,
+            currency: null,
+            selectedBiller: null,
+            selectedAccount: null,
+            isHelpTriggered: false,
+            currentHelpPage: 1,
+        };
+        this.sessionCache.set(userId, newSession);
     }
-    logger.log(`Creating a new session for user: ${userId}`);
-    const newSession = { 
-        userId: userId,
-        state: states.HELP, 
-        lastIntent: null, 
-        otp: null, 
-        mobileNumber: null,
-        accounts: null, 
-        billers: null,
-        amount: null,
-        currency: null,
-        selectedBiller: null,
-        selectedAccount: null, 
-        isHelpTriggered: false,
-        currentHelpPage: 1,
-    };
-    this.sessionCache.set(userId, newSession);
-    return newSession;
+    return this.sessionCache.get(userId);
 }
 
     async handleMessage(from, messageBody, intent) {
