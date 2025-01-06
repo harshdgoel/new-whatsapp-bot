@@ -20,13 +20,15 @@ const states = {
     HELP: "HELP",
     BALANCE: "BALANCE",
     BILLPAYMENT: "BILLPAYMENT",
+    TRANSFERMONEY: "TRANSFERMONEY",
     FETCHING_BILLERS: "FETCHING_BILLERS",
     ACCOUNT_SELECTION: "ACCOUNT_SELECTION",
     ASK_AMOUNT: "ASK_AMOUNT",
     FETCHING_BALANCE: "FETCHING_BALANCE",
     RESOLVE_AMOUNT: "RESOLVE_AMOUNT",
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
-    FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER"
+    FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER",
+    FETCH_PAYEES: "FETCH_PAYEES"
 
 };
 
@@ -46,6 +48,7 @@ class StateMachine {
             mobileNumber: null,
             accounts: null,
             billers: null,
+            payees: null,
             amount: null,
             currency: null,
             selectedBiller: null,
@@ -151,12 +154,12 @@ if (match) {
         if (userSession.state === states.ASK_INSIGHTS) {
             console.log("entering state ASK_INSIGHTS");
             if (messageBody.toLowerCase() === "yes") {
-              const balance = userSession.selectedAccount.availableBalance; // Fetch balance from selected account
+              const balance = userSession.selectedAccount.availableBalance;
         const advice = await CohereService.getInsights({
             currency: balance.currency || "USD",
             amount: balance.amount || 0,
         });
-        userSession.state = states.HELP; // Reset state after providing advice
+        userSession.state = states.HELP;
         userSession.isHelpTriggered = false;
         return `Here is your financial advice:\n\n${advice}`;
             } else if (messageBody.toLowerCase() === "no") {
@@ -201,6 +204,10 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 console.log("entered bill pay intent in processIntent");
                 userSession.state = states.BILLPAYMENT;
                 return await BillPaymentService.initiateBillPayment(userSession);
+            case "TRANSFERMONEY":
+                    console.log("entered transfer money intent in processIntent");
+                    userSession.state = states.TRANSFERMONEY;
+                    return await BillPaymentService.initiateBillPayment(userSession);
             default:
                 return "I'm sorry, I couldn't understand your request. Please try again.";
         }

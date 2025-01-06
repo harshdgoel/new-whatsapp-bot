@@ -7,6 +7,7 @@ module.exports = {
     transactions: "/digx-common/dda/v1/demandDeposit",
     upcoming_payments: "/digx-payments/payment/v1/payments/instructions",
     billers: "/digx-payments/ebpp/v1/registeredBillers",
-    billPayment: "/digx-payments/ebpp/v1/ebillPayments"
+    billPayment: "/digx-payments/ebpp/v1/ebillPayments",
+    payees: "/digx-payments/payment/v1/payments/payeesv3"
     // Add more endpoints as needed
 };

@@ -4,9 +4,12 @@ require('dotenv').config(); // Ensure this is loaded to access process.env value
 const router = express.Router();
 
 const intents = {
+    HELP: ["help", "assist", "support", "what can you do"],
     BALANCE: ["balance", "check balance", "my balance", "account balance"],
-    TRANSACTIONS: ["recent transactions", "last transactions", "transactions"],
-    HELPME: ["help me", "help"]
+    TRANSACTIONS: ["transactions", "recent transactions"],
+    UPCOMINGPAYMENTS: ["upcoming payments"],
+    BILLPAYMENT: ["pay bill", "bill payment"],
+    TRANSFERMONEY: ["money transfer", "transfer money"]
     // ... add more intents as needed
 };
 
