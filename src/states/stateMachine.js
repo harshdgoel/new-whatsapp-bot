@@ -30,8 +30,7 @@ const states = {
     RESOLVE_AMOUNT: "RESOLVE_AMOUNT",
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
     FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER",
-    FETCH_PAYEES: "FETCH_PAYEES"
-
+    FETCHING_PAYEES: "FETCHING_PAYEES"
 };
 
 class StateMachine {
@@ -110,7 +109,18 @@ class StateMachine {
         userSession.selectedBiller = selectedBiller; // Save selected biller to the session
         console.log("selected biller details:", selectedBiller);
         return BillPaymentService.confirmAmount(userSession, selectedBiller);
-    } else {
+    }
+    
+    if (userSession.state === states.FETCHING_PAYEES) {
+        console.log("selected Payee in state FETCHING_PAYEES(messagebody):", messageBody);
+const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, userSession.payees); // Parse the selected biller
+if (selectedBiller) {
+    userSession.selectedPayee = selectedPayee; // Save selected biller to the session
+    console.log("selected payee details:", selectedPayee);
+    return MoneyTransferService.confirmTransferAmount(userSession, selectedPayee);
+}
+}
+    else {
         return "Invalid selection. Please choose a valid biller from the list.";
     }
         }
@@ -306,13 +316,18 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             else if (userSession.lastIntent === "BILLPAYMENT") {
                 console.log("userSession in BILLPAYMENT STATE IS:", userSession);
                 console.log("userSession in BILLPAYMENT STATE IS:", userSession);
-
-    const billPaymentMessage = await BillPaymentService.completePayment(userSession);
-
-    userSession.isHelpTriggered = false;
-    userSession.state = states.HELP;
-
-    return billPaymentMessage;
+                const billPaymentMessage = await BillPaymentService.completePayment(userSession);
+                userSession.isHelpTriggered = false;
+                userSession.state = states.HELP;
+                return billPaymentMessage;
+            }
+            else if (userSession.lastIntent === "TRANSFERMONEY") {
+                console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
+                console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
+                const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
+                userSession.isHelpTriggered = false;
+                userSession.state = states.HELP;
+                return transferPaymentMessage;
             }
         } else {
             return "Please enter a valid account selection from the list.";
