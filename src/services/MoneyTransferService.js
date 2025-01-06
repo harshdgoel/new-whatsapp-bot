@@ -37,7 +37,7 @@ class MoneyTransferService {
             );
     
             console.log("Response is:", response);
-            const payees = response.items || [];
+            const payees = response.data.items || [];
             console.log("Payees list is:", payees);
             userSession.payees = payees;
     
