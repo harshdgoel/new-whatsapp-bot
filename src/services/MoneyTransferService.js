@@ -14,82 +14,85 @@ const states = {
 };
 
 class MoneyTransferService {
-    static async fetchPayees(userSession) {
-        const token = LoginService.getToken();
-        const cookie = LoginService.getCookie();
-    
-        if (!token || !cookie) {
-            userSession.state = states.OTP_VERIFICATION;
-            return "Please enter the One Time Password sent to your registered number.";
-        }
-    
-        try {
-            const queryParams = new Map([
-                ["locale", "en"],
-                ["types", "INTERNAL,GENERICDOMESTIC"],
-            ]);
-            const response = await OBDXService.invokeService(
-                endpoints.payees,
-                "GET",
-                queryParams,
-                {}, // No body needed for GET request
-                LoginService
-            );
-    
-            console.log("Response is:", response);
-            const payees = response.data.items || [];
-            console.log("Payees list is:", payees);
-            userSession.payees = payees;
-    
-            // Map the payees to a structured format
-            const rows = payees.map(payee => ({
-                id: payee.id,
-                title: payee.nickName,
-            }));
-    
-            console.log("Payee rows:", rows);
-    
-            const channel = process.env.CHANNEL.toLowerCase();
-            let templateData;
-    
-            switch (channel) {
-                case "whatsapp":
-                    templateData = {
-                        type: "list",
-                        sections: rows.map(row => ({
-                            id: row.id,
-                            title: row.title,
-                        })),
-                        bodyText: "Please select a payee to proceed.",
-                        buttonText: "View Payees",
-                        channel,
-                        to: "916378582419", // Replace with the actual recipient number
-                    };
-                    break;
-    
-                case "facebook":
-                    templateData = {
-                        bodyText: "Please select a Payee",
-                        sections: rows.map(row => ({
-                            content_type: "text",
-                            title: row.title,
-                            payload: row.id,
-                        })),
-                    };
-                    break;
-    
-                default:
-                    throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
-            }
-    
-            console.log("Template data for payees list:", templateData);
-            userSession.state = states.FETCHING_PAYEES;
-            return TemplateLayer.generateTemplate(templateData);
-        } catch (error) {
-            console.error("Error fetching payees:", error.message);
-            return "An error occurred while fetching payees. Please try again.";
-        }
+   static async fetchPayees(userSession) {
+    const token = LoginService.getToken();
+    const cookie = LoginService.getCookie();
+
+    if (!token || !cookie) {
+        userSession.state = states.OTP_VERIFICATION;
+        return "Please enter the One Time Password sent to your registered number.";
     }
+
+    try {
+        const queryParams = new Map([
+            ["locale", "en"],
+            ["types", "INTERNAL,GENERICDOMESTIC"],
+        ]);
+        const response = await OBDXService.invokeService(
+            endpoints.payees,
+            "GET",
+            queryParams,
+            {}, // No body needed for GET request
+            LoginService
+        );
+
+        console.log("Response is:", response);
+        const payees = response.data.items || [];
+        console.log("Payees list is:", payees);
+        userSession.payees = payees;
+
+        // Map the payees to a structured format
+        const rows = payees.map((payee) => ({
+            id: payee.id,
+            title: payee.nickName,
+        }));
+
+        console.log("Payee rows:", rows);
+
+        const channel = process.env.CHANNEL.toLowerCase();
+        let templateData;
+
+        switch (channel) {
+            case "whatsapp":
+                templateData = {
+                    type: "list",
+                    sections: rows.map((row) => ({
+                        id: row.id,
+                        title: row.title,
+                    })),
+                    bodyText: "Please select a payee to proceed.",
+                    buttonText: "View Payees",
+                    channel,
+                    to: "916378582419", // Replace with the actual recipient number
+                };
+                break;
+
+            case "facebook":
+                // Limit the list to 10 payees for Facebook
+                const limitedRows = rows.slice(0, 10);
+                templateData = {
+                    bodyText: "Please select a Payee",
+                    sections: limitedRows.map((row) => ({
+                        content_type: "text",
+                        title: row.title,
+                        payload: row.id,
+                    })),
+                };
+                break;
+
+            default:
+                throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
+        }
+
+        console.log("Template data for payees list:", templateData);
+        userSession.state = states.FETCHING_PAYEES;
+        return TemplateLayer.generateTemplate(templateData);
+    } catch (error) {
+        console.error("Error fetching payees:", error.message);
+        return "An error occurred while fetching payees. Please try again.";
+    }
+}
+
     
     static confirmTransferAmount(userSession, selectedPayee) {
         console.log("userSession.lastIntent in confirm amount is:", userSession.lastIntent);
