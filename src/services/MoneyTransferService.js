@@ -14,7 +14,7 @@ const states = {
 };
 
 class MoneyTransferService {
-    static async initiateBillPayment(userSession) {
+    static async fetchPayees(userSession) {
         const token = LoginService.getToken();
         const cookie = LoginService.getCookie();
 
@@ -26,8 +26,6 @@ class MoneyTransferService {
         try {
             const queryParams = new Map([["locale", "en"],
             ["types","INTERNAL,GENERICDOMESTIC"]
-        
-        
         ]);
             const response = await OBDXService.invokeService(
                 endpoints.payees,

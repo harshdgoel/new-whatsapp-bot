@@ -4,6 +4,8 @@ const MessageService = require('../services/MessageService');
 const TemplateLayer = require("../services/TemplateLayer");
 const RecentTransactionService = require("../services/RecentTransactionService");
 const BillPaymentService = require("../services/BillPaymentService");
+const MoneyTransferService = require("../services/MoneyTransferService");
+
 const CohereService = require('../genai/CohereService');
 const UpcomingPaymentsService = require("../services/UpcomingPaymentsService");
 const HelpMeService = require("../services/HelpMeService");
@@ -176,7 +178,7 @@ if (match) {
     }
 
     async processIntent(userSession, intent) {
-        if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT"].includes(intent)) {
+        if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT","TRANSFERMONEY"].includes(intent)) {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
@@ -207,7 +209,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "TRANSFERMONEY":
                     console.log("entered transfer money intent in processIntent");
                     userSession.state = states.TRANSFERMONEY;
-                    return await BillPaymentService.initiateBillPayment(userSession);
+                    return await MoneyTransferService.fetchPayees(userSession);
             default:
                 return "I'm sorry, I couldn't understand your request. Please try again.";
         }
