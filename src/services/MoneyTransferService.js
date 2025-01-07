@@ -169,6 +169,7 @@ static async completePayment(userSession) {
 
     // Make the service call
     try {
+        console.log("request body for MONEY TRANSFER GENERATED IS:", requestBody);
         const response = await OBDXService.invokeService(
             endpoints.moneyTransfer,
             "POST",
