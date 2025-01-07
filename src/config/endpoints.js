@@ -8,6 +8,7 @@ module.exports = {
     upcoming_payments: "/digx-payments/payment/v1/payments/instructions",
     billers: "/digx-payments/ebpp/v1/registeredBillers",
     billPayment: "/digx-payments/ebpp/v1/ebillPayments",
-    payees: "/digx-payments/payment/v1/payments/payeesv3"
+    payees: "/digx-payments/payment/v1/payments/payeesv3",
+    moneyTransfer: "/digx-payments/payment/v2/transfers"
     // Add more endpoints as needed
 };
