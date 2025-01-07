@@ -112,10 +112,10 @@ class StateMachine {
     }
     
     if (userSession.state === states.FETCHING_PAYEES) {
-        console.log("selected Payee in state FETCHING_PAYEES(messagebody):", messageBody);
+        console.log("entered state fetch_payee in handle message");
 const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, userSession.payees); // Parse the selected biller
-if (selectedBiller) {
-    userSession.selectedPayee = selectedPayee; // Save selected biller to the session
+if (selectedPayee) {
+    userSession.selectedPayee = selectedPayee; // Save selected payee to the session
     console.log("selected payee details:", selectedPayee);
     return MoneyTransferService.confirmTransferAmount(userSession, selectedPayee);
 }
