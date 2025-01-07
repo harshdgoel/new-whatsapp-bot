@@ -25,6 +25,8 @@ class RecentTransactionService {
         try {
             const response = await OBDXService.invokeService(endpointUrl, "GET", queryParams, {}, LoginService);
 
+            console.log("respnse for RECENT TRANSACTIONS IS:", response);
+
             if (response.data && response.data.items && Array.isArray(response.data.items)) {
                 const transactions = response.data.items;
 
