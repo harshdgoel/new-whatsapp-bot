@@ -96,6 +96,7 @@ class MoneyTransferService {
 
     
 static async completePayment(userSession) {
+    console.log("entering complete payment in money transfer and user session is: ", userSession);
     const { selectedPayee, amount, selectedAccount } = userSession;
 
     // Validate required details
