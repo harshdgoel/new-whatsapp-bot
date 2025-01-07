@@ -188,6 +188,7 @@ if (match) {
     }
 
     async processIntent(userSession, intent) {
+        console.log("entering processIntent and intent is:", intent);
         if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT","TRANSFERMONEY"].includes(intent)) {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             if (!isLoggedIn) {
