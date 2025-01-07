@@ -118,7 +118,6 @@ const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, user
 if (selectedPayee) {
     userSession.selectedPayee = selectedPayee; // Save selected payee to the session
     console.log("selected payee details:", selectedPayee);
-    userSession.lastIntent = 'TRANSFERMONEY';
     return MoneyTransferService.confirmTransferAmount(userSession, selectedPayee);
 }
 }
