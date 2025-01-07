@@ -97,7 +97,6 @@ class LoginService {
                     new Map(),
                     { mobileNumber: mobileNumber }
                 );
-
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
                     const registrationId = otpResponse.data.registrationId;
                     if (!registrationId) {
