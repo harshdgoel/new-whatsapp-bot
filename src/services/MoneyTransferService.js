@@ -111,7 +111,8 @@ static async completePayment(userSession) {
     }
 
     const systemReferenceId = userSession.systemReferenceId; // Fetch from userSession
-    const paymentDate = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+   // const paymentDate = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+    const paymentDate = "2024-09-20T00:00:00";
 
     // Initialize the request body
     const requestBody = {
