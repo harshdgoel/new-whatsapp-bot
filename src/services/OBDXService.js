@@ -4,35 +4,37 @@ const URL = process.env.BASE_URL;
 const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class OBDXService {
-    populateHeaders(loginService) {
+   
+    populateHeaders(loginService, userSession) {
         const token = loginService.getToken();
         const cookie = loginService.getCookie();
-
+    
         if (!token || !cookie) {
             throw new Error("Missing token or cookie for API call.");
         }
-
-        if(userSession.authOTP !== null){
-            return {
-                Authorization: `Bearer ${token}`,
-                Cookie: cookie,
-                "Content-Type": "application/json",
-                "X-Token-Type": "JWT",
-                "X-Target-Unit": defaultHomeEntity,
-                "X-CHALLENGE_RESPONSE": "",
-            };
-        }
-        return {
+    
+        const headers = {
             Authorization: `Bearer ${token}`,
             Cookie: cookie,
             "Content-Type": "application/json",
             "X-Token-Type": "JWT",
             "X-Target-Unit": defaultHomeEntity,
         };
+    
+        // Add X-CHALLENGE_RESPONSE header if OTP is present
+        if (userSession?.authOTP) {
+            headers["X-CHALLENGE_RESPONSE"] = JSON.stringify({
+                otp: userSession.authOTP,
+                referenceNo: userSession.XTOKENREFNO,
+                authType: userSession.AUTH_TYPE,
+            });
+        }
+    
+        return headers;
     }
-
+    
     async invokeService(ctxPath, method, queryParam = {}, body = null, loginService, userSession) {
-        const headers = this.populateHeaders(loginService);
+        const headers = this.populateHeaders(loginService,userSession);
         const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
 
         try {
