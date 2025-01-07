@@ -15,6 +15,7 @@ const intents = {
 
 // Function to identify intent from message
 function identifyIntent(messageBody) {
+    console.log("entering identifyIntent in botroutes and message is:", messageBody);
     for (const [intent, keywords] of Object.entries(intents)) {
         if (keywords.some(keyword => messageBody.toLowerCase().includes(keyword))) {
             return intent;
