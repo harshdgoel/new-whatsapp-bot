@@ -36,9 +36,7 @@ class MoneyTransferService {
             LoginService
         );
 
-        console.log("Response is:", response);
         const payees = response.data.items || [];
-        console.log("Payees list is:", payees);
         userSession.payees = payees;
 
         // Map the payees to a structured format
@@ -46,9 +44,6 @@ class MoneyTransferService {
             id: payee.id,
             title: payee.nickName,
         }));
-
-        console.log("Payee rows:", rows);
-
         const channel = process.env.CHANNEL.toLowerCase();
         let templateData;
 
@@ -83,8 +78,6 @@ class MoneyTransferService {
             default:
                 throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
         }
-
-        console.log("Template data for payees list:", templateData);
         userSession.state = states.FETCHING_PAYEES;
         return TemplateLayer.generateTemplate(templateData);
     } catch (error) {
