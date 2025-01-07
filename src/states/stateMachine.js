@@ -113,21 +113,24 @@ class StateMachine {
         console.log("selected biller details:", selectedBiller);
         return BillPaymentService.confirmAmount(userSession, selectedBiller);
     }
-    
-    if (userSession.state === states.FETCHING_PAYEES) {
-        console.log("entered state fetch_payee in handle message", userSession.payees);
-const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, userSession.payees); // Parse the selected biller
-        console.log("selected payee is:", selectedPayee);
-if (selectedPayee) {
-    userSession.selectedPayee = selectedPayee; // Save selected payee to the session
-    console.log("selected payee details:", selectedPayee);
-    return MoneyTransferService.confirmTransferAmount(userSession, selectedPayee);
-}
-}
     else {
         return "Invalid selection. Please choose a valid biller from the list.";
     }
         }
+
+        if (userSession.state === states.FETCHING_PAYEES) {
+            console.log("entered state fetch_payee in handle message", userSession.payees);
+    const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, userSession.payees); // Parse the selected biller
+            console.log("selected payee is:", selectedPayee);
+    if (selectedPayee) {
+        userSession.selectedPayee = selectedPayee; // Save selected payee to the session
+        console.log("selected payee details:", selectedPayee);
+        return MoneyTransferService.confirmTransferAmount(userSession, selectedPayee);
+    }
+    else {
+        return "Invalid selection. Please choose a valid biller from the list.";
+    }
+    }
         
         
         if (userSession.state === states.OTP_VERIFICATION) {
