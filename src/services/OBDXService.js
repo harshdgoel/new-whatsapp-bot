@@ -1,26 +1,28 @@
 "use strict";
 const axios = require("axios");
-const URL = process.env.BASE_URL; 
+const URL = process.env.BASE_URL;
 const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class OBDXService {
-   
     populateHeaders(loginService, userSession) {
-        const token = loginService.getToken();
+        const token = loginService.getToken() || loginService.getAnonymousToken();
         const cookie = loginService.getCookie();
-    
-        if (!token || !cookie) {
-            throw new Error("Missing token or cookie for API call.");
+
+        if (!token) {
+            throw new Error("Missing token for API call.");
         }
-    
+
         const headers = {
             Authorization: `Bearer ${token}`,
-            Cookie: cookie,
             "Content-Type": "application/json",
             "X-Token-Type": "JWT",
             "X-Target-Unit": defaultHomeEntity,
         };
-    
+
+        if (cookie) {
+            headers.Cookie = cookie;
+        }
+
         // Add X-CHALLENGE_RESPONSE header if OTP is present
         if (userSession?.authOTP) {
             headers["X-CHALLENGE_RESPONSE"] = JSON.stringify({
@@ -29,12 +31,12 @@ class OBDXService {
                 authType: userSession.AUTH_TYPE,
             });
         }
-    
+
         return headers;
     }
-    
+
     async invokeService(ctxPath, method, queryParam = {}, body = null, loginService, userSession) {
-        const headers = this.populateHeaders(loginService,userSession);
+        const headers = this.populateHeaders(loginService, userSession);
         const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
 
         try {
@@ -61,7 +63,6 @@ class OBDXService {
                 userSession.IS_OTP_REQUIRED = true;
                 userSession.AUTH_TYPE = authType;
                 userSession.XTOKENREFNO = refNo;
-                userSession.state = states.ACCOUNT_SELECTION;
 
                 if (authType === "OTP") {
                     return "Please enter the One Time Password (OTP) sent to your registered number.";
@@ -74,9 +75,10 @@ class OBDXService {
                 userSession.IS_OTP_REQUIRED = false;
                 throw new Error("Maximum OTP attempts exceeded. Please try again later.");
             } else if ([400, 403, 500].includes(statusCode)) {
-                const errorMessage = data?.message?.validationError?.[0]?.errorMessage || 
-                                     data?.message?.detail || 
-                                     "Unknown error.";
+                const errorMessage =
+                    data?.message?.validationError?.[0]?.errorMessage ||
+                    data?.message?.detail ||
+                    "Unknown error.";
                 throw new Error(`Network Error: ${errorMessage}`);
             } else {
                 throw new Error(`Unexpected error occurred: ${statusCode || "Unknown status"}`);
