@@ -187,6 +187,11 @@ if (match) {
           
         console.log("now calling process intent and intent is: ", intent);
         console.log("now calling process intent and usersession is", userSession);
+       
+        //trial if condn to be removed later
+        if(intent === "UNKNOWN"){
+            intent = userSession.lastIntent;
+        }
         return await this.processIntent(userSession, intent);
     }
 
