@@ -53,6 +53,7 @@ class StateMachine {
             amount: null,
             currency: null,
             selectedBiller: null,
+            selectedPayee: null,
             selectedAccount: null,
             isHelpTriggered: false,
             currentHelpPage: 1,
