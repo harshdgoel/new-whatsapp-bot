@@ -190,22 +190,21 @@ static async completePayment(userSession) {
     
     static parsePayeeSelection(payeeNickName, payees) {
         console.log("Parsing selected payee");
-        // if (!Array.isArray(payees) || payees.length === 0) {
-        //     console.error("Payees list is empty or invalid");
-        //     return null;
-        // }
+        if (!Array.isArray(payees) || payees.length === 0) {
+            console.error("Payees list is empty or invalid");
+            return null;
+        }
     
-        // const selectedPayee = payees.find(
-        //     payee => payee.nickName.toLowerCase() === payeeNickName.toLowerCase()
-        // );
+        const selectedPayee = payees.find(
+            payee => payee.nickName.toLowerCase() === payeeNickName.toLowerCase()
+        );
     
-        // if (!selectedPayee) {
-        //     console.warn(`Payee with nickname "${payeeNickName}" not found.`);
-        //     return null;
-        // }
+        if (!selectedPayee) {
+            console.warn(`Payee with nickname "${payeeNickName}" not found.`);
+            return null;
+        }
     
-        // return selectedPayee;
-        return "MANGO"
+        return selectedPayee;
     }
     
 }
