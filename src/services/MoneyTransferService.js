@@ -125,8 +125,8 @@ static async completePayment(userSession) {
             amount: amount,
         },
         debitAccountId: {
-            displayValue: selectedAccount.displayValue,
-            value: selectedAccount.value,
+            displayValue: selectedAccount.id.displayValue,
+            value: selectedAccount.id.value,
         },
         paymentDate,
         remarks: "Chatbot",
