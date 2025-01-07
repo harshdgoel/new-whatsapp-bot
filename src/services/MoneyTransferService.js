@@ -99,19 +99,20 @@ static async completePayment(userSession) {
     console.log("entering complete payment in money transfer and user session is: ", userSession);
     const { selectedPayee, amount, selectedAccount } = userSession;
 
-    // Validate required details
     if (!selectedPayee || !amount || !selectedAccount) {
         return "Missing details. Please select a payee, account, and enter an amount.";
     }
 
-    // Generate systemReferenceId if not already in userSession
     if (!userSession.systemReferenceId) {
-        const randomValue = Math.floor(Math.random() * 100000000000000); // Equivalent to SecureRandom
+        const randomValue = Math.floor(Math.random() * 100000000000000);
         userSession.systemReferenceId = `PC${String(randomValue).padStart(16, "0")}`;
     }
 
-    const systemReferenceId = userSession.systemReferenceId; // Fetch from userSession
-    const paymentDate = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+    const systemReferenceId = userSession.systemReferenceId;
+     // Format the payment date
+     const currentDate = new Date();
+     const paymentDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}T00:00:00`;
+ 
 
     // Initialize the request body
     const requestBody = {

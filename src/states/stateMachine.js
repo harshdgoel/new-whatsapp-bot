@@ -46,6 +46,7 @@ class StateMachine {
             state: states.HELP,
             lastIntent: null,
             otp: null,
+            authOTP: null,
             mobileNumber: null,
             accounts: null,
             billers: null,
@@ -57,6 +58,9 @@ class StateMachine {
             selectedAccount: null,
             isHelpTriggered: false,
             currentHelpPage: 1,
+            IS_OTP_REQUIRED: null,
+            AUTH_TYPE: null,
+            XTOKENREFNO: null
         };
         this.sessionCache.set(userId, newSession);
     }
@@ -301,12 +305,14 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
     }
 
     async handleAccountSelection(userSession, messageBody) {
+        const selectedAccount = null;
         console.log("entering handleAccountSelection");
-        const selectedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+        if(!userSession.selectedAccount){
+       selectedAccount  = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+       userSession.selectedAccount = selectedAccount;
+        }
         console.log("selected account is:",selectedAccount);
-        if (selectedAccount) {
-            userSession.selectedAccount = selectedAccount;
-
+        if (selectedAccount || userSession.selectedAccount) {
             if (userSession.lastIntent === "BALANCE") {
                 const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount,userSession);
                 return balanceMessage;
@@ -332,6 +338,9 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             else if (userSession.lastIntent === "TRANSFERMONEY") {
                 console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
                 console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
+                if(userSession.XTOKENREFNO !== null){
+                    userSession.authOTP = messageBody;
+                }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;

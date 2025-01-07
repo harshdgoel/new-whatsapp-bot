@@ -1,10 +1,9 @@
 "use strict";
 const axios = require("axios");
-const URL = process.env.BASE_URL; // Use the correct key from config
+const URL = process.env.BASE_URL; 
 const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class OBDXService {
-    // Constructs and returns headers for API calls
     populateHeaders(loginService) {
         const token = loginService.getToken();
         const cookie = loginService.getCookie();
@@ -13,38 +12,73 @@ class OBDXService {
             throw new Error("Missing token or cookie for API call.");
         }
 
-        return new Map([
-            ["Authorization", `Bearer ${token}`],
-            ["Cookie", cookie],
-            ["Content-Type", "application/json"],
-            ["X-Token-Type", "JWT"],
-            ["X-Target-Unit", defaultHomeEntity]
-        ]);
+        if(userSession.authOTP !== null){
+            return {
+                Authorization: `Bearer ${token}`,
+                Cookie: cookie,
+                "Content-Type": "application/json",
+                "X-Token-Type": "JWT",
+                "X-Target-Unit": defaultHomeEntity,
+                "X-CHALLENGE_RESPONSE": "",
+            };
+        }
+        return {
+            Authorization: `Bearer ${token}`,
+            Cookie: cookie,
+            "Content-Type": "application/json",
+            "X-Token-Type": "JWT",
+            "X-Target-Unit": defaultHomeEntity,
+        };
     }
 
-    // Main method to invoke services
-    async invokeService(ctxPath, method, queryParam, body, loginService) {
+    async invokeService(ctxPath, method, queryParam = {}, body = null, loginService, userSession) {
         const headers = this.populateHeaders(loginService);
-        const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
-        return responseData;
-    }
+        const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
 
-    // Helper method to make the API call
-    async serviceMeth(ctxPath, method, headers, queryParam, body) {
-        const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
-        const headersObj = Object.fromEntries(headers);
         try {
             const response = await axios({
                 url,
                 method,
-                headers: headersObj,
-                data: body
+                headers,
+                data: body,
             });
 
-            return response;
+            if ([200, 201, 202].includes(response.status)) {
+                return response.data;
+            }
         } catch (error) {
-            console.error("Service request failed:", error.message);
-            throw error; // Rethrow error to be handled by caller
+            const statusCode = error.response?.status;
+            const headers = error.response?.headers || {};
+            const data = error.response?.data || {};
+
+            if (statusCode === 417) {
+                const challenge = headers["x-challenge"] ? JSON.parse(headers["x-challenge"]) : {};
+                const authType = challenge.authType || "UNKNOWN";
+                const refNo = challenge.referenceNo || null;
+
+                userSession.IS_OTP_REQUIRED = true;
+                userSession.AUTH_TYPE = authType;
+                userSession.XTOKENREFNO = refNo;
+                userSession.state = states.ACCOUNT_SELECTION;
+
+                if (authType === "OTP") {
+                    return "Please enter the One Time Password (OTP) sent to your registered number.";
+                } else if (authType === "TOTP") {
+                    return "Please enter your Time-based One Time Password (TOTP).";
+                } else {
+                    return `Please enter the HOPT code: ${challenge.randomNumber}`;
+                }
+            } else if (statusCode === 412) {
+                userSession.IS_OTP_REQUIRED = false;
+                throw new Error("Maximum OTP attempts exceeded. Please try again later.");
+            } else if ([400, 403, 500].includes(statusCode)) {
+                const errorMessage = data?.message?.validationError?.[0]?.errorMessage || 
+                                     data?.message?.detail || 
+                                     "Unknown error.";
+                throw new Error(`Network Error: ${errorMessage}`);
+            } else {
+                throw new Error(`Unexpected error occurred: ${statusCode || "Unknown status"}`);
+            }
         }
     }
 }
