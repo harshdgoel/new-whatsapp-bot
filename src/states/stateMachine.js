@@ -184,7 +184,8 @@ if (match) {
             }
           }
           
-
+        console.log("now calling process intent and intent is: ", intent);
+        console.log("now calling process intent and usersession is", userSession);
         return await this.processIntent(userSession, intent);
     }
 
