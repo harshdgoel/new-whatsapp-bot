@@ -1,3 +1,5 @@
+
+
 "use strict";
 const axios = require("axios");
 const URL = process.env.BASE_URL; 
@@ -35,6 +37,11 @@ class OBDXService {
     
     async invokeService(ctxPath, method, queryParam = {}, body = null, loginService, userSession) {
         const headers = this.populateHeaders(loginService,userSession);
+        const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body,userSession);
+        return responseData;}
+
+    async serviceMeth(ctxPath, method, headers, queryParam, body,userSession) {
+
         const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
 
         try {
@@ -81,8 +88,9 @@ class OBDXService {
             } else {
                 throw new Error(`Unexpected error occurred: ${statusCode || "Unknown status"}`);
             }
-        }
+        }        
     }
+
 }
 
 module.exports = new OBDXService();

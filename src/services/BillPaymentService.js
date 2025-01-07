@@ -30,7 +30,8 @@ class BillPaymentService {
                 "GET",
                 queryParams,
                 {}, // No body needed for GET request
-                LoginService
+                LoginService,
+                userSession
             );
 
             console.log("Response is:", response);
@@ -155,7 +156,8 @@ class BillPaymentService {
                 "POST",
                 queryParams,
                 requestBody,
-                LoginService
+                LoginService,
+                userSession
             );
 
             console.log("Payment response:", response);

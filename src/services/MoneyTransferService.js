@@ -33,7 +33,8 @@ class MoneyTransferService {
             "GET",
             queryParams,
             {}, // No body needed for GET request
-            LoginService
+            LoginService,
+            userSession
         );
 
         const payees = response.data.items || [];
@@ -181,7 +182,8 @@ static async completePayment(userSession) {
             "POST",
             new Map([["locale", "en"]]),
             requestBody,
-            LoginService
+            LoginService,
+            userSession
         );
 
         if (response && response.status === "SUCCESS") {

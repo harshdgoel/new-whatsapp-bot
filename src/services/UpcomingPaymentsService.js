@@ -41,7 +41,8 @@ class UpcomingPaymentsService {
                 "GET",
                 queryParams,
                 {},
-                LoginService
+                LoginService,
+                userSession
             );
 
 

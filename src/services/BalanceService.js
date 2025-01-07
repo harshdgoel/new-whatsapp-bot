@@ -19,7 +19,8 @@ class BalanceService {
         "GET",
         queryParams,
         {}, // No body needed for GET request
-        LoginService
+        LoginService,
+        userSession
       );
 
 

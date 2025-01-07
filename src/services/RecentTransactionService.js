@@ -23,7 +23,7 @@ class RecentTransactionService {
         const endpointUrl = `${endpoints.transactions}/${selectedAccount.id.value}/transactions`;
 
         try {
-            const response = await OBDXService.invokeService(endpointUrl, "GET", queryParams, {}, LoginService);
+            const response = await OBDXService.invokeService(endpointUrl, "GET", queryParams, {}, LoginService,userSession);
 
             console.log("respnse for RECENT TRANSACTIONS IS:", response);
 
