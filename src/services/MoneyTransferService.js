@@ -101,93 +101,100 @@ class MoneyTransferService {
         return "Enter the amount to be paid.";
     }
 
-    static async completePayment(userSession) {
-        const { selectedPayee, amount, selectedAccount } = userSession;
+    
+static async completePayment(userSession) {
+    const { selectedPayee, amount, selectedAccount } = userSession;
 
-        if (!selectedPayee || !amount || !selectedAccount) {
-            return "Missing details. Please select a payee, account, and enter an amount.";
-        }
-
-        const payeeType = selectedPayee.payeeType.toUpperCase();
-        let requestBody;
-
-        if (payeeType === "DOMESTIC") {
-            requestBody = {
-                partyId: {
-                    displayValue: null,
-                    value: null,
-                },
-                amount: {
-                    currency: "USD",
-                    amount: amount,
-                },
-                debitAccountId: {
-                    displayValue: selectedAccount.displayValue,
-                    value: selectedAccount.value,
-                },
-                paymentDate: new Date().toISOString().split("T")[0],
-                payee: {
-                    id: selectedPayee.id,
-                    payeeType: "DOMESTIC",
-                    nickName: selectedPayee.nickName,
-                },
-                currencyOfTransfer: "USD",
-                remarks: "Chatbot Transfer",
-            };
-        } else if (payeeType === "INTERNAL") {
-            requestBody = {
-                partyId: {
-                    displayValue: null,
-                    value: null,
-                },
-                amount: {
-                    currency: "USD",
-                    amount: amount,
-                },
-                paymentDate: new Date().toISOString().split("T")[0],
-                debitAccountId: {
-                    displayValue: selectedAccount.displayValue,
-                    value: selectedAccount.value,
-                },
-                payee: {
-                    id: selectedPayee.id,
-                    payeeType: "INTERNAL",
-                    nickName: selectedPayee.nickName,
-                },
-                currencyOfTransfer: "USD",
-                remarks: "Chatbot Transfer",
-                paymentType: "INTERNAL",
-                beneficiary: [
-                    {
-                        creditAccountId: selectedPayee.creditAccountId,
-                        beneficiaryName: selectedPayee.nickName,
-                    },
-                ],
-            };
-        } else {
-            return "Unsupported payee type.";
-        }
-
-        try {
-            const response = await OBDXService.invokeService(
-                endpoints.moneyTransfer,
-                "POST",
-                new Map([["locale", "en"]]),
-                requestBody,
-                LoginService
-            );
-
-            if (response && response.status === "SUCCESS") {
-                return `Transfer successful! Reference Number: ${response.referenceNumber}`;
-            } else {
-                return "Transfer failed. Please try again.";
-            }
-        } catch (error) {
-            console.error("Error completing payment:", error.message);
-            return "An error occurred during the transfer. Please try again later.";
-        }
+    // Validate required details
+    if (!selectedPayee || !amount || !selectedAccount) {
+        return "Missing details. Please select a payee, account, and enter an amount.";
     }
 
+    // Generate systemReferenceId if not already in userSession
+    if (!userSession.systemReferenceId) {
+        const randomValue = Math.floor(Math.random() * 100000000000000); // Equivalent to SecureRandom
+        userSession.systemReferenceId = `PC${String(randomValue).padStart(16, "0")}`;
+    }
+
+    const systemReferenceId = userSession.systemReferenceId; // Fetch from userSession
+    const paymentDate = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+
+    // Initialize the request body
+    const requestBody = {
+        systemReferenceId,
+        partyId: {
+            displayValue: null,
+            value: null,
+        },
+        amount: {
+            currency: selectedPayee.currency || "EUR", // Use currency from payee or default to EUR
+            amount: amount,
+        },
+        debitAccountId: {
+            displayValue: selectedAccount.displayValue,
+            value: selectedAccount.value,
+        },
+        paymentDate,
+        remarks: "Chatbot",
+        payee: {
+            id: selectedPayee.id,
+            payeeType: selectedPayee.payeeType.toUpperCase(),
+            nickName: selectedPayee.nickName,
+        },
+    };
+
+    // Handle different payee types
+    if (selectedPayee.payeeType.toUpperCase() === "INTERNAL") {
+        requestBody.paymentType = "INTERNAL";
+        requestBody.network = "INTERNAL";
+        requestBody.beneficiary = [
+            {
+                creditAccountId: selectedPayee.accountNumber,
+                beneficiaryName: selectedPayee.accountName,
+            },
+        ];
+        requestBody.currencyOfTransfer = selectedPayee.currency || "GBP"; // Default for INTERNAL is GBP
+    } else if (selectedPayee.payeeType.toUpperCase() === "GENERICDOMESTIC") {
+        requestBody.paymentType = "DOMESTIC";
+        requestBody.network = selectedPayee.network || "SEPACREDIT"; // Default network for DOMESTIC
+        requestBody.beneficiary = [
+            {
+                creditAccountId: selectedPayee.accountNumber,
+                beneficiaryName: selectedPayee.accountName,
+                payeeEmail: selectedPayee.payeeEmail,
+                beneficiaryBankDetails: [
+                    {
+                        bic2: selectedPayee.bankDetails?.code || null, // Fetch BIC if available
+                    },
+                ],
+            },
+        ];
+        requestBody.currencyOfTransfer = null; // No transfer currency for DOMESTIC
+        requestBody.purpose = "STO"; // Static purpose for DOMESTIC
+    }
+
+    // Make the service call
+    try {
+        const response = await OBDXService.invokeService(
+            endpoints.moneyTransfer,
+            "POST",
+            new Map([["locale", "en"]]),
+            requestBody,
+            LoginService
+        );
+
+        if (response && response.status === "SUCCESS") {
+            return `Transfer successful! Reference Number: ${response.referenceNumber}`;
+        } else {
+            return "Transfer failed. Please try again.";
+        }
+    } catch (error) {
+        console.error("Error completing payment:", error.message);
+        return "An error occurred during the transfer. Please try again later.";
+    }
+}
+
+    
     static parsePayeeSelection(payeeNickName, payees) {
         console.log("Parsing selected payee:", payeeNickName);
         if (!Array.isArray(payees) || payees.length === 0) {
