@@ -185,8 +185,8 @@ static async completePayment(userSession) {
         );
 
         console.log("response is:",response);
-        if (response && response.status === "SUCCESS") {
-            return `Transfer successful! Reference Number: ${response.referenceNumber}`;
+        if (response && response.data.status.result === "SUCCESSFUL") {
+            return `Transfer successful! Reference Number: ${response.data.status.referenceNumber}`;
         } else {
             return "Transfer failed. Please try again.";
         }
