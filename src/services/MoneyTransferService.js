@@ -130,11 +130,6 @@ static async completePayment(userSession) {
         },
         paymentDate,
         remarks: "Chatbot",
-        payee: {
-            id: selectedPayee.id,
-            payeeType: selectedPayee.payeeType.toUpperCase(),
-            nickName: selectedPayee.nickName,
-        },
     };
 
     // Handle different payee types
@@ -147,6 +142,11 @@ static async completePayment(userSession) {
                 beneficiaryName: selectedPayee.accountName,
             },
         ];
+        requestBody.payee = {
+            id: selectedPayee.id,
+            payeeType: "INTERNAL",
+            nickName: selectedPayee.nickName,
+        };
         requestBody.currencyOfTransfer = selectedPayee.currency || "GBP"; // Default for INTERNAL is GBP
     } else if (selectedPayee.payeeType.toUpperCase() === "GENERICDOMESTIC") {
         requestBody.paymentType = "DOMESTIC";
@@ -163,6 +163,11 @@ static async completePayment(userSession) {
                 ],
             },
         ];
+          requestBody.payee = {
+            id: selectedPayee.id,
+            payeeType: "DOMESTIC",
+            nickName: selectedPayee.nickName,
+        };
         requestBody.currencyOfTransfer = null; // No transfer currency for DOMESTIC
         requestBody.purpose = "STO"; // Static purpose for DOMESTIC
     }
