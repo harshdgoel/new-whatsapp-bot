@@ -66,6 +66,8 @@ class StateMachine {
     async handleMessage(from, messageBody, intent) {
         const userSession = this.getSession(from);
         console.log("entering handle message and state is:", userSession.state);
+        console.log("entering handle message is:", messageBody);
+
 
         if ( !userSession.isHelpTriggered && 
     userSession.state === states.HELP) {
@@ -113,8 +115,9 @@ class StateMachine {
     }
     
     if (userSession.state === states.FETCHING_PAYEES) {
-        console.log("entered state fetch_payee in handle message");
+        console.log("entered state fetch_payee in handle message", userSession.payees);
 const selectedPayee = MoneyTransferService.parsePayeeSelection(messageBody, userSession.payees); // Parse the selected biller
+        console.log("selected payee is:", selectedPayee);
 if (selectedPayee) {
     userSession.selectedPayee = selectedPayee; // Save selected payee to the session
     console.log("selected payee details:", selectedPayee);
