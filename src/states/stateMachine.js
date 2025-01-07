@@ -184,16 +184,7 @@ if (match) {
               return 'Invalid response. Please reply with "Yes" or "No".';
             }
           }
-          
-      
-       
-        //trial if condn to be removed later
-        if(intent === "UNKNOWN"){
-            intent = userSession.lastIntent;
-        }
-
-//trial ends
-          console.log("now calling process intent and intent is: ", intent);
+        console.log("now calling process intent and intent is: ", intent);
         console.log("now calling process intent and usersession is", userSession);
         return await this.processIntent(userSession, intent);
     }
