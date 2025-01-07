@@ -18,6 +18,7 @@ class IntentService {
     }
 
     identifyIntentFromHelpSelection(message) {
+        console.log("entering identifyIntentFromHelpSelection and message is :", message);
         const normalizedMessage = message.toLowerCase().trim();
         for (const [intent, examples] of Object.entries(this.intents)) {
             if (examples.some(example => normalizedMessage === example)) {
