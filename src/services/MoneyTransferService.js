@@ -196,7 +196,7 @@ static async completePayment(userSession) {
 
     
     static parsePayeeSelection(payeeNickName, payees) {
-        console.log("Parsing selected payee:", payeeNickName);
+        console.log("Parsing selected payee");
         if (!Array.isArray(payees) || payees.length === 0) {
             console.error("Payees list is empty or invalid");
             return null;
