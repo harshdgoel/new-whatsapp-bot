@@ -35,44 +35,6 @@ class LoginService {
         this.authCache = { token: null, cookie: null, anonymousToken: null };
     }
 
-    isTokenExpired() {
-        const token = this.getToken();
-        if (!token) return true;
-        try {
-            const payloadBase64 = token.split(".")[1];
-            const decodedPayload = JSON.parse(Buffer.from(payloadBase64, "base64").toString("utf-8"));
-            const exp = decodedPayload.exp;
-            if (!exp) {
-                this.clearAuthCache();
-                return true;
-            }
-
-            const isExpired = Date.now() >= exp * 1000;
-            if (isExpired) {
-                this.clearAuthCache();
-            }
-
-            return isExpired;
-        } catch (error) {
-            console.error("Error decoding token:", error.message);
-            this.clearAuthCache();
-            return true;
-        }
-    }
-
-    async checkLogin() {
-        const token = this.getToken();
-        const cookie = this.getCookie();
-        if (!token || !cookie) {
-            return false;
-        }
-
-        if (this.isTokenExpired()) {
-            return false;
-        }
-        return true;
-    }
-
     async verifyOTP(otp, mobileNumber) {
         console.log("Mobile number is:", mobileNumber);
         try {
@@ -88,10 +50,6 @@ class LoginService {
 
             if (tokenResponse) {
                 this.setAnonymousToken(tokenResponse.token);
-                const setCookie = tokenResponse.headers["set-cookie"];
-                if (setCookie) {
-                    this.authCache.cookie = setCookie.join("; ");
-                }
 
                 // Step 2: Verify OTP
                 const otpResponse = await OBDXService.invokeService(
@@ -130,14 +88,9 @@ class LoginService {
                     const setCookieFinal = finalLoginResponse.headers["set-cookie"];
                     if (setCookieFinal) {
                         this.authCache.cookie = setCookieFinal.join("; ");
-                    } else {
-                        console.error("Cookie setting failed in final login.");
-                        return "Final login failed. Please try again.";
                     }
                     this.setAuthDetails(finalLoginResponse.token, this.getCookie());
 
-                    // Fetch user details after login
-                    const userDetails = await this.fetchUserDetails();
                     return true;
                 } else {
                     console.error("OTP verification failed:", otpResponse);
@@ -151,18 +104,6 @@ class LoginService {
             console.error("Error during login process:", error.message);
             return "An error occurred during verification. Please try again.";
         }
-    }
-
-    async fetchUserDetails() {
-        const response = await OBDXService.invokeService(
-            endpoints.me,
-            "GET",
-            { locale: "en" },
-            null,
-            this,
-            {}
-        );
-        return response;
     }
 }
 
