@@ -55,12 +55,12 @@ console.log("respose is:", response);
     const topAccounts = validAccounts.slice(0, 10);
 
     // Generate rows for the top 10 accounts
-    const rows = topAccounts.map((account, index) => ({
+    const acc_rows = topAccounts.map((account, index) => ({
         id:  account.id?.displayValue || `Account ${index + 1}`,
         title: account.id?.displayValue || `Account ${index + 1}`, 
     }));
 
-    if (rows.length === 0) {
+    if (acc_rows.length === 0) {
         throw new Error("No accounts available for WhatsApp template.");
     }
 
@@ -68,7 +68,7 @@ console.log("respose is:", response);
         type: "list",
         sections: [
             {
-                rows, // Include rows for WhatsApp list
+                acc_rows, // Include rows for WhatsApp list
             },
         ],
         bodyText: "Please select an account to view details.",
