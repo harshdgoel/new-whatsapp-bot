@@ -42,19 +42,23 @@ class HelpMeService {
                             title: row.title,
                         })));
             switch (channel.toLowerCase()) {
-                case "whatsapp":
-                    templateData = {
-                        type: "list",
-                        sections: rows.map(row => ({
-                            id: row.id,
-                            title: row.title,
-                        })),
-                        bodyText: "How can I assist you today? Please select an option:",
-                        buttonText: "Help Options",
-                        channel,
-                        to: "917249318604",
-                    };
-                    break;
+                 case "whatsapp":
+        templateData = {
+            type: "list",
+            sections: [
+                {
+                    rows: rows.map(row => ({
+                        id: row.id,
+                        title: row.title,
+                    })),
+                },
+            ],
+            bodyText: "How can I assist you today? Please select an option:",
+            buttonText: "Help Options",
+            channel,
+            to: "917249318604",
+        };
+        break;
 
                 case "facebook":
                     templateData = {bodyText: `Here's what I can help you with:
