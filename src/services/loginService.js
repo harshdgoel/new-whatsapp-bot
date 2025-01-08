@@ -84,7 +84,22 @@ class LoginService {
                 //     this.authCache.cookie = setCookie;
                 // }
             console.log("THE SAVED  tokenresponse is:", this.getAnonymousToken());
-
+console.log("response:",OBDXService.serviceMeth(
+                    endpoints.login,
+                    "POST",
+                    new Map([
+                        ["Content-Type", "application/json"],
+                        ["x-digx-authentication-type", "CHATBOT"],
+                        ["TOKEN_ID", otp],
+                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                        ["X-Token-Type", "JWT"],
+                        ["X-Target-Unit", defaultHomeEntity]
+                    ]),
+                    new Map(),
+                    { mobileNumber: mobileNumber },
+                    {}
+                ));
+                
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
                     "POST",
