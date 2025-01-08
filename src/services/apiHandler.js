@@ -11,6 +11,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
         }
 
         if (channel === "whatsapp") {
+            console.log("message is", message);
             // WhatsApp-specific message formatting
             if (message.type === "interactive") {
                 responseData = message;
