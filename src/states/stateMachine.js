@@ -298,7 +298,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
        const loginResult = await LoginService.fetchFinalLoginResponse(otp,userSession.mobileNumber,userSession.registrationId);
        console.log("login result is:", loginResult);
-        if (loginResult.status === true) {
+        if (loginResult.success === true) {
             userSession.state = states.LOGGED_IN;
             return this.handleIntentAfterLogin(userSession);
         } else {
