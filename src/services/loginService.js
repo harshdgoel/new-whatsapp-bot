@@ -75,6 +75,7 @@ class LoginService {
                 new Map(),
                 {}
             );
+            console.log("first call success and tokenresponse is:", tokenResponse);
 
             if (tokenResponse) {
                 this.setAnonymousToken(tokenResponse.headers.authorization);
@@ -97,6 +98,9 @@ class LoginService {
                     new Map(),
                     { mobileNumber: mobileNumber }
                 );
+            console.log(" second call success and otpresponse is:", otpResponse);
+
+                
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
                     const registrationId = otpResponse.data.registrationId;
                     if (!registrationId) {
