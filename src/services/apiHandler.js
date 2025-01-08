@@ -70,6 +70,17 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 };
             }
 
+            
+            else if (message.bodyText){
+
+                  responseData = {
+                    messaging_type: "MESSAGE_TAG",
+                    recipient: { id: to },
+                    message: { text: message.bodyText },
+                    tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
+                };
+            }
+
             const response = await sendToFacebookAPI(responseData);
         } else {
             throw new Error("Unsupported channel specified.");
