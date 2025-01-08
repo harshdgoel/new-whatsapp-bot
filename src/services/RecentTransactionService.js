@@ -30,6 +30,7 @@ class RecentTransactionService {
             if (response.data && response.data.items && Array.isArray(response.data.items)) {
                 const transactions = response.data.items;
 
+                console.log("transactions are:", transactions);
                 // Prepare text for WhatsApp/Facebook
                 let bodyText = "*Here are your Recent Transactions:*\n";
                 transactions.forEach((transaction, index) => {
@@ -51,6 +52,7 @@ class RecentTransactionService {
                     bodyText += `~ ~ ~ ~ ~ ~ ~ ~\n\n`;
                 });
                 let templateData;
+                console.log("bodyText is:",bodyText);
                 // Select channel template structure based on config
                 switch (process.env.CHANNEL.toLowerCase()) {
                     case "whatsapp":
