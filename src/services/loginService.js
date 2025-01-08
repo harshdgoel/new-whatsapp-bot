@@ -167,7 +167,7 @@ async fetchFinalLoginResponse(otp, mobileNumber, registrationId) {
                 ["X-Target-Unit", defaultHomeEntity]
             ]),
             queryParams,
-            { mobileNumber: mobileNumber, registrationId }
+            { mobileNumber: mobileNumber, registrationId: registrationId }
         );
 
         const setCookieFinal = finalLoginResponse.headers['set-cookie'];
@@ -188,14 +188,6 @@ async fetchFinalLoginResponse(otp, mobileNumber, registrationId) {
         return { success: false, error: "Error during final login. Please try again." };
     }
 }
-
-
-
-
-
-
-
-
     async fetchUserDetails() {
         const headers = new Map([
             ["Authorization", `Bearer ${this.getToken()}`],
