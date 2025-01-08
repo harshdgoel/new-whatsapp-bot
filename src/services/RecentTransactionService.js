@@ -73,6 +73,8 @@ class RecentTransactionService {
                     default:
                         throw new Error("Unsupported channel type");
                 }
+
+                console.log("templatedata is:",templateData);
                 // Pass template data to TemplateLayer
                 return templateData;
 
