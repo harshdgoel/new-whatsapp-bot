@@ -28,6 +28,7 @@ class OBDXService {
                 authType: userSession.AUTH_TYPE,
             });
         }
+        return headers;
     }
 
     // Main method to invoke services
