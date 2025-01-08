@@ -53,27 +53,19 @@ class HelpMeService {
                     break;
 
                 case "facebook":
-                    templateData = {
-                        bodyText: `
-                        Here's what I can help you with:
-                        - View account balances
-                        - Bill Payment
-                        - Money Transfer
-                        - Find a bank branch or ATM
-                        - View recent transactions
-                        - Inquire your spends
-                        - Know your upcoming payments
-                        - Inquire your dues on credit card
-                        - Inquire about credit card limit
-                        - Inquire your outstanding balance on loan account
-                        - Inquire about next installment date and amount
-                        - Get more information about banking products and services offered by Futura Bank
-                        - New Account Opening info
-                        - Open Term Deposit
-                        - Finance Inquiry
-                        - Block/Unblock Debit/Credit Cards
-                        
-                        You can type your questions, but using my quick reply and menu navigation is sometimes more reliable. Who likes typing anyway?
+                    templateData = {bodyText: `Here's what I can help you with:
+- View account balances
+- Bill Payment
+- Money Transfer
+- View recent transactions
+- Inquire your spends
+- Know your upcoming payments
+- Inquire your dues on credit card
+- Inquire about credit card limit
+- Inquire your outstanding balance on loan account
+- Inquire about next installment date and amount
+- Get more information about banking products and services offered by Futura Bank
+You can type your questions, but using my quick reply and menu navigation is sometimes more reliable. Who likes typing anyway?
                                                 `.trim(),
                         sections: rows.map(row => ({
                             content_type: "text",
