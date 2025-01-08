@@ -50,11 +50,11 @@ class MoneyTransferService {
 
         switch (channel) {
             case "whatsapp":
-                const limitedRows = rows.slice(0, 10);
+                const limitrows = rows.slice(0, 10);
 
                 templateData = {
                     type: "list",
-                    sections: limitedRows.map((row) => ({
+                    sections: limitrows.map((row) => ({
                         id: row.id,
                         title: row.title,
                     })),
