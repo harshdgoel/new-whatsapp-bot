@@ -336,12 +336,15 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
     // Perform actions based on the last intent
     if (userSession.selectedAccount) {
         switch (userSession.lastIntent) {
+                //for genai use case
+            // case "BALANCE":
+            //     return await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
+
             case "BALANCE":
-                //extra added
+                const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
                  userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
-                //till here
-                return await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
+                return balanceMessage;
 
             case "TRANSACTIONS":
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(userSession.selectedAccount);
