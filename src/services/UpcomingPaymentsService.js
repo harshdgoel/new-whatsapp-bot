@@ -79,7 +79,7 @@ class UpcomingPaymentsService {
                             type: "text",
                             bodyText: bodyText,
                             channel: process.env.CHANNEL,
-                            to: userSession.channelId // WhatsApp number here
+                            to: "917249318604" // WhatsApp number here
                         };
                         break;
 
@@ -91,7 +91,7 @@ class UpcomingPaymentsService {
                 }
 
                 // Pass template data to TemplateLayer
-                return TemplateLayer.generateTemplate(templateData);
+                return templateData;
             } else {
                 throw new Error("No transaction data found in the response.");
             }
