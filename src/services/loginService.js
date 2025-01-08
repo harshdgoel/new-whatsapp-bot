@@ -75,31 +75,14 @@ class LoginService {
                 new Map(),
                 {}
             );
-            console.log("first call success and tokenresponse is:", tokenResponse);
 
             if (tokenResponse) {
-                this.setAnonymousToken(tokenResponse.token);
-                // const setCookie = tokenResponse.headers['set-cookie'];
-                // if (setCookie) {
-                //     this.authCache.cookie = setCookie;
-                // }
-            console.log("THE SAVED  tokenresponse is:", this.getAnonymousToken());
-console.log("response:",OBDXService.serviceMeth(
-                    endpoints.login,
-                    "POST",
-                    new Map([
-                        ["Content-Type", "application/json"],
-                        ["x-digx-authentication-type", "CHATBOT"],
-                        ["TOKEN_ID", otp],
-                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
-                        ["X-Token-Type", "JWT"],
-                        ["X-Target-Unit", defaultHomeEntity]
-                    ]),
-                    new Map(),
-                    { mobileNumber: mobileNumber },
-                    {}
-                ));
-                
+                this.setAnonymousToken(tokenResponse.headers.authorization);
+                const setCookie = tokenResponse.headers['set-cookie'];
+                if (setCookie) {
+                    this.authCache.cookie = setCookie;
+                }
+
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
                     "POST",
@@ -112,12 +95,9 @@ console.log("response:",OBDXService.serviceMeth(
                         ["X-Target-Unit", defaultHomeEntity]
                     ]),
                     new Map(),
-                    { mobileNumber: mobileNumber },
-                    {}
+                    { mobileNumber: mobileNumber }
                 );
-            console.log(" second call success and otpresponse is:", otpResponse);
 
-                
                 if (otpResponse.data.status.result === "SUCCESSFUL") {
                     const registrationId = otpResponse.data.registrationId;
                     if (!registrationId) {
@@ -138,11 +118,8 @@ console.log("response:",OBDXService.serviceMeth(
                             ["X-Target-Unit", defaultHomeEntity]
                         ]),
                         queryParams,
-                        { mobileNumber: mobileNumber, registrationId: this.registrationId },
-                        {}
+                        { mobileNumber: mobileNumber, registrationId: this.registrationId }
                     );
-                    
-            console.log(" second call success and loginresponse is:", finalLoginResponse);
 
                     const setCookieFinal = finalLoginResponse.headers['set-cookie'];
                     if (setCookieFinal) {
