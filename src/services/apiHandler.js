@@ -75,7 +75,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 let messageText = message.bodyText;
 
                 // If the message is too long, truncate it
-                if (messageText.length > MAX_MESSAGE_LENGTH) {
+                if (messageText.length > 2000) {
                     messageText = messageText.substring(0, MAX_MESSAGE_LENGTH);
                     console.warn("Message truncated to 2000 characters.");
                 }
