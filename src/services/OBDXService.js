@@ -52,7 +52,9 @@ class OBDXService {
                 data: body,
             });
 
-            if ([200, 201, 202].includes(response.status)) {
+           console.log("response in service meth is:", response);
+           
+           if ([200, 201, 202].includes(response.status)) {
                 return response.data;
             }
         } catch (error) {
