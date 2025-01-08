@@ -56,7 +56,6 @@ class OBDXService {
                 data: body
             });
 
-            console.log("response status is:", response.status);
 if ([200, 201, 202].includes(response.status)) {
                 return response;
             }
