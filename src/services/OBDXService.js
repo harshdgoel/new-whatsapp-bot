@@ -45,7 +45,7 @@ class OBDXService {
         const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
          console.log("url is", url);
        console.log("headers is:",headers);
-              console.log("data is", data);
+              console.log("data is", body);
         try {
             const response = await axios({
                 url,
