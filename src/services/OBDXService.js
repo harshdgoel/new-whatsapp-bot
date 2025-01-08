@@ -40,8 +40,12 @@ class OBDXService {
 
     // Helper method to make the API call
     async serviceMeth(ctxPath, method, headers, queryParam, body) {
+        console.log("entering service method");
         const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
+        console.log("url generated is",url);
         const headersObj = Object.fromEntries(headers);
+        console.log("headersObj:",headersObj);
+        console.log("method:",method);
         try {
             const response = await axios({
                 url,
