@@ -297,7 +297,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
         if (!otp) throw new Error("OTP is not available or initialized.");
 
        const loginResult = await LoginService.fetchFinalLoginResponse(otp,userSession.mobileNumber,userSession.registrationId);
-
+       console.log("login result is:", loginResult);
         if (loginResult.status === true) {
             userSession.state = states.LOGGED_IN;
             return this.handleIntentAfterLogin(userSession);
