@@ -318,53 +318,63 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
         return "You're logged in! How may I assist you?";
     }
 
-    async handleAccountSelection(userSession, messageBody) {
-        const selectedAccount = null;
-        console.log("entering handleAccountSelection");
-        if(!userSession.selectedAccount){
-       selectedAccount  = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
-       userSession.selectedAccount = selectedAccount;
+ async handleAccountSelection(userSession, messageBody) {
+    console.log("Entering handleAccountSelection");
+    
+    // Parse and set selectedAccount only if not already set in the userSession
+    if (!userSession.selectedAccount) {
+        const parsedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
+        if (parsedAccount) {
+            userSession.selectedAccount = parsedAccount;
+        } else {
+            return "Please enter a valid account selection from the list.";
         }
-        console.log("selected account is:",selectedAccount);
-        if (selectedAccount || userSession.selectedAccount) {
-            if (userSession.lastIntent === "BALANCE") {
-                const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(selectedAccount,userSession);
-                return balanceMessage;
-            } else if (userSession.lastIntent === "TRANSACTIONS") {
-                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(selectedAccount);
-                console.log("transactionMessage:", transactionMessage);
+    }
+
+    console.log("Selected account is:", userSession.selectedAccount);
+
+    // Perform actions based on the last intent
+    if (userSession.selectedAccount) {
+        switch (userSession.lastIntent) {
+            case "BALANCE":
+                return await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
+
+            case "TRANSACTIONS":
+                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(userSession.selectedAccount);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
                 return transactionMessage;
-            } else if (userSession.lastIntent === "UPCOMINGPAYMENTS") {
-                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(selectedAccount);
+
+            case "UPCOMINGPAYMENTS":
+                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(userSession.selectedAccount);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
                 return paymentsMessage;
-            }
-            else if (userSession.lastIntent === "BILLPAYMENT") {
-                console.log("userSession in BILLPAYMENT STATE IS:", userSession);
-                console.log("userSession in BILLPAYMENT STATE IS:", userSession);
+
+            case "BILLPAYMENT":
+                console.log("User session in BILLPAYMENT state is:", userSession);
                 const billPaymentMessage = await BillPaymentService.completePayment(userSession);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
                 return billPaymentMessage;
-            }
-            else if (userSession.lastIntent === "TRANSFERMONEY") {
-                console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
-                console.log("userSession in TRANSFERMONEY STATE IS:", userSession);
-                if(userSession.XTOKENREFNO !== null){
+
+            case "TRANSFERMONEY":
+                console.log("User session in TRANSFERMONEY state is:", userSession);
+                if (userSession.XTOKENREFNO) {
                     userSession.authOTP = messageBody;
                 }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
                 userSession.isHelpTriggered = false;
                 userSession.state = states.HELP;
                 return transferPaymentMessage;
-            }
-        } else {
-            return "Please enter a valid account selection from the list.";
+
+            default:
+                return "Invalid operation. Please try again.";
         }
+    } else {
+        return "Please enter a valid account selection from the list.";
     }
+}
 }
 
 module.exports = new StateMachine();
