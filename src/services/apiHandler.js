@@ -15,12 +15,12 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             // WhatsApp-specific message formatting
             if (message.type === "interactive") {
                 responseData = message;
-            } else if (message.type === "text" && message.text?.body) {
+            } else if (message.type === "text" && message.bodyText) {
                 responseData = {
                     messaging_product: "whatsapp",
                     to: to,
                     type: "text",
-                    text: { body: message.text.body },
+                    text: { body: message.bodyText  },
                 };
             } else {
                 responseData = {
