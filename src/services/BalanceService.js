@@ -107,7 +107,9 @@ console.log("respose is:", response);
       userSession.selectedAccount = selectedAccount;
   //    userSession.state = "ASK_INSIGHTS"; // Set next state for insights
       
-      return `${balanceMessage}\n\nWould you like financial advice based on your balance? Reply "Yes" or "No".`;
+   //   return `${balanceMessage}\n\nWould you like financial advice based on your balance? Reply "Yes" or "No".`;
+              return `${balanceMessage}`;
+
          } catch (error) {
       console.error("Error fetching balance:", error.message);
       return "Unable to fetch balance at this time. Please try again later.";
