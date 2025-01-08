@@ -37,6 +37,10 @@ class HelpMeService {
             // Construct the template data
             let templateData;
 
+            console.log("sections is:",   sections: rows.map(row => ({
+                            id: row.id,
+                            title: row.title,
+                        })));
             switch (channel.toLowerCase()) {
                 case "whatsapp":
                     templateData = {
