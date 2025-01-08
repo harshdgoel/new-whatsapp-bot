@@ -37,7 +37,7 @@ class MoneyTransferService {
             userSession
         );
 
-        const payees = response.data.items || [];
+    const payees = response?.data?.items || [];
         userSession.payees = payees;
        console.log("payees is:",payees);
         // Map the payees to a structured format
