@@ -49,7 +49,9 @@ class OBDXService {
                 data: body
             });
 
-            return response;
+if ([200, 201, 202].includes(response.status)) {
+                return response;
+            }
         } catch (error) {
             console.error("Service request failed:", error.message);
             throw error; // Rethrow error to be handled by caller
