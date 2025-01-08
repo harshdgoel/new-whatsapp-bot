@@ -11,6 +11,7 @@ const states = {
 };
 class BalanceService {
   static async initiateBalanceInquiry(userSession) {
+      console.log("entering initiateBalanceInquiry");
     try {
       const queryParams = null;
 
@@ -23,7 +24,7 @@ class BalanceService {
         userSession
       );
 
-
+console.log("respose is:", response);
       if (response.data && response.data.accounts) {
         const accounts = response.data.accounts;
 
