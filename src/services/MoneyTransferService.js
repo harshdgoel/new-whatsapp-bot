@@ -39,10 +39,10 @@ class MoneyTransferService {
 
         const payees = response.data.items || [];
         userSession.payees = payees;
-
+       console.log("payees is:",payees);
         // Map the payees to a structured format
         const rows = payees.map((payee) => ({
-            id: payee.id,
+            id: payee.nickName,
             title: payee.nickName,
         }));
         const channel = process.env.CHANNEL.toLowerCase();
@@ -50,16 +50,18 @@ class MoneyTransferService {
 
         switch (channel) {
             case "whatsapp":
+                const limitedRows = rows.slice(0, 10);
+
                 templateData = {
                     type: "list",
-                    sections: rows.map((row) => ({
+                    sections: limitedRows.map((row) => ({
                         id: row.id,
                         title: row.title,
                     })),
                     bodyText: "Please select a payee to proceed.",
                     buttonText: "View Payees",
                     channel,
-                    to: "916378582419", // Replace with the actual recipient number
+                    to: "917249318604", // Replace with the actual recipient number
                 };
                 break;
 
@@ -80,6 +82,7 @@ class MoneyTransferService {
                 throw new Error("Unsupported channel type. Only 'whatsapp' and 'facebook' are supported.");
         }
         userSession.state = states.FETCHING_PAYEES;
+        console.log("template data in moneytransfer:",templateData);
         return TemplateLayer.generateTemplate(templateData);
     } catch (error) {
         console.error("Error fetching payees:", error.message);
