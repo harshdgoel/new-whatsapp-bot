@@ -63,6 +63,7 @@ class TemplateLayer {
             payload: section.payload,
         }));
 
+        console.log("quick_replies is:",quickReplies);
         const template = {
             recipient: {
                 id: to,
