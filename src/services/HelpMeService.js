@@ -48,7 +48,7 @@ class HelpMeService {
             sections: [
                 {
                     rows: rows.map(row => ({
-                        id: row.id,
+                        id: row.title,
                         title: row.title,
                     })),
                 },
