@@ -39,9 +39,10 @@ class StateMachine {
     }
 
  getSession(userId) {
-    if (!this.sessionCache.has(userId)) {
+    let userSession = this.sessionCache.get(userId);
+    if (!userSession) {
         logger.log(`Creating a new session for user: ${userId}`);
-        const newSession = {
+        userSession = {
             userId: userId,
             state: states.HELP,
             lastIntent: null,
@@ -63,10 +64,11 @@ class StateMachine {
             AUTH_TYPE: null,
             XTOKENREFNO: null
         };
-        this.sessionCache.set(userId, newSession);
+        this.sessionCache.set(userId, userSession);
     }
-    return this.sessionCache.get(userId);
+    return userSession;
 }
+
 
     async handleMessage(from, messageBody, intent) {
         const userSession = this.getSession(from);
