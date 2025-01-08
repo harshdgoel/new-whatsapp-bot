@@ -43,7 +43,9 @@ class OBDXService {
     async serviceMeth(ctxPath, method, headers, queryParam, body,userSession) {
 
         const url = `${URL}${ctxPath}?${new URLSearchParams(queryParam).toString()}`;
-
+         console.log("url is", url);
+       console.log("headers is:",headers);
+              console.log("data is", data);
         try {
             const response = await axios({
                 url,
