@@ -19,7 +19,7 @@ class OBDXService {
             "X-Token-Type": "JWT",
             "X-Target-Unit": defaultHomeEntity,
         };
-    
+    console.log("headers is:",headers);
         // Add X-CHALLENGE_RESPONSE header if OTP is present
         if (userSession?.authOTP) {
             headers["X-CHALLENGE_RESPONSE"] = JSON.stringify({
@@ -32,6 +32,7 @@ class OBDXService {
 
     // Main method to invoke services
     async invokeService(ctxPath, method, queryParam, body, loginService,userSession) {
+        console.log("entering invokeservice and usersession is:",userSession);
         const headers = this.populateHeaders(loginService,userSession);
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
         return responseData;
