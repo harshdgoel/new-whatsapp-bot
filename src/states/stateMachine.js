@@ -109,7 +109,7 @@ class StateMachine {
             userSession.mobileNumber = messageBody;
             userSession.state = states.OTP_VERIFICATION;
             console.log("mobile number in FETCH_MOB_NUM state is:", messageBody);
-            const result = await LoginService.authenticateUser(mobileNumber,userSession);
+            const result = await LoginService.authenticateUser(messageBody,userSession);
             console.log("result for login is",result);
 
             if (result.success) {
