@@ -105,7 +105,7 @@ console.log("respose is:", response);
       const balanceMessage = `Balance for account ${selectedAccount.id.displayValue} is ${selectedAccount.availableBalance.currency} ${selectedAccount.availableBalance.amount}.`;
     
       userSession.selectedAccount = selectedAccount;
-      userSession.state = "ASK_INSIGHTS"; // Set next state for insights
+  //    userSession.state = "ASK_INSIGHTS"; // Set next state for insights
       
       return `${balanceMessage}\n\nWould you like financial advice based on your balance? Reply "Yes" or "No".`;
          } catch (error) {
