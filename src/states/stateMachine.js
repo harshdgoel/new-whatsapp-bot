@@ -337,6 +337,10 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
     if (userSession.selectedAccount) {
         switch (userSession.lastIntent) {
             case "BALANCE":
+                //extra added
+                 userSession.isHelpTriggered = false;
+                userSession.state = states.HELP;
+                //till here
                 return await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
 
             case "TRANSACTIONS":
