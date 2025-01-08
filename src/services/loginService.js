@@ -65,9 +65,9 @@ class LoginService {
         return true;
     }
 
-    async verifyOTP(otp,mobileNumber) {
-        console.log("mobile number is:", mobileNumber);
+    async authenticateUser(mobileNumber,userSession) {
         try {
+            // Step 1: Fetch anonymous token
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
                 "POST",
@@ -75,76 +75,126 @@ class LoginService {
                 new Map(),
                 {}
             );
-
-            if (tokenResponse) {
-                this.setAnonymousToken(tokenResponse.headers.authorization);
-                const setCookie = tokenResponse.headers['set-cookie'];
-                if (setCookie) {
-                    this.authCache.cookie = setCookie;
-                }
-
-                const otpResponse = await OBDXService.serviceMeth(
-                    endpoints.login,
-                    "POST",
-                    new Map([
-                        ["Content-Type", "application/json"],
-                        ["x-digx-authentication-type", "CHATBOT"],
-                        ["TOKEN_ID", otp],
-                        ["Authorization", `Bearer ${this.getAnonymousToken()}`],
-                        ["X-Token-Type", "JWT"],
-                        ["X-Target-Unit", defaultHomeEntity]
-                    ]),
-                    new Map(),
-                    { mobileNumber: mobileNumber }
-                );
-
-                if (otpResponse.data.status.result === "SUCCESSFUL") {
-                    const registrationId = otpResponse.data.registrationId;
-                    if (!registrationId) {
-                        console.error("Registration ID missing in OTP response:", otpResponse);
-                        return "Final login failed due to missing registration ID. Please try again.";
-                    }
-                    this.registrationId = registrationId;
-                    const queryParams = new Map([["locale", "en"]]);
-                    const finalLoginResponse = await OBDXService.serviceMeth(
-                        endpoints.login,
-                        "POST",
-                        new Map([
-                            ["Content-Type", "application/json"],
-                            ["x-digx-authentication-type", "CHATBOT"],
-                            ["TOKEN_ID", otp],
-                            ["Authorization", `Bearer ${this.getAnonymousToken()}`],
-                            ["X-Token-Type", "JWT"],
-                            ["X-Target-Unit", defaultHomeEntity]
-                        ]),
-                        queryParams,
-                        { mobileNumber: mobileNumber, registrationId: this.registrationId }
-                    );
-
-                    const setCookieFinal = finalLoginResponse.headers['set-cookie'];
-                    if (setCookieFinal) {
-                        this.authCache.cookie = setCookieFinal.join('; ');
-                    } else {
-                        console.error("Cookie setting failed in final login.");
-                        return "Final login failed. Please try again.";
-                    }
-                    this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
-                    // Make the additional API call to fetch user details
-                    const userDetails = await this.fetchUserDetails();
-                    return true;
-                } else {
-                    console.error("OTP verification failed:", otpResponse);
-                    return "OTP verification failed. Please try again.";
-                }
-            } else {
+    
+            if (!tokenResponse) {
                 console.error("Failed to obtain anonymous token:", tokenResponse);
-                return "Failed to initiate login. Please try again.";
+                return { success: false, message: "Failed to initiate login. Please try again." };
             }
+    
+            console.log("first login call success and token is:",tokenResponse);
+            // Set anonymous token and cookies
+            this.setAnonymousToken(tokenResponse.headers.authorization);
+            const setCookie = tokenResponse.headers['set-cookie'];
+            if (setCookie) {
+                this.authCache.cookie = setCookie;
+            }
+    
+            // Step 2: Verify OTP
+            const otpResponse = await OBDXService.serviceMeth(
+                endpoints.login,
+                "POST",
+                new Map([
+                    ["Content-Type", "application/json"],
+                    ["x-digx-authentication-type", "CHATBOT"],
+                    ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                    ["X-Token-Type", "JWT"],
+                    ["X-Target-Unit", defaultHomeEntity]
+                ]),
+                new Map(),
+                { mobileNumber: mobileNumber }
+            );
+    
+            if (otpResponse.data.status.result !== "SUCCESSFUL") {
+                console.error("OTP verification failed:", otpResponse);
+                return { success: false, message: "OTP verification failed. Please try again." };
+            }
+    
+    
+        console.log("otpResponse.data is:",otpResponse.data);
+            // Extract values from otpResponse
+            const { authType, token: counter, registrationId } = otpResponse.data;
+            if (!registrationId) {
+                console.error("Registration ID missing in OTP response:", otpResponse);
+                return { success: false, message: "Registration ID missing. Please try again." };
+            }
+    
+    
+           console.log("authType:",authType);
+           console.log("COUNTER IS:",counter);
+           console.log("registration id is:",registrationId);
+           userSession.registrationId = registrationId;
+
+            // Generate the message based on authType
+            let message;
+            switch (authType) {
+                case "OTP":
+                    message = "To verify your details, we have sent a one-time password to your mobile number. Please enter the password here.";
+                    break;
+                case "R_SOFT_TOKEN":
+                    message = `Open the Soft Token App on your handheld device and log in with your PIN. Enter the Authorization Code ${counter} and generate an OTP. Please enter the code appearing on your Soft Token application.`;
+                    break;
+                case "PIN":
+                    message = "Please enter your PIN.";
+                    break;
+                default:
+                    console.error("Unknown authType:", authType);
+                    message = "Unknown authentication method. Please try again.";
+                    break;
+            }
+    
+            return { success: true, registrationId, message };
         } catch (error) {
-            console.error("Error during login process:", error.message);
-            return "An error occurred during verification. Please try again.";
+            console.error("Error during user authentication:", error.message);
+            return { success: false, message: "An error occurred during authentication. Please try again." };
         }
     }
+
+
+//3RD CALL
+async fetchFinalLoginResponse(otp, mobileNumber, registrationId) {
+    console.log("entering final api call");
+    try {
+        const queryParams = new Map([["locale", "en"]]);
+        const finalLoginResponse = await OBDXService.serviceMeth(
+            endpoints.login,
+            "POST",
+            new Map([
+                ["Content-Type", "application/json"],
+                ["x-digx-authentication-type", "CHATBOT"],
+                ["TOKEN_ID", otp],
+                ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                ["X-Token-Type", "JWT"],
+                ["X-Target-Unit", defaultHomeEntity]
+            ]),
+            queryParams,
+            { mobileNumber: mobileNumber, registrationId }
+        );
+
+        const setCookieFinal = finalLoginResponse.headers['set-cookie'];
+        if (setCookieFinal) {
+            this.authCache.cookie = setCookieFinal.join('; ');
+        } else {
+            console.error("Cookie setting failed in final login.");
+            return { success: false, error: "Final login failed. Please try again." };
+        }
+
+        this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
+
+        // Optionally fetch user details
+        const userDetails = await this.fetchUserDetails();
+        return { success: true, userDetails };
+    } catch (error) {
+        console.error("Error during final login:", error.message);
+        return { success: false, error: "Error during final login. Please try again." };
+    }
+}
+
+
+
+
+
+
+
 
     async fetchUserDetails() {
         const headers = new Map([
