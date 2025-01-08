@@ -109,7 +109,9 @@ class StateMachine {
             userSession.mobileNumber = messageBody;
             userSession.state = states.OTP_VERIFICATION;
             console.log("mobile number in FETCH_MOB_NUM state is:", messageBody);
-            const result = await authenticateUser(messageBody);
+            const result = await LoginService.authenticateUser(mobileNumber,userSession);
+            console.log("result for login is",result);
+
             if (result.success) {
                 console.log("User authenticated. Prompt user with message:", result.message);
             } else {
@@ -117,20 +119,6 @@ class StateMachine {
             }
             return result.message;
         }
-
-        const result = await LoginService.authenticateUser(mobileNumber,userSession);
-console.log("result for login is",result);
-        if (result.success) {
-            console.log("User authenticated. Prompt user with message:", result.message);
-            // Proceed with registrationId for the next step
-        } else {
-            console.error("Authentication failed:", result.message);
-            // Inform the user about the failure
-        }
-        
-
-
-
 
      if (userSession.state === states.FETCHING_BILLERS) {
             console.log("selected biller in state FETCHING_BILLERS(messagebody):", messageBody);
