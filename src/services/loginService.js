@@ -78,11 +78,11 @@ class LoginService {
             console.log("first call success and tokenresponse is:", tokenResponse);
 
             if (tokenResponse) {
-                this.setAnonymousToken(tokenResponse.headers.authorization);
-                const setCookie = tokenResponse.headers['set-cookie'];
-                if (setCookie) {
-                    this.authCache.cookie = setCookie;
-                }
+                this.setAnonymousToken(tokenResponse.token);
+                // const setCookie = tokenResponse.headers['set-cookie'];
+                // if (setCookie) {
+                //     this.authCache.cookie = setCookie;
+                // }
 
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
@@ -123,6 +123,8 @@ class LoginService {
                         queryParams,
                         { mobileNumber: mobileNumber, registrationId: this.registrationId }
                     );
+                    
+            console.log(" second call success and loginresponse is:", finalLoginResponse);
 
                     const setCookieFinal = finalLoginResponse.headers['set-cookie'];
                     if (setCookieFinal) {
