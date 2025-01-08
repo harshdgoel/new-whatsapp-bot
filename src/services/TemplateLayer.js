@@ -19,22 +19,43 @@ class TemplateLayer {
             throw new Error("Missing or invalid sections for list template.");
         }
 
+        // const template = {
+        //     recipient_type: "individual",
+        //     to: to,
+        //     messaging_product: "whatsapp",
+        //     type: "interactive",
+        //     interactive: {
+        //         type: "list",
+        //         body: {
+        //             text: bodyText || "Please make a selection.",
+        //         },
+        //         action: {
+        //             button: buttonText || "Select",
+        //             sections: sections,
+        //         },
+        //     },
+        // };
         const template = {
-            recipient_type: "individual",
-            to: to,
-            messaging_product: "whatsapp",
-            type: "interactive",
-            interactive: {
-                type: "list",
-                body: {
-                    text: bodyText || "Please make a selection.",
-                },
-                action: {
-                    button: buttonText || "Select",
-                    sections: sections,
-                },
-            },
-        };
+    recipient_type: "individual",
+    to: to,
+    messaging_product: "whatsapp",
+    type: "interactive",
+    interactive: {
+        type: "list",
+        body: {
+            text: bodyText || "Please make a selection.",
+        },
+        action: {
+            button: buttonText || "Select",
+            sections: sections.map((section) => ({
+                rows: section.rows.map((row) => ({
+                    id: row.id,
+                    title: row.title                })),
+            })),
+        },
+    },
+};
+
 
         return template;
     }
