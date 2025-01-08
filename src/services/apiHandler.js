@@ -80,6 +80,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
 };
 
 const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
+    console.log("data in sendtowhatsappapi:", messageData);
     try {
         const response = await axios.post(
             `https://graph.facebook.com/v20.0/${phoneNumberId}/messages`,
