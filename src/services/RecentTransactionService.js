@@ -74,7 +74,7 @@ class RecentTransactionService {
                         throw new Error("Unsupported channel type");
                 }
                 // Pass template data to TemplateLayer
-                return TemplateLayer.generateTemplate(templateData);
+                return templateData;
 
             } else {
                 throw new Error("No transaction data found in the response.");
