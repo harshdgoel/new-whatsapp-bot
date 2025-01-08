@@ -69,7 +69,7 @@ class UpcomingPaymentsService {
                 });
                 let templateData = {
                     bodyText: bodyText,
-                    to: userSession.mobileNumber // Pass the correct recipient for Facebook or WhatsApp
+                    to: "917249318604" // Pass the correct recipient for Facebook or WhatsApp
                 };
 
                 // Select channel template structure based on config
