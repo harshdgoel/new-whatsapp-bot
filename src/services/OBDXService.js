@@ -43,8 +43,9 @@ class OBDXService {
         console.log("entering service method");
         const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
         console.log("url generated is",url);
-        const headersObj = Object.fromEntries(headers);
-        console.log("headersObj:",headersObj);
+        // Convert headers to a plain object if it's a Map
+    const headersObj = headers instanceof Map ? Object.fromEntries(headers) : headers;
+    console.log("headersObj:", headersObj);
         console.log("method:",method);
         try {
             const response = await axios({
