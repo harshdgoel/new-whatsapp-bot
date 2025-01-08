@@ -30,7 +30,8 @@ const states = {
     RESOLVE_AMOUNT: "RESOLVE_AMOUNT",
     FETCHING_TRANSACTION: "FETCHING_TRANSACTION",
     FETCH_MOBILE_NUMBER: "FETCH_MOBILE_NUMBER",
-    FETCHING_PAYEES: "FETCHING_PAYEES"
+    FETCHING_PAYEES: "FETCHING_PAYEES",
+    WHATSAPP_LOGIN: "WHATSAPP_LOGIN"
 };
 
 class StateMachine {
@@ -116,6 +117,20 @@ class StateMachine {
 
             if (result.success) {
                 console.log("User authenticated. Prompt user with message:", result.message);
+            } else {
+                console.error("Authentication failed:", result.message);
+            }
+            return result.message;
+        }
+       if (userSession.state === states.WHATSAPP_LOGIN) {
+            userSession.isHelpTriggered = true;
+            userSession.mobileNumber = "917249318604";
+            const result = await LoginService.authenticateUser(userSession.mobileNumber,userSession);
+            console.log("result for login is",result);
+
+            if (result.success) {
+            userSession.otp = messageBody;
+            return await this.handleOTPVerification(userSession);
             } else {
                 console.error("Authentication failed:", result.message);
             }
@@ -221,7 +236,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 userSession.state = states.FETCH_MOBILE_NUMBER;
                 return MessageService.getMessage("mobileNumber");
             } else {
-                userSession.state = states.OTP_VERIFICATION;
+                userSession.state = states.WHATSAPP_LOGIN;
                 return MessageService.getMessage("otpMessage");
             }
             }
