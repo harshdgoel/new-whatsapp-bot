@@ -88,7 +88,7 @@ class LoginService {
             if (setCookie) {
                 this.authCache.cookie = setCookie;
             }
-    
+            console.log("mobilenum in second login api call:",mobileNumber);
             // Step 2: Verify OTP
             const otpResponse = await OBDXService.serviceMeth(
                 endpoints.login,
