@@ -47,6 +47,13 @@ class OBDXService {
        console.log("headers is:",headers);
               console.log("data is", body);
         try {
+
+           console.log( axios({
+                url,
+                method,
+                headers,
+                data: body,
+            }));
             const response = await axios({
                 url,
                 method,
