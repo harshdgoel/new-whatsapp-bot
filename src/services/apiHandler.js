@@ -72,11 +72,17 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
 
             
             else if (message.bodyText){
+                let messageText = message.bodyText;
 
+                // If the message is too long, truncate it
+                if (messageText.length > MAX_MESSAGE_LENGTH) {
+                    messageText = messageText.substring(0, MAX_MESSAGE_LENGTH);
+                    console.warn("Message truncated to 2000 characters.");
+                }
                   responseData = {
                     messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
-                    message: { text: message.bodyText },
+                    message: { text: messageText },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             }
