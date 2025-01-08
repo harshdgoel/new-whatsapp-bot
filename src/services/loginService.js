@@ -120,14 +120,13 @@ class LoginService {
     
     
            console.log("authType:",authType);
-           console.log("COUNTER IS:",counter);
            console.log("registration id is:",registrationId);
            userSession.registrationId = registrationId;
 
             // Generate the message based on authType
             let message;
             switch (authType) {
-                case "OTP":
+                case "LOCAL":
                     message = "To verify your details, we have sent a one-time password to your mobile number. Please enter the password here.";
                     break;
                 case "R_SOFT_TOKEN":
