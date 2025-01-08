@@ -14,51 +14,35 @@ class TemplateLayer {
     }
 
     static generateTemplateForWhatsApp({ sections, bodyText, buttonText, to }) {
-
-        if (!sections || !Array.isArray(sections) || sections.length === 0) {
-            throw new Error("Missing or invalid sections for list template.");
-        }
-
-        // const template = {
-        //     recipient_type: "individual",
-        //     to: to,
-        //     messaging_product: "whatsapp",
-        //     type: "interactive",
-        //     interactive: {
-        //         type: "list",
-        //         body: {
-        //             text: bodyText || "Please make a selection.",
-        //         },
-        //         action: {
-        //             button: buttonText || "Select",
-        //             sections: sections,
-        //         },
-        //     },
-        // };
-        const template = {
-    recipient_type: "individual",
-    to: to,
-    messaging_product: "whatsapp",
-    type: "interactive",
-    interactive: {
-        type: "list",
-        body: {
-            text: bodyText || "Please make a selection.",
-        },
-        action: {
-            button: buttonText || "Select",
-            sections: sections.map((section) => ({
-                rows: section.rows.map((row) => ({
-                    id: row.id,
-                    title: row.title                })),
-            })),
-        },
-    },
-};
-
-
-        return template;
+    if (!sections || !Array.isArray(sections) || sections.length === 0) {
+        throw new Error("Missing or invalid sections for list template.");
     }
+
+    const template = {
+        recipient_type: "individual",
+        to: to,
+        messaging_product: "whatsapp",
+        type: "interactive",
+        interactive: {
+            type: "list",
+            body: {
+                text: bodyText || "Please make a selection.",
+            },
+            action: {
+                button: buttonText || "Select",
+                sections: sections.map(section => ({
+                    rows: section.rows.map(row => ({
+                        id: row.id,
+                        title: row.title,
+                    })),
+                })),
+            },
+        },
+    };
+
+    return template;
+}
+
 
     static generateTemplateForFacebook({ sections, bodyText, to }) {
 
