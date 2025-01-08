@@ -47,6 +47,7 @@ class StateMachine {
             lastIntent: null,
             otp: null,
             authOTP: null,
+            registrationId: null,
             mobileNumber: null,
             accounts: null,
             billers: null,
@@ -107,8 +108,30 @@ class StateMachine {
             console.log("userSession in FETCH_MOBILE_NUMBER is:", userSession);
             userSession.mobileNumber = messageBody;
             userSession.state = states.OTP_VERIFICATION;
-            return MessageService.getMessage("otpMessage");
+            console.log("mobile number in FETCH_MOB_NUM state is:", messageBody);
+            const result = await authenticateUser(messageBody);
+            if (result.success) {
+                console.log("User authenticated. Prompt user with message:", result.message);
+            } else {
+                console.error("Authentication failed:", result.message);
+            }
+            return result.message;
         }
+
+        const result = await LoginService.authenticateUser(mobileNumber,userSession);
+console.log("result for login is",result);
+        if (result.success) {
+            console.log("User authenticated. Prompt user with message:", result.message);
+            // Proceed with registrationId for the next step
+        } else {
+            console.error("Authentication failed:", result.message);
+            // Inform the user about the failure
+        }
+        
+
+
+
+
      if (userSession.state === states.FETCHING_BILLERS) {
             console.log("selected biller in state FETCHING_BILLERS(messagebody):", messageBody);
     const selectedBiller = BillPaymentService.parseBillerSelection(messageBody, userSession.billers); // Parse the selected biller
@@ -285,7 +308,8 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
         console.log("otp is:",otp);
         if (!otp) throw new Error("OTP is not available or initialized.");
 
-       const loginResult = await LoginService.verifyOTP(otp,userSession.mobileNumber);
+       const loginResult = await LoginService.fetchFinalLoginResponse(otp,userSession.mobileNumber,userSession.registrationId);
+
         if (loginResult === true) {
             userSession.state = states.LOGGED_IN;
             return this.handleIntentAfterLogin(userSession);
