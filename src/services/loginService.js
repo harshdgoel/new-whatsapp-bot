@@ -83,6 +83,7 @@ class LoginService {
                 // if (setCookie) {
                 //     this.authCache.cookie = setCookie;
                 // }
+            console.log("THE SAVED  tokenresponse is:", ${this.getAnonymousToken()});
 
                 const otpResponse = await OBDXService.serviceMeth(
                     endpoints.login,
