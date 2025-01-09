@@ -41,7 +41,7 @@ class RecentTransactionService {
                     const transactionRef = transaction.key?.transactionReferenceNumber || "N/A";
                     const transactionDate = transaction.transactionDate || "N/A";
                     const transactionType = transaction.transactionType === "C" ? "Credit" : "Debit";
-                    
+
                     bodyText += `*Transaction ${index + 1}:*\n`;
                     bodyText += `Account: ${accountDisplayValue}\n`;
                     bodyText += `Amount: ${currency} ${amount}\n`;
