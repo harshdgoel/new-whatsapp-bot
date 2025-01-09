@@ -35,9 +35,9 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
             console.log("message is:",message)
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
-                let messageText = message.bodyText;
-                if (messageText.length > 2000) {
-                    messageText = messageText.substring(0, 2000);
+                let messageLimit = message.bodyText;
+                if (messageLimit.length > 2000) {
+                    messageLimit = messageLimit.substring(0, 2000);
                     console.warn("Message truncated to 2000 characters.");
                 }
 
@@ -45,7 +45,7 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
                 responseData = {
                     messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
-                    message: { text: messageText },
+                    message: { text: messageLimit },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
