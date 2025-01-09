@@ -31,9 +31,14 @@ console.log("respose is:", response);
 
           console.log("accounts is:",accounts);
         // Filter accounts with missing or invalid required properties
-        const validAccounts = accounts.filter(account => {
-          return account.id?.value && account.id?.displayValue;
-        });
+       const validAccounts = accounts.filter(account => {
+  const isValid = account.id?.value && account.id?.displayValue;
+  if (!isValid) {
+    console.warn("Invalid account detected:", account);
+  }
+  return isValid;
+});
+
 
         if (validAccounts.length === 0) {
           throw new Error("No valid accounts found in the response.");
