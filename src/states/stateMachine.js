@@ -72,7 +72,7 @@ class StateMachine {
 
 
     async handleMessage(from, messageBody, intent) {
-
+        console.log("from in handleMessage is", from);
         const userSession = this.getSession(from);
         console.log("entering handle message and state is:", userSession.state);
         console.log("entering handle message is:", messageBody);
@@ -82,7 +82,6 @@ class StateMachine {
     userSession.state === states.HELP) {
                     console.log("help me triggered,usersession is:",userSession);
             userSession.state = states.HELP;
-            userSession.mobileNumber = from;
             userSession.isHelpTriggered = true;
             return await HelpMeService.helpMe();
         }
@@ -126,7 +125,7 @@ class StateMachine {
         }
        if (userSession.state === states.WHATSAPP_LOGIN) {
             userSession.isHelpTriggered = true;
-            userSession.mobileNumber = from;
+            userSession.mobileNumber = "917249318604";
             const result = await LoginService.authenticateUser(userSession.mobileNumber,userSession);
             console.log("result for login is",result);
 
