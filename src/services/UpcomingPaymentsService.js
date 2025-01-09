@@ -82,10 +82,11 @@ class UpcomingPaymentsService {
                             to: "917249318604" // WhatsApp number here
                         };
                         break;
-
                     case "facebook":
-                        return bodyText;
-
+                        templateData = {
+                            bodyText: bodyText
+                        };
+                        break;
                     default:
                         throw new Error("Unsupported channel type");
                 }
