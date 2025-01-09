@@ -34,14 +34,18 @@ class LoginService {
         try {
             const payloadBase64 = token.split('.')[1];
             const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+            console.log("decodedPayload:",decodedPayload);
             const exp = decodedPayload.exp;
+            console.log("exp",exp);
             if (!exp) {
+                console.log("clearing token because exp not there");
                 this.clearAuthCache();
                 return true;
             }
 
             const isExpired = Date.now() >= exp * 1000;
             if (isExpired) {
+                console.log("isexpired so clearinge token",isExpired);
                 this.clearAuthCache();
             }
 
