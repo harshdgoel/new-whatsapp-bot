@@ -116,8 +116,9 @@ static async completePayment(userSession) {
     const systemReferenceId = userSession.systemReferenceId;
      // Format the payment date
      const currentDate = new Date();
-     const paymentDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}T00:00:00`;
- 
+    // const paymentDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}T00:00:00`;
+      const paymentDate = "2024-09-20T00:00:00";
+
 
     // Initialize the request body
     const requestBody = {
