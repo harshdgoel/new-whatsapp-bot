@@ -60,7 +60,7 @@ class RecentTransactionService {
                             type: "text",
                             bodyText: bodyText,
                             channel: process.env.CHANNEL,
-                            to: "917249318604" // WhatsApp number here
+                            to: userSession.mobileNumber // WhatsApp number here
                         };
                         break;
 

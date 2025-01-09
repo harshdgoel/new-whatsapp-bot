@@ -37,43 +37,43 @@ class HelpMeService {
             // Construct the template data
             let templateData;
 
-            console.log("sections is:", rows.map(row => ({
+            switch (channel.toLowerCase()) {
+                case "whatsapp":
+                    templateData = {
+                        type: "list",
+                        sections: rows.map(row => ({
                             id: row.id,
                             title: row.title,
-                        })));
-            switch (channel.toLowerCase()) {
-                 case "whatsapp":
-        templateData = {
-            type: "list",
-            sections: [
-                {
-                    rows: rows.map(row => ({
-                        id: row.title,
-                        title: row.title,
-                    })),
-                },
-            ],
-            bodyText: "How can I assist you today? Please select an option:",
-            buttonText: "Help Options",
-            channel,
-            to: "917249318604",
-        };
-        break;
+                        })),
+                        bodyText: "How can I assist you today? Please select an option:",
+                        buttonText: "Help Options",
+                        channel,
+                        to: "916378582419",
+                    };
+                    break;
 
                 case "facebook":
-                    templateData = {bodyText: `Here's what I can help you with:
-- View account balances
-- Bill Payment
-- Money Transfer
-- View recent transactions
-- Inquire your spends
-- Know your upcoming payments
-- Inquire your dues on credit card
-- Inquire about credit card limit
-- Inquire your outstanding balance on loan account
-- Inquire about next installment date and amount
-- Get more information about banking products and services offered by Futura Bank
-You can type your questions, but using my quick reply and menu navigation is sometimes more reliable. Who likes typing anyway?
+                    templateData = {
+                        bodyText: `
+                        Here's what I can help you with:
+                        - View account balances
+                        - Bill Payment
+                        - Money Transfer
+                        - Find a bank branch or ATM
+                        - View recent transactions
+                        - Inquire your spends
+                        - Know your upcoming payments
+                        - Inquire your dues on credit card
+                        - Inquire about credit card limit
+                        - Inquire your outstanding balance on loan account
+                        - Inquire about next installment date and amount
+                        - Get more information about banking products and services offered by Futura Bank
+                        - New Account Opening info
+                        - Open Term Deposit
+                        - Finance Inquiry
+                        - Block/Unblock Debit/Credit Cards
+                        
+                        You can type your questions, but using my quick reply and menu navigation is sometimes more reliable. Who likes typing anyway?
                                                 `.trim(),
                         sections: rows.map(row => ({
                             content_type: "text",

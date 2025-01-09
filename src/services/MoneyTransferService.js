@@ -62,7 +62,7 @@ class MoneyTransferService {
                     bodyText: "Please select a payee to proceed.",
                     buttonText: "View Payees",
                     channel,
-                    to: "917249318604", // Replace with the actual recipient number
+                    to: userSession.mobileNumber, // Replace with the actual recipient number
                 };
                 break;
 

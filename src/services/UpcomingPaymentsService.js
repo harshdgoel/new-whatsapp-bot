@@ -69,7 +69,7 @@ class UpcomingPaymentsService {
                 });
                 let templateData = {
                     bodyText: bodyText,
-                    to: "917249318604" // Pass the correct recipient for Facebook or WhatsApp
+                    to: userSession.mobileNumber // Pass the correct recipient for Facebook or WhatsApp
                 };
 
                 // Select channel template structure based on config
@@ -79,7 +79,7 @@ class UpcomingPaymentsService {
                             type: "text",
                             bodyText: bodyText,
                             channel: process.env.CHANNEL,
-                            to: "917249318604" // WhatsApp number here
+                            to: userSession.mobileNumber // WhatsApp number here
                         };
                         break;
                     case "facebook":
