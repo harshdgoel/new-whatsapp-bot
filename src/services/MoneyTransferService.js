@@ -42,16 +42,17 @@ class MoneyTransferService {
        console.log("payees is:",payees);
         // Map the payees to a structured format
         const rows = payees.map((payee) => ({
-            id: payee.nickName,
-            title: payee.nickName,
+            id: payee.nickName || null,
+            title: payee.nickName || null,
         }));
         const channel = process.env.CHANNEL.toLowerCase();
+
         let templateData;
+        console.log("rows is:",rows);
 
         switch (channel) {
             case "whatsapp":
                 const limitrows = rows.slice(0, 10);
-
                 templateData = {
                     type: "list",
                     sections: limitrows.map((row) => ({

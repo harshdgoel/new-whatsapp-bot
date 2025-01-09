@@ -32,13 +32,20 @@ const sendResponseToChannel = async (channel, phoneNumberId, to, message) => {
            const response = await sendToWhatsAppAPI(phoneNumberId, responseData);
 
         } else if (channel === "facebook") {
+            console.log("message is:",message)
             // Facebook Messenger-specific message formatting
             if (typeof message === "string") {
+                let messageText = message.bodyText;
+                if (messageText.length > 2000) {
+                    messageText = messageText.substring(0, 2000);
+                    console.warn("Message truncated to 2000 characters.");
+                }
+
                 // Plain text message
                 responseData = {
                     messaging_type: "MESSAGE_TAG",
                     recipient: { id: to },
-                    message: { text: message },
+                    message: { text: messageText },
                     tag: "CONFIRMED_EVENT_UPDATE", // Add a relevant tag
                 };
             } else if (message.text?.body) {
@@ -117,7 +124,7 @@ const sendToWhatsAppAPI = async (phoneNumberId, messageData) => {
 const sendToFacebookAPI = async (messageData) => {
     try {
         const response = await axios.post(
-            `https://graph.facebook.com/v20.0/me/messages`, // Correct endpoint
+            `https://graph.facebook.com/v20.0/me/messages`,
             messageData,
             {
                 headers: {
