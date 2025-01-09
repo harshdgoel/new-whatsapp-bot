@@ -72,6 +72,7 @@ class StateMachine {
 
 
     async handleMessage(from, messageBody, intent) {
+        console.log("from in handleMessage is", from);
         const userSession = this.getSession(from);
         console.log("entering handle message and state is:", userSession.state);
         console.log("entering handle message is:", messageBody);
