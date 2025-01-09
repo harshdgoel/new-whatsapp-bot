@@ -26,8 +26,10 @@ class BalanceService {
 
 console.log("respose is:", response);
       if (response.data && response.data.accounts) {
+          console.log("response.data present");
         const accounts = response.data.accounts;
 
+          console.log("accounts is:",accounts);
         // Filter accounts with missing or invalid required properties
         const validAccounts = accounts.filter(account => {
           return account.id?.value && account.id?.displayValue;
@@ -38,6 +40,7 @@ console.log("respose is:", response);
         }
 
         userSession.accounts = validAccounts; // Store valid accounts in the user session
+          console.log("validAccounts is:",validAccounts);
 
         // Generate rows for valid accounts
         const rows = validAccounts.map((account, index) => ({
