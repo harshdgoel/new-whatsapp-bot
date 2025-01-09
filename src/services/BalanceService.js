@@ -58,13 +58,13 @@ console.log("respose is:", response);
 
         // Generate the appropriate template structure based on the channel
         switch (channel) {
-       case "whatsapp":
+case "whatsapp":
     // Limit accounts to top 10
     const topAccounts = validAccounts.slice(0, 10);
 
     // Generate rows for the top 10 accounts
     const acc_rows = topAccounts.map((account, index) => ({
-        id:  account.id?.displayValue || `Account ${index + 1}`,
+        id: account.id?.displayValue || `Account ${index + 1}`,
         title: account.id?.displayValue || `Account ${index + 1}`, 
     }));
 
@@ -76,7 +76,7 @@ console.log("respose is:", response);
         type: "list",
         sections: [
             {
-                acc_rows, // Include rows for WhatsApp list
+                rows: acc_rows, // Correctly include rows for WhatsApp list
             },
         ],
         bodyText: "Please select an account to view details.",
@@ -85,7 +85,6 @@ console.log("respose is:", response);
         to: "917249318604", // Replace with the actual recipient number
     };
     break;
-
 
           case "facebook":
            templateData = {
