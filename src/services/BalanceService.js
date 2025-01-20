@@ -82,7 +82,7 @@ case "whatsapp":
         bodyText: "Please select an account to view details.",
         buttonText: "View Accounts",
         channel,
-        to: "917249318604", // Replace with the actual recipient number
+        to: userSession.mobileNumber, // Replace with the actual recipient number
     };
     break;
 
