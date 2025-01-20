@@ -4,11 +4,10 @@ const channel = process.env.CHANNEL;
 const MAX_ITEMS_PER_PAGE = 9;
 
 class HelpMeService {
-    static async helpMe(page = 1) {
+    static async helpMe(page = 1,from) {
         try {
             // Fetch the full help options string from messages
             const helpOptions = MessageService.getMessage('Help.helpOptions');
-            console.log("usersession.mobilenumebr is:",userSession.mobileNumber);
             // Split the options into an array
             const optionsList = helpOptions.split('\\n').map(option => option.trim());
 
@@ -56,7 +55,7 @@ class HelpMeService {
             bodyText: "How can I assist you today? Please select an option:",
             buttonText: "Help Options",
             channel,
-            to: userSession.mobileNumber,
+            to: from,
         };
         break;
 
