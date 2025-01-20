@@ -8,6 +8,7 @@ class HelpMeService {
         try {
             // Fetch the full help options string from messages
             const helpOptions = MessageService.getMessage('Help.helpOptions');
+            console.log("from in helpmeservice:", from);
             // Split the options into an array
             const optionsList = helpOptions.split('\\n').map(option => option.trim());
 
