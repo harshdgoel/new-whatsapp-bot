@@ -8,7 +8,7 @@ class HelpMeService {
         try {
             // Fetch the full help options string from messages
             const helpOptions = MessageService.getMessage('Help.helpOptions');
-
+            console.log("usersession.mobilenumebr is:",userSession.mobileNumber);
             // Split the options into an array
             const optionsList = helpOptions.split('\\n').map(option => option.trim());
 
@@ -56,7 +56,7 @@ class HelpMeService {
             bodyText: "How can I assist you today? Please select an option:",
             buttonText: "Help Options",
             channel,
-            to: "917249318604",
+            to: userSession.mobileNumber,
         };
         break;
 
