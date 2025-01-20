@@ -83,7 +83,7 @@ class StateMachine {
             userSession.state = states.HELP;
             userSession.mobileNumber = from;
             userSession.isHelpTriggered = true;
-            return await HelpMeService.helpMe(from);
+            return await HelpMeService.helpMe(userSession.currentHelpPage || 1, from);
         }
 
         if (userSession.state === states.HELP) {
