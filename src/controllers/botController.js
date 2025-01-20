@@ -21,7 +21,7 @@ const handleIncomingMessage = async (phoneNumberId, from, message) => {
     if (userSession.state === "HELP" && !userSession.isHelpTriggered) {
         const page = 1; // Initial page
         userSession.isHelpTriggered = true; // Set the flag to avoid duplicate sends
-        const helpMenu = await HelpMeService.helpMe(page);
+        const helpMenu = await HelpMeService.helpMe(page,from);
         await sendResponseToChannel(channel, phoneNumberId, from, helpMenu);
     }
 };
