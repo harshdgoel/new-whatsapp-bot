@@ -83,7 +83,7 @@ class StateMachine {
             userSession.state = states.HELP;
             userSession.mobileNumber = from;
             userSession.isHelpTriggered = true;
-            return await HelpMeService.helpMe();
+            return await HelpMeService.helpMe(from);
         }
 
         if (userSession.state === states.HELP) {
@@ -91,7 +91,7 @@ class StateMachine {
             if (messageBody === "View More") {
                 const nextPage = (userSession.currentHelpPage || 1) + 1;
                 userSession.currentHelpPage = nextPage;
-                return await HelpMeService.helpMe(nextPage);
+                return await HelpMeService.helpMe(nextPage,from);
             } else {
                 const selectedIntent = IntentService.identifyIntentFromHelpSelection(messageBody);
                 console.log("message body is:", messageBody);
