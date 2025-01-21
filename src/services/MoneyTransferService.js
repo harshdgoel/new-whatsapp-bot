@@ -49,10 +49,14 @@ class MoneyTransferService {
                 const limitrows = rows.slice(0, 10);
                 templateData = {
                     type: "list",
-                    sections: limitrows.map((row) => ({
-                        id: row.id,
-                        title: row.title,
-                    })),
+                     sections: [
+                        {
+                                rows: limitrows.map(row => ({
+                                id: row.id,
+                                title: row.title,
+                            })),
+                        },
+                    ],
                     bodyText: "Please select a payee to proceed.",
                     buttonText: "View Payees",
                     channel,
