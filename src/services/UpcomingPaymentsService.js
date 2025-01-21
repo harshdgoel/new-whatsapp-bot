@@ -13,13 +13,6 @@ const states = {
 
 class UpcomingPaymentsService {
     static async fetchPaymentsForSelectedAccount(selectedAccount, userSession) {
-        const token = LoginService.getToken();
-        const cookie = LoginService.getCookie();
-        if (!token || !cookie) {
-            userSession.state = states.OTP_VERIFICATION;
-            return "Please enter the One Time Password sent to your registered number.";
-        }
-
         const queryParams = new Map([
             ["pageSize", "10"],
             ["pageNumber", "1"],
