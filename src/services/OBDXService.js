@@ -34,12 +34,12 @@ class OBDXService {
     async invokeService(ctxPath, method, queryParam, body, loginService, userSession) {
         console.log("entering invokeservice and usersession is:",userSession);
         const headers = this.populateHeaders(loginService,userSession);
-        const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
+        const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body, userSession);
         return responseData;
     }
 
     // Helper method to make the API call
-    async serviceMeth(ctxPath, method, headers, queryParam, body) {
+    async serviceMeth(ctxPath, method, headers, queryParam, body, userSession) {
         console.log("entering service method");
         const url = URL + ctxPath + "?" + new URLSearchParams(queryParam).toString();
         console.log("url generated is",url);
@@ -64,10 +64,14 @@ if ([200, 201, 202].includes(response.status)) {
             const data = error.response?.data || {};
 
             if (statusCode === 417) {
+                console.log("entered 417 2fa ");
                 const challenge = headers["x-challenge"] ? JSON.parse(headers["x-challenge"]) : {};
                 const authType = challenge.authType || "UNKNOWN";
                 const refNo = challenge.referenceNo || null;
 
+                console.log("challenge:",challenge);
+                console.log("authType:",authType);
+                console.log("refNo:",refNo);
                 userSession.IS_OTP_REQUIRED = true;
                 userSession.AUTH_TYPE = authType;
                 userSession.XTOKENREFNO = refNo;
