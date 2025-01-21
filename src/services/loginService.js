@@ -1,77 +1,104 @@
 "use strict";
-
 const OBDXService = require('../services/OBDXService');
 const endpoints = require("../config/endpoints");
 const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 
 class LoginService {
     constructor() {
-        this.authCache = { token: null, cookie: null, anonymousToken: null };
-        this.mobileNumber = "919819250898";
+        // Map to store session details against user identifiers (phone number or Facebook ID)
+        this.userSessions = new Map();
     }
-    setAuthDetails(token, cookie) {
-        this.authCache.token = token;
-        this.authCache.cookie = cookie;
+
+    // Set auth details (token and cookie) for a specific user
+    setAuthDetails(userId, token, cookie) {
+        if (!this.userSessions.has(userId)) {
+            this.userSessions.set(userId, { token: null, cookie: null, anonymousToken: null });
+        }
+        const session = this.userSessions.get(userId);
+        session.token = token;
+        session.cookie = cookie;
+        this.userSessions.set(userId, session);
     }
-    setAnonymousToken(token) {
-        this.authCache.anonymousToken = token;
+
+    // Set anonymous token for a specific user
+    setAnonymousToken(userId, token) {
+        if (!this.userSessions.has(userId)) {
+            this.userSessions.set(userId, { token: null, cookie: null, anonymousToken: null });
+        }
+        const session = this.userSessions.get(userId);
+        session.anonymousToken = token;
+        this.userSessions.set(userId, session);
     }
-    getToken() {
-        return this.authCache.token;
+
+    // Get token for a specific user
+    getToken(userId) {
+        const session = this.userSessions.get(userId);
+        return session ? session.token : null;
     }
-    getCookie() {
-        return this.authCache.cookie;
+
+    // Get cookie for a specific user
+    getCookie(userId) {
+        const session = this.userSessions.get(userId);
+        return session ? session.cookie : null;
     }
-    getAnonymousToken() {
-        return this.authCache.anonymousToken;
+
+    // Get anonymous token for a specific user
+    getAnonymousToken(userId) {
+        const session = this.userSessions.get(userId);
+        return session ? session.anonymousToken : null;
     }
-    clearAuthCache() {
-        this.authCache = { token: null, cookie: null, anonymousToken: null };
+
+    // Clear auth details for a specific user
+    clearAuthCache(userId) {
+        this.userSessions.delete(userId);
     }
-    isTokenExpired() {
-        const token = this.getToken();
+
+    // Check if a user's token is expired
+    isTokenExpired(userId) {
+        const token = this.getToken(userId);
         if (!token) return true;
         try {
             const payloadBase64 = token.split('.')[1];
             const decodedPayload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
-            console.log("decodedPayload:",decodedPayload);
             const exp = decodedPayload.exp;
-            console.log("exp",exp);
+
             if (!exp) {
-                console.log("clearing token because exp not there");
-                this.clearAuthCache();
+                console.log("Clearing token because expiration time is missing.");
+                this.clearAuthCache(userId);
                 return true;
             }
 
             const isExpired = Date.now() >= exp * 1000;
             if (isExpired) {
-                console.log("isexpired so clearinge token",isExpired);
-                this.clearAuthCache();
+                console.log("Token expired. Clearing user session.");
+                this.clearAuthCache(userId);
             }
 
             return isExpired;
         } catch (error) {
             console.error("Error decoding token:", error.message);
-            this.clearAuthCache();
+            this.clearAuthCache(userId);
             return true;
         }
     }
-    async checkLogin() {
-        const token = this.getToken();
-        const cookie = this.getCookie();
+
+    // Check if a user is logged in
+    async checkLogin(userId) {
+        const token = this.getToken(userId);
+        const cookie = this.getCookie(userId);
         if (!token || !cookie) {
             return false;
         }
 
-        if (this.isTokenExpired()) {
+        if (this.isTokenExpired(userId)) {
             return false;
         }
         return true;
     }
 
-    async authenticateUser(mobileNumber,userSession) {
+    // Authenticate user (Step 1: Fetch anonymous token and OTP)
+    async authenticateUser(mobileNumber, userSession) {
         try {
-            // Step 1: Fetch anonymous token
             const tokenResponse = await OBDXService.serviceMeth(
                 endpoints.anonymousToken,
                 "POST",
@@ -79,55 +106,58 @@ class LoginService {
                 new Map(),
                 {}
             );
-    
+
             if (!tokenResponse) {
                 console.error("Failed to obtain anonymous token:", tokenResponse);
                 return { success: false, message: "Failed to initiate login. Please try again." };
             }
-    
-            console.log("first login call success and token is:",tokenResponse);
-            // Set anonymous token and cookies
-            this.setAnonymousToken(tokenResponse.headers.authorization);
+
+            console.log("First login call success. Anonymous token:", tokenResponse.headers.authorization);
+            const userId = mobileNumber;
+
+            // Save anonymous token for the user
+            this.setAnonymousToken(userId, tokenResponse.headers.authorization);
+
             const setCookie = tokenResponse.headers['set-cookie'];
             if (setCookie) {
-                this.authCache.cookie = setCookie;
+                const session = this.userSessions.get(userId) || {};
+                session.cookie = setCookie;
+                this.userSessions.set(userId, session);
             }
-            console.log("mobilenum in second login api call:",mobileNumber);
-            // Step 2: Verify OTP
+
+            console.log("Mobile number for second login API call:", mobileNumber);
+
             const otpResponse = await OBDXService.serviceMeth(
                 endpoints.login,
                 "POST",
                 new Map([
                     ["Content-Type", "application/json"],
                     ["x-digx-authentication-type", "CHATBOT"],
-                    ["Authorization", `Bearer ${this.getAnonymousToken()}`],
+                    ["Authorization", `Bearer ${this.getAnonymousToken(userId)}`],
                     ["X-Token-Type", "JWT"],
                     ["X-Target-Unit", defaultHomeEntity]
                 ]),
                 new Map(),
                 { mobileNumber: mobileNumber }
             );
-    
+
             if (otpResponse.data.status.result !== "SUCCESSFUL") {
                 console.error("OTP verification failed:", otpResponse);
                 return { success: false, message: "OTP verification failed. Please try again." };
             }
-    
-    
-        console.log("otpResponse.data is:",otpResponse.data);
-            // Extract values from otpResponse
+
+            console.log("OTP response data:", otpResponse.data);
+
             const { authType, token: counter, registrationId } = otpResponse.data;
             if (!registrationId) {
                 console.error("Registration ID missing in OTP response:", otpResponse);
                 return { success: false, message: "Registration ID missing. Please try again." };
             }
-    
-    
-           console.log("authType:",authType);
-           console.log("registration id is:",registrationId);
-           userSession.registrationId = registrationId;
 
-            // Generate the message based on authType
+            console.log("AuthType:", authType);
+            console.log("Registration ID:", registrationId);
+            userSession.registrationId = registrationId;
+
             let message;
             switch (authType) {
                 case "LOCAL":
@@ -144,7 +174,7 @@ class LoginService {
                     message = "Unknown authentication method. Please try again.";
                     break;
             }
-    
+
             return { success: true, registrationId, message };
         } catch (error) {
             console.error("Error during user authentication:", error.message);
@@ -152,49 +182,49 @@ class LoginService {
         }
     }
 
+    // Final login (Step 3: Verify OTP and log the user in)
+    async fetchFinalLoginResponse(otp, mobileNumber, registrationId) {
+        console.log("Entering final API call");
+        const userId = mobileNumber;
 
-//3RD CALL
-async fetchFinalLoginResponse(otp, mobileNumber, registrationId) {
-    console.log("entering final api call");
-    try {
-        const queryParams = new Map([["locale", "en"]]);
-        const finalLoginResponse = await OBDXService.serviceMeth(
-            endpoints.login,
-            "POST",
-            new Map([
-                ["Content-Type", "application/json"],
-                ["x-digx-authentication-type", "CHATBOT"],
-                ["TOKEN_ID", otp],
-                ["Authorization", `Bearer ${this.getAnonymousToken()}`],
-                ["X-Token-Type", "JWT"],
-                ["X-Target-Unit", defaultHomeEntity]
-            ]),
-            queryParams,
-            { mobileNumber: mobileNumber, registrationId: registrationId }
-        );
+        try {
+            const queryParams = new Map([["locale", "en"]]);
+            const finalLoginResponse = await OBDXService.serviceMeth(
+                endpoints.login,
+                "POST",
+                new Map([
+                    ["Content-Type", "application/json"],
+                    ["x-digx-authentication-type", "CHATBOT"],
+                    ["TOKEN_ID", otp],
+                    ["Authorization", `Bearer ${this.getAnonymousToken(userId)}`],
+                    ["X-Token-Type", "JWT"],
+                    ["X-Target-Unit", defaultHomeEntity]
+                ]),
+                queryParams,
+                { mobileNumber: mobileNumber, registrationId: registrationId }
+            );
 
-        const setCookieFinal = finalLoginResponse.headers['set-cookie'];
-        if (setCookieFinal) {
-            this.authCache.cookie = setCookieFinal.join('; ');
-        } else {
-            console.error("Cookie setting failed in final login.");
-            return { success: false, error: "Final login failed. Please try again." };
+            const setCookieFinal = finalLoginResponse.headers['set-cookie'];
+            if (setCookieFinal) {
+                this.setAuthDetails(userId, finalLoginResponse.data.token, setCookieFinal.join('; '));
+            } else {
+                console.error("Cookie setting failed in final login.");
+                return { success: false, error: "Final login failed. Please try again." };
+            }
+
+            return { success: true, userDetails: await this.fetchUserDetails(userId) };
+        } catch (error) {
+            console.error("Error during final login:", error.message);
+            return { success: false, error: "Error during final login. Please try again." };
         }
-
-        this.setAuthDetails(finalLoginResponse.data.token, this.getCookie());
-
-        // Optionally fetch user details
-        const userDetails = await this.fetchUserDetails();
-        return { success: true, userDetails };
-    } catch (error) {
-        console.error("Error during final login:", error.message);
-        return { success: false, error: "Error during final login. Please try again." };
     }
-}
-    async fetchUserDetails() {
+
+    // Fetch user details
+    async fetchUserDetails(userId) {
+        console.log("entering ME CALL");
         const headers = new Map([
-            ["Authorization", `Bearer ${this.getToken()}`],
-            ["Cookie", this.getCookie()],
+            ["Authorization", `Bearer ${this.getToken(userId)}`],
+            ["Cookie", this.getCookie(userId)],
             ["Content-Type", "application/json"],
             ["X-Token-Type", "JWT"]
         ]);
