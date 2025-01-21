@@ -390,7 +390,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 return balanceMessage;
 
             case "TRANSACTIONS":
-                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(userSession.selectedAccount);
+                const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(userSession.selectedAccount, userSession);
                 userSession.isHelpTriggered = false;
                 userSession.selectedAccount = null;
                 userSession.state = states.HELP;
