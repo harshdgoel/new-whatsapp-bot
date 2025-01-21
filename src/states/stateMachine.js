@@ -366,12 +366,14 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "TRANSACTIONS":
                 const transactionMessage = await RecentTransactionService.fetchTransactionsForSelectedAccount(userSession.selectedAccount);
                 userSession.isHelpTriggered = false;
+                userSession.selectedAccount = null;
                 userSession.state = states.HELP;
                 return transactionMessage;
 
             case "UPCOMINGPAYMENTS":
                 const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(userSession.selectedAccount);
                 userSession.isHelpTriggered = false;
+                userSession.selectedAccount = null;
                 userSession.state = states.HELP;
                 return paymentsMessage;
 
