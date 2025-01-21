@@ -63,7 +63,8 @@ class StateMachine {
             currentHelpPage: 1,
             IS_OTP_REQUIRED: null,
             AUTH_TYPE: null,
-            XTOKENREFNO: null
+            XTOKENREFNO: null,
+            otpAttempts: null
         };
         this.sessionCache.set(userId, userSession);
     }
@@ -167,8 +168,33 @@ class StateMachine {
         
         
         if (userSession.state === states.OTP_VERIFICATION) {
-            userSession.otp = messageBody;
-            return await this.handleOTPVerification(userSession);
+          
+             // Initialize otpAttempts if it doesn't exist
+    userSession.otpAttempts = userSession.otpAttempts || 0;
+
+    // Increment the OTP attempt counter
+    userSession.otpAttempts += 1;
+    console.log(`OTP attempt #${userSession.otpAttempts} for user: ${userSession.userId}`);
+
+    if (userSession.otpAttempts > 3) {
+        // OTP attempt limit reached
+        console.warn(`User ${userSession.userId} exceeded OTP attempt limit.`);
+        this.sessionCache.delete(userSession.userId); // Reset the session
+        return "You have exceeded the maximum number of OTP attempts. Please restart the process.";
+    }
+
+    // Proceed with OTP verification
+    userSession.otp = messageBody;
+    const verificationResult = await this.handleOTPVerification(userSession);
+
+    if (!verificationResult.success && userSession.otpAttempts === 3) {
+        // Handle failed attempt on the last try
+        console.error("Final OTP attempt failed.");
+        this.sessionCache.delete(userSession.userId); // Reset the session
+        return "Your session has been reset due to multiple incorrect OTP attempts. Please restart the process.";
+    }
+
+    return verificationResult;
         }
        
         if (userSession.state === states.RESOLVE_AMOUNT) {
