@@ -75,7 +75,7 @@ if ([200, 201, 202].includes(response.status)) {
                 userSession.IS_OTP_REQUIRED = true;
                 userSession.AUTH_TYPE = authType;
                 userSession.XTOKENREFNO = refNo;
-                userSession.state = states.ACCOUNT_SELECTION;
+                userSession.state = "ACCOUNT_SELECTION";
 
                 if (authType === "OTP") {
                     return "Please enter the One Time Password (OTP) sent to your registered number.";
