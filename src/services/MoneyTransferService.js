@@ -15,13 +15,6 @@ const states = {
 
 class MoneyTransferService {
    static async fetchPayees(userSession) {
-    const token = LoginService.getToken();
-    const cookie = LoginService.getCookie();
-
-    if (!token || !cookie) {
-        userSession.state = states.OTP_VERIFICATION;
-        return "Please enter the One Time Password sent to your registered number.";
-    }
 
     try {
         const queryParams = new Map([
