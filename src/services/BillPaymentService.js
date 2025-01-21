@@ -57,7 +57,7 @@ class BillPaymentService {
                         bodyText: "Please select a Biller",
                         buttonText: "View Billers",
                         channel,
-                        to: "917249318604", // Replace with actual recipient number
+                        to: userSession.mobileNumber, // Replace with actual recipient number
                     };
                     break;
 
