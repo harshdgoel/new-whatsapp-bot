@@ -359,6 +359,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "BALANCE":
                 const balanceMessage = await BalanceService.fetchBalanceForSelectedAccount(userSession.selectedAccount, userSession);
                  userSession.isHelpTriggered = false;
+                userSession.selectedAccount = null;
                 userSession.state = states.HELP;
                 return balanceMessage;
 
