@@ -44,7 +44,7 @@ class StateMachine {
     if (!userSession) {
         logger.log(`Creating a new session for user: ${userId}`);
         userSession = {
-            userId: userId,
+            userId,
             state: states.HELP,
             lastIntent: null,
             otp: null,
