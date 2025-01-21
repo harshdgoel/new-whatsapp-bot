@@ -397,7 +397,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 return transactionMessage;
 
             case "UPCOMINGPAYMENTS":
-                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(userSession.selectedAccount);
+                const paymentsMessage = await UpcomingPaymentsService.fetchPaymentsForSelectedAccount(userSession.selectedAccount, userSession);
                 userSession.isHelpTriggered = false;
                 userSession.selectedAccount = null;
                 userSession.state = states.HELP;
