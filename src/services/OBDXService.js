@@ -6,9 +6,8 @@ const defaultHomeEntity = process.env.DEFAULT_HOME_ENTITY;
 class OBDXService {
     // Constructs and returns headers for API calls
     populateHeaders(loginService,userSession) {
-        const token = loginService.getToken();
-        const cookie = loginService.getCookie();
-
+         const token = loginService.getToken(userSession.userId);
+         const cookie = loginService.getCookie(userSession.userId);
         if (!token || !cookie) {
             throw new Error("Missing token or cookie for API call.");
         }        
@@ -32,7 +31,7 @@ class OBDXService {
     }
 
     // Main method to invoke services
-    async invokeService(ctxPath, method, queryParam, body, loginService,userSession) {
+    async invokeService(ctxPath, method, queryParam, body, loginService, userSession) {
         console.log("entering invokeservice and usersession is:",userSession);
         const headers = this.populateHeaders(loginService,userSession);
         const responseData = await this.serviceMeth(ctxPath, method, headers, queryParam, body);
