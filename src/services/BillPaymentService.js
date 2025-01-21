@@ -31,10 +31,12 @@ class BillPaymentService {
             console.log("Billers list is:", billers);
             userSession.billers = billers;
 
-            const rows = billers.map(biller => ({
-                id: biller.billerId,
-                title: biller.billerNickName,
-            }));
+             // Generate unique row IDs
+        const rows = billers.map((biller, index) => ({
+            id: `${biller.billerId}_${index}`, // Append index to ensure uniqueness
+            title: biller.billerNickName,
+        }));
+
 
             console.log("Biller rows:", rows);
             const channel = process.env.CHANNEL.toLowerCase();
