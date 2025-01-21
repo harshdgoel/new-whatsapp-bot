@@ -407,6 +407,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 console.log("User session in BILLPAYMENT state is:", userSession);
                 const billPaymentMessage = await BillPaymentService.completePayment(userSession);
                 userSession.isHelpTriggered = false;
+                userSession.selectedAccount = null;
                 userSession.state = states.HELP;
                 return billPaymentMessage;
 
@@ -417,6 +418,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                 }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
                 userSession.isHelpTriggered = false;
+                userSession.selectedAccount = null;
                 userSession.state = states.HELP;
                 return transferPaymentMessage;
 
