@@ -30,6 +30,7 @@ class MoneyTransferService {
             userSession
         );
 
+    console.log("money transfer payee response is:", response);
     const payees = response?.data?.items || [];
         userSession.payees = payees;
        console.log("payees is:",payees);
