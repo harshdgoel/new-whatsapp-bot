@@ -12,13 +12,6 @@ const states = {
 
 class RecentTransactionService {
     static async fetchTransactionsForSelectedAccount(selectedAccount, userSession) {
-        const token = LoginService.getToken();
-        const cookie = LoginService.getCookie();
-        if (!token || !cookie) {
-            userSession.state = states.OTP_VERIFICATION;
-            return "Please enter the One Time Password sent to your registered number.";
-        }
-
         const queryParams = new Map([["searchBy", "CPR"], ["transactionType", "A"], ["locale", "en"]]);
         const endpointUrl = `${endpoints.transactions}/${selectedAccount.id.value}/transactions`;
 
