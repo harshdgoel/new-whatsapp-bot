@@ -44,14 +44,18 @@ class BillPaymentService {
                 case "whatsapp":
                     templateData = {
                         type: "list",
-                        sections: rows.map(row => ({
-                            id: row.id,
-                            title: row.title,
-                        })),
-                        bodyText: "Please select an account to view details.",
-                        buttonText: "View Accounts",
+                        sections: [
+                        {
+                                rows: rows.map(row => ({
+                                id: row.id,
+                                title: row.title,
+                            })),
+                        },
+                    ],
+                        bodyText: "Please select a Biller",
+                        buttonText: "View Billers",
                         channel,
-                        to: "916378582419", // Replace with actual recipient number
+                        to: "917249318604", // Replace with actual recipient number
                     };
                     break;
 
