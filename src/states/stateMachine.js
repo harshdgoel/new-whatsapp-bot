@@ -100,7 +100,11 @@ class StateMachine {
                 if (selectedIntent && selectedIntent !== "UNKNOWN") {
                     userSession.lastIntent = selectedIntent;
                     return await this.processIntent(userSession, selectedIntent);
-                } else {
+                } 
+                    else if(userSession.XTOKENREFNO != null){
+                        return await this.handleAccountSelection(userSession, messageBody);
+                    }
+                else {
                     userSession.isHelpTriggered = false;
                     userSession.state = states.HELP;
                     return "Invalid selection. Please choose a valid option from the menu.";
@@ -414,6 +418,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "TRANSFERMONEY":
                 console.log("User session in TRANSFERMONEY state is:", userSession);
                 if (userSession.XTOKENREFNO) {
+                    userSession.lastIntent = "TRANSFERMONEY";
                     userSession.authOTP = messageBody;
                 }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
