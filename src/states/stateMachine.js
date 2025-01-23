@@ -417,9 +417,11 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
                     userSession.authOTP = messageBody;
                 }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
+                if (!userSession.XTOKENREFNO) {
                 userSession.isHelpTriggered = false;
                 userSession.selectedAccount = null;
                 userSession.state = states.HELP;
+                    }
                 return transferPaymentMessage;
 
             default:
