@@ -192,6 +192,7 @@ static async completePayment(userSession) {
         if (response && response.status === "SUCCESS") {
             return `Transfer successful! Reference Number: ${response.referenceNumber}`;
         } else if(userSession.XTOKENREFNO!== null){
+            console.log("entering userSession.XTOKENREFNO!== null");
             userSession.state = "ACCOUNT_SELECTION";
             return "Please enter the One Time Password (OTP) sent to your registered number.";
         }
