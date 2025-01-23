@@ -89,7 +89,7 @@ class MoneyTransferService {
     }
 }
 
-    
+
     static confirmTransferAmount(userSession, selectedPayee) {
         console.log("userSession.lastIntent in confirm amount is:", userSession.lastIntent);
         userSession.selectedPayee = selectedPayee;
@@ -97,7 +97,7 @@ class MoneyTransferService {
         return "Enter the amount to be paid.";
     }
 
-    
+
 static async completePayment(userSession) {
     console.log("entering complete payment in money transfer and user session is: ", userSession);
     const { selectedPayee, amount, selectedAccount } = userSession;
@@ -193,11 +193,8 @@ static async completePayment(userSession) {
             return `Transfer successful! Reference Number: ${response.referenceNumber}`;
         } else if(userSession.XTOKENREFNO!== null){
             console.log("entering userSession.XTOKENREFNO!== null");
-            userSession.state = "TRANSFERMONEY";
+            userSession.state = "ACCOUNT_SELECTION";
             return "Please enter the One Time Password (OTP) sent to your registered number.";
-        }
-        else{
-            console.log("Response is: ", response);
         }
     } catch (error) {
         console.error("Error completing payment:", error.message);
@@ -205,26 +202,26 @@ static async completePayment(userSession) {
     }
 }
 
-    
+
     static parsePayeeSelection(payeeNickName, payees) {
         console.log("Parsing selected payee");
         if (!Array.isArray(payees) || payees.length === 0) {
             console.error("Payees list is empty or invalid");
             return null;
         }
-    
+
         const selectedPayee = payees.find(
             payee => payee.nickName.toLowerCase() === payeeNickName.toLowerCase()
         );
-    
+
         if (!selectedPayee) {
             console.warn(`Payee with nickname "${payeeNickName}" not found.`);
             return null;
         }
-    
+
         return selectedPayee;
     }
-    
+
 }
 
 module.exports = MoneyTransferService;
