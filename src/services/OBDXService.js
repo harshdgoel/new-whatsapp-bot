@@ -68,7 +68,6 @@ if ([200, 201, 202].includes(response.status)) {
                 const challenge = headers["x-challenge"] ? JSON.parse(headers["x-challenge"]) : {};
                 const authType = challenge.authType || "UNKNOWN";
                 const refNo = challenge.referenceNo || null;
-
                 console.log("challenge:",challenge);
                 console.log("authType:",authType);
                 console.log("refNo:",refNo);
@@ -76,8 +75,8 @@ if ([200, 201, 202].includes(response.status)) {
                 userSession.AUTH_TYPE = authType;
                 userSession.XTOKENREFNO = refNo;
                 userSession.state = "ACCOUNT_SELECTION";
-
                 if (authType === "OTP") {
+                    console.log("return for authtype OTP");
                     return "Please enter the One Time Password (OTP) sent to your registered number.";
                 } else if (authType === "TOTP") {
                     return "Please enter your Time-based One Time Password (TOTP).";
