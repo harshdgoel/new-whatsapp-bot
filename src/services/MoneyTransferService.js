@@ -196,6 +196,9 @@ static async completePayment(userSession) {
             userSession.state = "ACCOUNT_SELECTION";
             return "Please enter the One Time Password (OTP) sent to your registered number.";
         }
+        else{
+            console.log("Response is: ", response);
+        }
     } catch (error) {
         console.error("Error completing payment:", error.message);
         return "An error occurred during the transfer. Please try again later.";
