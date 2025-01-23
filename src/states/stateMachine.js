@@ -100,11 +100,7 @@ class StateMachine {
                 if (selectedIntent && selectedIntent !== "UNKNOWN") {
                     userSession.lastIntent = selectedIntent;
                     return await this.processIntent(userSession, selectedIntent);
-                } 
-                    else if(userSession.XTOKENREFNO != null){
-                        return await this.handleAccountSelection(userSession, messageBody);
-                    }
-                else {
+                } else {
                     userSession.isHelpTriggered = false;
                     userSession.state = states.HELP;
                     return "Invalid selection. Please choose a valid option from the menu.";
@@ -169,10 +165,10 @@ class StateMachine {
         return "Invalid selection. Please choose a valid biller from the list.";
     }
     }
-        
-        
+
+
         if (userSession.state === states.OTP_VERIFICATION) {
-          
+
              // Initialize otpAttempts if it doesn't exist
     userSession.otpAttempts = userSession.otpAttempts || 0;
 
@@ -200,7 +196,7 @@ class StateMachine {
 
     return verificationResult;
         }
-       
+
         if (userSession.state === states.RESOLVE_AMOUNT) {
             console.log("entering resolve amount state");
 const regex = /^([A-Z]{3})\s(\d+(\.\d{1,2})?)$/; // Regex to match "USD 300" format
@@ -326,7 +322,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
         }
     }
 
-    
+
     async handleBillPayments(userSession) {
         console.log("entering bill pay handleBillPayments");
         const accountsResult = await BalanceService.initiateBalanceInquiry(userSession);
@@ -366,7 +362,7 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
 
  async handleAccountSelection(userSession, messageBody) {
     console.log("Entering handleAccountSelection");
-    
+
     // Parse and set selectedAccount only if not already set in the userSession
     if (!userSession.selectedAccount) {
         const parsedAccount = BalanceService.parseAccountSelection(messageBody, userSession.accounts);
@@ -418,15 +414,12 @@ const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             case "TRANSFERMONEY":
                 console.log("User session in TRANSFERMONEY state is:", userSession);
                 if (userSession.XTOKENREFNO) {
-                    userSession.lastIntent = "TRANSFERMONEY";
                     userSession.authOTP = messageBody;
                 }
                 const transferPaymentMessage = await MoneyTransferService.completePayment(userSession);
-                if (!userSession.XTOKENREFNO) {
                 userSession.isHelpTriggered = false;
                 userSession.selectedAccount = null;
                 userSession.state = states.HELP;
-                    }
                 return transferPaymentMessage;
 
             default:
