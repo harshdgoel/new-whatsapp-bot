@@ -137,9 +137,10 @@ case "whatsapp":
       return "Unable to fetch balance at this time. Please try again later.";
     }
   }
-
+    
   static parseAccountSelection(accountId, accounts) {
-    return accounts.find(account => account.id.displayValue === accountId);
-  }
+    const cleanAccountId = accountId.split('_')[0]; 
+    return accounts.find(account => account.id.displayValue === cleanAccountId);
+}
 }
 module.exports = BalanceService;
