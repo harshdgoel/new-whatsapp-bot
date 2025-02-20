@@ -64,7 +64,7 @@ case "whatsapp":
 
     // Generate rows for the top 10 accounts
     const acc_rows = topAccounts.map((account, index) => ({
-        id: account.id?.displayValue || `Account ${index + 1}`,
+        id: `${account.id?.displayValue || `Account_${index}`}_${index}`,
         title: account.id?.displayValue || `Account ${index + 1}`, 
     }));
 
