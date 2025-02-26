@@ -258,7 +258,7 @@ if (match) {
         if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT","TRANSFERMONEY"].includes(intent)) {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
             console.log("isloggedin is:",isLoggedIn);
-            if (!isLoggedIn) {
+            if (!isLoggedIn && !(process.env.CHANNEL === "facebook")) {
                 userSession.lastIntent = intent;
             if (process.env.CHANNEL === "facebook") {
                 userSession.state = states.FETCH_MOBILE_NUMBER;
