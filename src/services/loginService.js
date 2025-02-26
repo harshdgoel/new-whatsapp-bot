@@ -87,10 +87,12 @@ class LoginService {
         const token = this.getToken(userId);
         const cookie = this.getCookie(userId);
         if (!token || !cookie) {
+            console.log("token expired", userId);
             return false;
         }
 
         if (this.isTokenExpired(userId)) {
+            console.log("token expired", userId);
             return false;
         }
         return true;
