@@ -68,11 +68,6 @@ class StateMachine {
         };
         this.sessionCache.set(userId, userSession);
     }
-     // If it's Facebook, replace userId with mobileNumber after login to beremovedddddddd
-    if (userSession.mobileNumber) {
-        logger.log(`Replacing Facebook userId ${userId} with mobileNumber ${userSession.mobileNumber}`);
-        return this.sessionCache.get(userSession.mobileNumber) || userSession;
-    }
     return userSession;
 }
 
