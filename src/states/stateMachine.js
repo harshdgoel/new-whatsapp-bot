@@ -257,6 +257,7 @@ if (match) {
         console.log("entering processIntent and intent is:", intent);
         if (["BALANCE", "TRANSACTIONS", "UPCOMINGPAYMENTS","BILLPAYMENT","TRANSFERMONEY"].includes(intent)) {
 const isLoggedIn = await LoginService.checkLogin(userSession.userId);
+            console.log("isloggedin is:",isLoggedIn);
             if (!isLoggedIn) {
                 userSession.lastIntent = intent;
             if (process.env.CHANNEL === "facebook") {
