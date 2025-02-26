@@ -17,6 +17,8 @@ class LoginService {
         const session = this.userSessions.get(userId);
         session.token = token;
         session.cookie = cookie;
+        console.log("session.token",  session.token);
+        console.log("session.cookie",  session.cookie);
         this.userSessions.set(userId, session);
     }
 
