@@ -35,23 +35,27 @@ class LoginService {
     // Get token for a specific user
     getToken(userId) {
         const session = this.userSessions.get(userId);
+        console.log("session in gettoken: ",session);
         return session ? session.token : null;
     }
 
     // Get cookie for a specific user
     getCookie(userId) {
         const session = this.userSessions.get(userId);
+        console.log("session in getcookie", session);
         return session ? session.cookie : null;
     }
 
     // Get anonymous token for a specific user
     getAnonymousToken(userId) {
         const session = this.userSessions.get(userId);
+        console.log("session in getanontoken", session);
         return session ? session.anonymousToken : null;
     }
 
     // Clear auth details for a specific user
     clearAuthCache(userId) {
+        console.log("clearing auth cache");
         this.userSessions.delete(userId);
     }
 
